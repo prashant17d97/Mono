@@ -1,3 +1,466 @@
 <resources>
     <string name="app_name">Mono</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="remember_me">Remember Me!</string>
+    <string name="invalid_username">Username field must not be empty!</string>
+    <string name="invalid_password">Password field must not be empty!</string>
+
+    <string name="someError">Some error occurred!</string>
+    <string name="your_device_offline">You\'re offline</string>
+    <string name="note">Note</string>
+    <string name="all">All</string>
+    <string name="expense">Expense</string>
+    <string name="category">Category</string>
+    <string name="addCategory">Add Category</string>
+    <string name="editCategory">Edit Category</string>
+    <string name="submit">Submit</string>
+    <string name="delete_all">Delete All Transactions</string>
+    <string name="delete_success">All Transactions has been deleted successfully!</string>
+    <string name="delete_failed">Failed to delete all transactions!</string>
+    <string name="delete">Delete</string>
+    <string name="no_data">There is no data to delete!</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="income">Income</string>
+    <string name="currentBalance">Current Balance</string>
+    <string name="totalBalance">Total Available Balance</string>
+    <string name="thisMonthTotalBalance">%s Balance</string>
+    <string name="previousBalance">Previous Balance</string>
+    <string name="zero">0.00</string>
+    <string name="input">Please Input</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="equal">=</string>
+    <string name="okay">Okay</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="back">Back</string>
+    <string name="add">Add</string>
+    <string name="icon">Icon</string>
+    <string name="please_input">Please input</string>
+    <string name="remove">Remove</string>
+    <string name="currency">Currency</string>
+    <string name="save">Save</string>
+    <string name="appearance">Appearance</string>
+    <string name="font">Font Family</string>
+    <string name="introHeading1">Easy to add new dailyTransaction</string>
+    <string name="introHeading2">Track income and expenses</string>
+    <string name="introHeading3">Easy to add new dailyTransaction</string>
+    <string name="introDescription1">We always try to bring the best experience to users. Your transactions are recorded as quickly as possible. You will not have any difficulties when you first use MoNo.</string>
+    <string name="introDescription2">Details tracking transactions visually with the adding images features bills</string>
+    <string name="introDescription3">Supports viewing your balance for monthly, income and expenses, debts, loans as well as reports with category.</string>
+    <string name="setting">Setting</string>
+    <string name="addMore">Add more</string>
+    <string name="skip">Skip</string>
+    <string name="conti">Continue</string>
+    <string name="getStarted">Get started</string>
+    <string name="characterWarning">You can not add more character!</string>
+
+
+    <string name="reminderCaption">Mono will reminder to note dailyTransaction on this time everyday.</string>
+    <string name="setReminder">Set Reminder</string>
+    <string name="removeReminder">Remove Reminder</string>
+
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+
+    <!--Theme Mode-->
+    <string name="default_mode">Default</string>
+
+    <!--Icon's Name-->
+    <string name="coffee">Coffee</string>
+    <string name="dynamicColor">Dynamic Color</string>
+
+    <!--Currency-->
+    <string name="inr">INR</string>
+    <string name="inrIcon">₹</string>
+
+    <string name="usd">USD</string>
+    <string name="usdIcon">$</string>
+
+    <string name="eur">EUR</string>
+    <string name="eurIcon">€</string>
+
+    <string name="reminder">Reminder</string>
+
+    <string-array name="currenciesIcon">
+        <item>@string/inrIcon</item>
+        <item>@string/usdIcon</item>
+        <item>@string/eurIcon</item>
+    </string-array>
+
+    <string-array name="currencyCode">
+        <item>@string/inr</item>
+        <item>@string/usd</item>
+        <item>@string/eur</item>
+    </string-array>
+
+
+    <!--Weeks-->
+
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+
+    <!--Weeks Array-->
+    <string-array name="weeks">
+        <item>@string/sun</item>
+        <item>@string/mon</item>
+        <item>@string/tue</item>
+        <item>@string/wed</item>
+        <item>@string/thu</item>
+        <item>@string/fri</item>
+        <item>@string/sat</item>
+    </string-array>
+
+    <!--Months-->
+    <string name="Jan">January</string>
+    <string name="Feb">February</string>
+    <string name="Mar">March</string>
+    <string name="Apr">April</string>
+    <string name="May">May</string>
+    <string name="Jun">June</string>
+    <string name="Jul">July</string>
+    <string name="Aug">August</string>
+    <string name="Sep">September</string>
+    <string name="Oct">October</string>
+    <string name="Nov">November</string>
+    <string name="Dec">December</string>
+
+    <!--Months Array-->
+    <string-array name="months">
+        <item>@string/Jan</item>
+        <item>@string/Feb</item>
+        <item>@string/Mar</item>
+        <item>@string/Apr</item>
+        <item>@string/May</item>
+        <item>@string/Jun</item>
+        <item>@string/Jul</item>
+        <item>@string/Aug</item>
+        <item>@string/Sep</item>
+        <item>@string/Oct</item>
+        <item>@string/Nov</item>
+        <item>@string/Dec</item>
+    </string-array>
+
+
+    <string name="language">Language</string>
+
+    <!--Language Array-->
+    <string name="hindi">Hindi</string>
+    <string name="english">English</string>
+
+    <string-array name="language">
+        <item>@string/hindi</item>
+        <item>@string/english</item>
+    </string-array>
+
+    <!--Font Families-->
+    <string name="concertOne">Concert One</string>
+    <string name="dosis">Dosis</string>
+    <string name="lato">Lato</string>
+    <string name="merriweather">Merriweather</string>
+    <string name="montserrat">Montserrat</string>
+    <string name="openSans">Open Sans</string>
+    <string name="poppins">Poppins</string>
+    <string name="raleway">Raleway</string>
+    <string name="roboto">Roboto</string>
+    <string name="slabo13px">Slabo 13px</string>
+
+
+    <string-array name="fontFamilies">
+        <item>@string/concertOne</item>
+        <item>@string/dosis</item>
+        <item>@string/lato</item>
+        <item>@string/merriweather</item>
+        <item>@string/montserrat</item>
+        <item>@string/openSans</item>
+        <item>@string/poppins</item>
+        <item>@string/raleway</item>
+        <item>@string/roboto</item>
+        <item>@string/slabo13px</item>
+    </string-array>
+
+
+    <!--Hours-->
+    <string name="hours01">01</string>
+    <string name="hours02">02</string>
+    <string name="hours03">03</string>
+    <string name="hours04">04</string>
+    <string name="hours05">05</string>
+    <string name="hours06">06</string>
+    <string name="hours07">07</string>
+    <string name="hours08">08</string>
+    <string name="hours09">09</string>
+    <string name="hours10">10</string>
+    <string name="hours11">11</string>
+    <string name="hours12">12</string>
+    <string name="hours13">13</string>
+    <string name="hours14">14</string>
+    <string name="hours15">15</string>
+    <string name="hours16">16</string>
+    <string name="hours17">17</string>
+    <string name="hours18">18</string>
+    <string name="hours19">19</string>
+    <string name="hours20">20</string>
+    <string name="hours21">21</string>
+    <string name="hours22">22</string>
+    <string name="hours23">23</string>
+    <string name="hours24">24</string>
+
+    <!--Hours Array-->
+    <string-array name="hours_12">
+        <item>@string/hours01</item>
+        <item>@string/hours02</item>
+        <item>@string/hours03</item>
+        <item>@string/hours04</item>
+        <item>@string/hours05</item>
+        <item>@string/hours06</item>
+        <item>@string/hours07</item>
+        <item>@string/hours08</item>
+        <item>@string/hours09</item>
+        <item>@string/hours10</item>
+        <item>@string/hours11</item>
+        <item>@string/hours12</item>
+    </string-array>
+
+    <string-array name="hours_24">
+        <item>@string/hours01</item>
+        <item>@string/hours02</item>
+        <item>@string/hours03</item>
+        <item>@string/hours04</item>
+        <item>@string/hours05</item>
+        <item>@string/hours06</item>
+        <item>@string/hours07</item>
+        <item>@string/hours08</item>
+        <item>@string/hours09</item>
+        <item>@string/hours10</item>
+        <item>@string/hours11</item>
+        <item>@string/hours12</item>
+        <item>@string/hours13</item>
+        <item>@string/hours14</item>
+        <item>@string/hours15</item>
+        <item>@string/hours16</item>
+        <item>@string/hours17</item>
+        <item>@string/hours18</item>
+        <item>@string/hours19</item>
+        <item>@string/hours20</item>
+        <item>@string/hours21</item>
+        <item>@string/hours22</item>
+        <item>@string/hours23</item>
+        <item>@string/hours24</item>
+    </string-array>
+
+    <!--minutes-->
+    <string name="minute00">00</string>
+    <string name="minute01">01</string>
+    <string name="minute02">02</string>
+    <string name="minute03">03</string>
+    <string name="minute04">04</string>
+    <string name="minute05">05</string>
+    <string name="minute06">06</string>
+    <string name="minute07">07</string>
+    <string name="minute08">08</string>
+    <string name="minute09">09</string>
+    <string name="minute10">10</string>
+    <string name="minute11">11</string>
+    <string name="minute12">12</string>
+    <string name="minute13">13</string>
+    <string name="minute14">14</string>
+    <string name="minute15">15</string>
+    <string name="minute16">16</string>
+    <string name="minute17">17</string>
+    <string name="minute18">18</string>
+    <string name="minute19">19</string>
+    <string name="minute20">20</string>
+    <string name="minute21">21</string>
+    <string name="minute22">22</string>
+    <string name="minute23">23</string>
+    <string name="minute24">24</string>
+    <string name="minute25">25</string>
+    <string name="minute26">26</string>
+    <string name="minute27">27</string>
+    <string name="minute28">28</string>
+    <string name="minute29">29</string>
+    <string name="minute30">30</string>
+    <string name="minute31">31</string>
+    <string name="minute32">32</string>
+    <string name="minute33">33</string>
+    <string name="minute34">34</string>
+    <string name="minute35">35</string>
+    <string name="minute36">36</string>
+    <string name="minute37">37</string>
+    <string name="minute38">38</string>
+    <string name="minute39">39</string>
+    <string name="minute40">40</string>
+    <string name="minute41">41</string>
+    <string name="minute42">42</string>
+    <string name="minute43">43</string>
+    <string name="minute44">44</string>
+    <string name="minute45">45</string>
+    <string name="minute46">46</string>
+    <string name="minute47">47</string>
+    <string name="minute48">48</string>
+    <string name="minute49">49</string>
+    <string name="minute50">50</string>
+    <string name="minute51">51</string>
+    <string name="minute52">52</string>
+    <string name="minute53">53</string>
+    <string name="minute54">54</string>
+    <string name="minute55">55</string>
+    <string name="minute56">56</string>
+    <string name="minute57">57</string>
+    <string name="minute58">58</string>
+    <string name="minute59">59</string>
+
+    <!--minutes Array-->
+    <string-array name="minutes">
+        <item>@string/minute00</item>
+        <item>@string/minute01</item>
+        <item>@string/minute02</item>
+        <item>@string/minute03</item>
+        <item>@string/minute04</item>
+        <item>@string/minute05</item>
+        <item>@string/minute06</item>
+        <item>@string/minute07</item>
+        <item>@string/minute08</item>
+        <item>@string/minute09</item>
+        <item>@string/minute10</item>
+        <item>@string/minute11</item>
+        <item>@string/minute12</item>
+        <item>@string/minute13</item>
+        <item>@string/minute14</item>
+        <item>@string/minute15</item>
+        <item>@string/minute16</item>
+        <item>@string/minute17</item>
+        <item>@string/minute18</item>
+        <item>@string/minute19</item>
+        <item>@string/minute20</item>
+        <item>@string/minute21</item>
+        <item>@string/minute22</item>
+        <item>@string/minute23</item>
+        <item>@string/minute24</item>
+        <item>@string/minute25</item>
+        <item>@string/minute26</item>
+        <item>@string/minute27</item>
+        <item>@string/minute28</item>
+        <item>@string/minute29</item>
+        <item>@string/minute30</item>
+        <item>@string/minute31</item>
+        <item>@string/minute32</item>
+        <item>@string/minute33</item>
+        <item>@string/minute34</item>
+        <item>@string/minute35</item>
+        <item>@string/minute36</item>
+        <item>@string/minute37</item>
+        <item>@string/minute38</item>
+        <item>@string/minute39</item>
+        <item>@string/minute40</item>
+        <item>@string/minute41</item>
+        <item>@string/minute42</item>
+        <item>@string/minute43</item>
+        <item>@string/minute44</item>
+        <item>@string/minute45</item>
+        <item>@string/minute46</item>
+        <item>@string/minute47</item>
+        <item>@string/minute48</item>
+        <item>@string/minute49</item>
+        <item>@string/minute50</item>
+        <item>@string/minute51</item>
+        <item>@string/minute52</item>
+        <item>@string/minute53</item>
+        <item>@string/minute54</item>
+        <item>@string/minute55</item>
+        <item>@string/minute56</item>
+        <item>@string/minute57</item>
+        <item>@string/minute58</item>
+        <item>@string/minute59</item>
+    </string-array>
+
+
+    <!--Time Format-->
+    <string name="AM">AM</string>
+    <string name="PM">PM</string>
+    <string name="food">Food</string>
+    <string name="salary">Salary</string>
+
+    <!--Time Format Array-->
+    <string-array name="format">
+        <item>@string/AM</item>
+        <item>@string/PM</item>
+    </string-array>
+
+    <!--Camera and gallery -->
+    <string name="permission_required">Permission Required</string>
+    <string name="permission_explanation">This app needs access to storage and camera to allow you to select an image from your gallery or capture one using the camera.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="select_image">Select Image</string>
+    <string name="capture_image">Capture Image</string>
+    <string name="app_config_saved">New config applied!</string>
+    <string name="alert">Alert</string>
+
+    <!--Alert Dialog-->
+
+    <string name="delete_all_transactions">Are you sure you want to delete all transactions?</string>
+    <string name="seeMore">See more..</string>
+
+    <!--Filter-->
+    <string name="this_month">This Month</string>
+    <string name="last_month">Last Month</string>
+    <string name="last_three_month">Last Three Month</string>
+    <string name="last_six_month">Last Six Month</string>
+    <string name="custom_range">Custom Range</string>
+
+
+    <!--Icons-->
+    <string name="baby">Baby</string>
+    <string name="bank">Bank</string>
+    <string name="bird">Bird</string>
+    <string name="boat">Boat</string>
+    <string name="books">Books</string>
+    <string name="car">Car</string>
+    <string name="cat">Cat</string>
+    <string name="coin">Coin</string>
+    <string name="cook">Cook</string>
+    <string name="cup">Cup</string>
+    <string name="dinner">Dinner</string>
+    <string name="dog">Dog</string>
+    <string name="face_mask">Face-mask</string>
+    <string name="flower">Flower</string>
+    <string name="gas">Gas</string>
+    <string name="gift">Gift</string>
+    <string name="gym">Gym</string>
+    <string name="house">House</string>
+    <string name="lawyer">Lawyer</string>
+    <string name="medicine">Medicine</string>
+    <string name="music">Music</string>
+    <string name="_package">Package</string>
+    <string name="party">Party</string>
+    <string name="pie">Pie</string>
+    <string name="pill">Pill</string>
+    <string name="sea">Sea</string>
+    <string name="study">Study</string>
+    <string name="tennisball">TennisBall</string>
+    <string name="train">Train</string>
+    <string name="groceries">Groceries</string>
+    <string name="noTransactionFound">No Transaction Found!</string>
+    <string name="select_date_range">Select Date Range</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
+    <string name="transaction_deleted">Transaction Deleted</string>
+    <string name="transaction_updated">Transaction Update</string>
+    <string name="transaction_card_title">Transaction</string>
+    <string name="close">Close</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
+
+
 </resources>
