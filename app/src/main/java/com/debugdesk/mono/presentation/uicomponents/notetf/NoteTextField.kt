@@ -1,7 +1,6 @@
 package com.debugdesk.mono.presentation.uicomponents.notetf
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -9,7 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +28,7 @@ import com.debugdesk.mono.presentation.uicomponents.tf.MonoOutlineTextField
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp1
 import com.debugdesk.mono.utils.Dp.dp10
-import com.debugdesk.mono.utils.Dp.dp250
+import com.debugdesk.mono.utils.ImageCard
 
 @Composable
 fun NoteTextField(
@@ -74,12 +73,24 @@ fun NoteTextField(
                 fieldClickBack = { }
             )
 
-            AnimatedVisibility(visible = false) {
-                Image(
-                    modifier = Modifier.size(dp250),
-                    painter = painterResource(id = R.drawable.intro_img_one),
-                    contentDescription = ""
-                )
+            AnimatedVisibility(visible = noteState.images.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space = dp10,
+                        alignment = Alignment.Start
+                    ),
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    itemsIndexed(noteState.images) { index, item ->
+                        ImageCard(modifier = Modifier,
+                            bitmap = item,
+                            onImageClick = { onNoteChange(NoteIntent.ShowGallery(index)) },
+                            onDelete = { bitmap ->
+                                onNoteChange(NoteIntent.DeleteImage(noteState.images.filter { it != bitmap }))
+                            })
+                    }
+                }
             }
         }
     }

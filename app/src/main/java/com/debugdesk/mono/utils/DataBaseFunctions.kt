@@ -46,7 +46,11 @@ object DataBaseFunctions {
     private fun Long.toMonth(): Int = (this.toInt() % 10000) / 100
 
 
-    fun findTransactionsForMonth(transactions: List<DailyTransaction>, month: Int, year: Int): List<DailyTransaction> {
+    fun findTransactionsForMonth(
+        transactions: List<DailyTransaction>,
+        month: Int,
+        year: Int
+    ): List<DailyTransaction> {
         return transactions.filter { transaction ->
             val transactionCalendar = transaction.date.toCalendar()
             transactionCalendar.get(Calendar.MONTH) == month - 1 && // Months are 0-indexed

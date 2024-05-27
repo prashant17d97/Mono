@@ -1,5 +1,7 @@
 package com.debugdesk.mono.presentation.report
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
@@ -25,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,6 +62,13 @@ fun Report(
     val scroll = rememberScrollState(0)
     val reportState by viewModel.reportState.collectAsState()
     val context = LocalContext.current
+    BackHandler {
+        (context as Activity).finishAffinity()
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.fetchTransaction()
+    }
     ReportContainer(
         scrollState = scroll,
         reportState = reportState,
@@ -77,11 +87,12 @@ fun Report(
 private fun ReportContainer(
     scrollState: ScrollState = rememberScrollState(),
     reportState: ReportState,
+    currency: String = stringResource(id = reportState.currency),
     onIntentChange: (ReportIntent) -> Unit
 ) {
     if (reportState.showTransactionCard) {
         TransactionCard(
-            currency = reportState.currency,
+            currency = currency,
             dailyTransaction = reportState.showClickedTransaction,
             onIntentChange = onIntentChange
         )
@@ -97,17 +108,17 @@ private fun ReportContainer(
         )
 
         TotalLeftBalanceCard(
-            currency = reportState.currency,
+            currency = currency,
             amount = reportState.totalAmount
         )
 
         MonthBalanceSummary(
-            currency = reportState.currency,
+            currency = currency,
             income = reportState.currentMonthIncome,
             expense = reportState.currentMonthExpense
         )
         CurrentMonthAvlBalance(
-            currency = reportState.currency,
+            currency = currency,
             currentMonth = reportState.monthString,
             availableBalance = reportState.currentMonthAvailableBalance
         )
@@ -116,15 +127,11 @@ private fun ReportContainer(
             onIntentChange(ReportIntent.UpdateTab(index))
         })
 
-        AnimatedVisibility(
-            visible = reportState.isTransactionEmpty,
-            enter = slideInHorizontally { -it } + fadeIn(),
-            exit = slideOutHorizontally { -it }
-        ) {
+        if (reportState.isTransactionEmpty) {
             Column {
                 reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
                     ExpenseCard(
-                        currency = reportState.currency,
+                        currency = currency,
                         dailyTransaction = dailyTransaction,
                         onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) }
                     )
@@ -139,7 +146,8 @@ private fun ReportContainer(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(
                     space = dp8,
                     alignment = Alignment.CenterVertically

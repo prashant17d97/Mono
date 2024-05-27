@@ -33,7 +33,7 @@ fun IntroCard(
     skip: () -> Unit,
     onContinue: () -> Unit,
 ) {
-//        val seconds by heading.collectAsState(initial = heading)
+
     val height = (LocalConfiguration.current).screenHeightDp
     val width = (LocalConfiguration.current).screenWidthDp
     Column(

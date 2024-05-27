@@ -23,7 +23,9 @@ import com.debugdesk.mono.utils.enums.ExpenseType
 
 @Composable
 fun NavigationGraph(navHostController: NavHostController) {
-    NavHost(navController = navHostController, startDestination = Screens.WelcomeScreen.route) {
+    NavHost(
+        navController = navHostController, startDestination = Screens.WelcomeScreen.route,
+    ) {
         composable(route = Screens.WelcomeScreen.route) {
             WelcomeScreen(navHostController)
         }

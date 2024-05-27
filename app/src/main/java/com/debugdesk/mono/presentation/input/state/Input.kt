@@ -1,11 +1,9 @@
 package com.debugdesk.mono.presentation.input.state
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -90,7 +88,7 @@ import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp80
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.filterExpenseType
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.filterIncomeType
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyIcon
+import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyDrawableIcon
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getMonthAndYearFromLong
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDate
 import com.debugdesk.mono.utils.enums.Buttons
@@ -109,7 +107,6 @@ fun Input(
     navHostController: NavHostController, viewModel: InputVM = koinViewModel()
 ) {
     val context = LocalContext.current
-    val activity = (context as? Activity)
     LaunchedEffect(Unit) {
         viewModel.init()
     }
@@ -143,12 +140,8 @@ fun Input(
         skipPartiallyExpanded = inputState.skipPartiallyExpanded
     )
 
-
     val appConfigProperties by viewModel.appConfigProperties.collectAsState()
 
-    BackHandler {
-        activity?.finishAffinity()
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -172,6 +165,7 @@ fun Input(
 
             DatePickerDialog(
                 openDialog = showDialog,
+                initial = date,
                 openDialogChange = { showDialog = it }
             ) {
                 date = it
@@ -351,7 +345,6 @@ private fun Page(
 
 
     val screenHeight = (LocalConfiguration.current).screenHeightDp
-    val screenWidth = (LocalConfiguration.current).screenWidthDp
     ConstraintLayout(modifier = Modifier
         .fillMaxWidth()
         .graphicsLayer {
@@ -413,7 +406,8 @@ private fun Page(
                 modifier = Modifier.padding(10.dp))
 
 
-            CustomOutlineTextField(leadingIcon = appConfigProperties.selectedCurrencyCode.getCurrencyIcon(),
+            CustomOutlineTextField(
+                leadingIcon = appConfigProperties.selectedCurrencyCode.getCurrencyDrawableIcon(),
                 placeHolderText = stringResource(id = R.string.zero),
                 textStyle = MaterialTheme.typography.headlineLarge,
                 start = 10.dp,

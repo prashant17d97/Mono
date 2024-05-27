@@ -16,8 +16,8 @@ class ReminderVM(
     val time =
         (SimpleDateFormat("HH:mm", Locale.ENGLISH).format(Calendar.getInstance().time)).split(":")
 
-    fun toast(msg: Int?,message:String?) {
-        appStateManager.showToastState(msg,message)
+    fun toast(msg: Int?, message: String?) {
+        appStateManager.showToastState(msg, message)
     }
 
 

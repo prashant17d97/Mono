@@ -61,7 +61,7 @@ fun MonoOutlineTextField(
     imeAction: ImeAction,
     inFocus: Boolean = interactionSource.collectIsFocusedAsState().value,
     singleLine: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Decimal,
+    keyboardType: KeyboardType = KeyboardType.Text,
     value: String,
     focusManager: FocusManager = LocalFocusManager.current,
     onValueChange: (String) -> Unit,

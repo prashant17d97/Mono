@@ -63,10 +63,10 @@ class DataStoreUtil(
     }
 
     private fun exceptionHandler() = CoroutineExceptionHandler { _, t ->
-        Log.e("DataStoreUtil", "exceptionHandler: ${t.localizedMessage}", )
+        Log.e("DataStoreUtil", "exceptionHandler: ${t.localizedMessage}")
 
         CoroutineScope(Dispatchers.Main).launch {
-            Log.e("DataStoreUtil", "exceptionHandlerScope: ${t.localizedMessage}", )
+            Log.e("DataStoreUtil", "exceptionHandlerScope: ${t.localizedMessage}")
 
             t.printStackTrace()
         }

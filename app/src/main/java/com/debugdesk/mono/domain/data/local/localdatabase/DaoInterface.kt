@@ -29,7 +29,7 @@ interface DaoInterface {
     suspend fun getAllTransactionByMonth(year: Int, month: Int): List<DailyTransaction>
 
     @Query("SELECT * FROM dailyTransaction WHERE transactionId = :transactionId ORDER BY date DESC")
-    suspend fun fetchTransactionFromId(transactionId:Int): DailyTransaction
+    suspend fun fetchTransactionFromId(transactionId: Int): DailyTransaction
 
     @Query("SELECT * FROM dailyTransaction WHERE year = :year  ORDER BY date DESC")
     suspend fun getAllTransactionByYear(year: Int): List<DailyTransaction>
@@ -39,10 +39,10 @@ interface DaoInterface {
 
 
     @Query("SELECT * FROM dailyTransaction WHERE type = :income ORDER BY date DESC")
-    suspend fun getAllIncomeTransaction(income:String=ExpenseType.Income.name): List<DailyTransaction>
+    suspend fun getAllIncomeTransaction(income: String = ExpenseType.Income.name): List<DailyTransaction>
 
     @Query("SELECT * FROM dailyTransaction WHERE type = :expense ORDER BY date DESC")
-    suspend fun getAllExpenseTransaction(expense:String=ExpenseType.Expense.name): List<DailyTransaction>
+    suspend fun getAllExpenseTransaction(expense: String = ExpenseType.Expense.name): List<DailyTransaction>
 
     @Query("SELECT * FROM categoryModel")
     suspend fun getAllCategory(): List<CategoryModel>
@@ -53,7 +53,8 @@ interface DaoInterface {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(categoryModel: CategoryModel)
 
-
+    @Query("DELETE FROM dailyTransaction")
+    suspend fun deleteAllTransactions()
 
 
 }

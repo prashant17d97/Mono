@@ -29,13 +29,13 @@ import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
 import com.debugdesk.mono.presentation.report.ReportIntent
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp
+import com.debugdesk.mono.utils.ImageUtils.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDate
-import java.util.Currency
 
 @Composable
 fun TransactionCard(
     modifier: Modifier = Modifier,
-    currency: String = Currency.getInstance("INR").symbol,
+    currency: String,
     dailyTransaction: DailyTransaction,
     onIntentChange: (ReportIntent) -> Unit = {}
 ) {
@@ -112,7 +112,8 @@ fun TransactionCard(
             )
 
             LazyRow(content = {
-                items(dailyTransaction.images) {
+
+                items(dailyTransaction.images.toBitmap()) {
                     // Image
                 }
             })
@@ -151,6 +152,7 @@ fun TransactionCardPrev() {
     PreviewTheme {
         TransactionCard(
             dailyTransaction = emptyTransaction,
+            currency = "$"
         )
     }
 }

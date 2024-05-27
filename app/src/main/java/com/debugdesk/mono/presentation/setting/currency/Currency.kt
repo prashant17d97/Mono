@@ -23,7 +23,6 @@ import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp.dp5
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toCurrencyIcon
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -36,8 +35,6 @@ fun Currency(
 ) {
 
     val appConfigProperties by currencyVM.appConfigProperties.collectAsState()
-
-    val currency = appConfigProperties.currencyIcon
 
     BackHandler {
         currencyVM.revertTheAppConfigPropertiesChange()
@@ -64,7 +61,7 @@ fun Currency(
                     )
                 })
             SpacerHeight(value = dp5)
-            if (index != currency.lastIndex) {
+            if (index != getCurrencies(appConfigProperties).lastIndex) {
                 HorizontalDivider(
                     modifier = Modifier
                         .height(1.dp)
@@ -87,11 +84,12 @@ fun CurrencyPreview() = Currency(
 @Composable
 private fun getCurrencies(appConfigProperties: AppConfigProperties): List<RadioModel> {
     val context = LocalContext.current
-    val currencyCodes = context.resources.getStringArray(R.array.currencyCode)
+    val currenciesCode = context.resources.getStringArray(R.array.currenciesCode)
+    val currenciesIcon = context.resources.getStringArray(R.array.currenciesIcon)
 
-    return currencyCodes.map { code ->
+    return currenciesCode.mapIndexed { index, code ->
         RadioModel(
-            currencyIcon = code.toCurrencyIcon(),
+            currencyIcon = currenciesIcon[index],
             currencyCode = code,
             isSelected = appConfigProperties.selectedCurrencyCode == code
         )

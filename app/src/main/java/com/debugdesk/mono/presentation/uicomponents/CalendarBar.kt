@@ -277,7 +277,7 @@ fun CustomDateRange(
 @Composable
 fun DateText(
     modifier: Modifier = Modifier, text: String,
-    initialDateInMillis: Long? = null,
+    initialDateInMillis: Long? = System.currentTimeMillis(),
     selectedDate: (Long) -> Unit = {}
 ) {
     var showDateDialog by remember { mutableStateOf(false) }
@@ -303,6 +303,7 @@ fun DateText(
 
     DatePickerDialog(
         openDialog = showDateDialog,
+        initial = initialDateInMillis ?: 0,
         openDialogChange = { showDateDialog = it },
         value = selectedDate
     )

@@ -5,7 +5,6 @@ import com.debugdesk.mono.domain.data.local.localdatabase.DaoInterface
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
-import com.debugdesk.mono.presentation.addcategory.AddCategoryState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +69,11 @@ class RepositoryImpl(
         getTransactionAll()
     }
 
+    override suspend fun deleteAllTransaction() {
+        daoInterface.deleteAllTransactions()
+        getTransactionAll()
+    }
+
     override suspend fun clearDatabase() {
         appDatabase.clearAllTables()
         getTransactionAll()
@@ -90,19 +94,14 @@ class RepositoryImpl(
         _allDailyYearTransaction.tryEmit(daoInterface.getAllTransactionByYear(year = year))
     }
 
-    override suspend fun saveCategories(addCategoryState: AddCategoryState) {
+    override suspend fun saveCategories(categoryModel: CategoryModel) {
         fetchCategories()
         delay(100)
-        val categoryModel = CategoryModel(
-            category = addCategoryState.category,
-            categoryIcon = addCategoryState.categoryIcon,
-            categoryType = addCategoryState.categoryType,
-        )
-        if (categoryModelList.value.contains(categoryModel)) {
-            return
+        if (categoryModel !in categoryModelList.value) {
+            daoInterface.insertCategory(categoryModel)
+            delay(100)
+            fetchCategories()
         }
-        daoInterface.insertCategory(categoryModel)
-        fetchCategories()
     }
 
     override suspend fun fetchCategories() {

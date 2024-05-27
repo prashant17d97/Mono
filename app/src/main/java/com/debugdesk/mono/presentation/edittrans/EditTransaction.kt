@@ -1,17 +1,25 @@
 package com.debugdesk.mono.presentation.edittrans
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,17 +28,21 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.presentation.uicomponents.CalendarCard
+import com.debugdesk.mono.presentation.uicomponents.Camera
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
+import com.debugdesk.mono.presentation.uicomponents.ImageGallery
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.ScreenView
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTfState
+import com.debugdesk.mono.presentation.uicomponents.bsm.BottomSheetDialog
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteState
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.ImageUtils.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDateWeek
 import com.debugdesk.mono.utils.enums.Buttons
 import org.koin.androidx.compose.koinViewModel
@@ -42,6 +54,7 @@ fun EditTransaction(
     transactionId: Int?,
     editTransactionViewModel: EditTransactionVM = koinViewModel(),
 ) {
+    val context = LocalContext.current
     val editTransactionState by editTransactionViewModel.editTransactionState.collectAsState()
     LaunchedEffect(transactionId) {
         Log.e("TAG", "EditTransaction: $transactionId")
@@ -50,16 +63,24 @@ fun EditTransaction(
     EditTransactionContainer(
         editTransactionState = editTransactionState,
         onEditTransactionIntent = {
-            editTransactionViewModel.handleTransactionIntent(it, navHostController)
+            editTransactionViewModel.handleTransactionIntent(it, navHostController, context)
         }
     )
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTransactionContainer(
     editTransactionState: EditTransactionState,
     onEditTransactionIntent: (EditTransactionIntent) -> Unit = {},
 ) {
+    BottomSheetDialog(
+        show = editTransactionState.showBSM,
+        onDismiss = { onEditTransactionIntent(EditTransactionIntent.CloseBSM) },
+        onGallery = { onEditTransactionIntent(EditTransactionIntent.OpenGallery) },
+        onCamera = { onEditTransactionIntent(EditTransactionIntent.OpenCamera) }
+    )
     Column(
         Modifier
             .fillMaxSize()
@@ -130,7 +151,45 @@ fun EditTransactionContainer(
             onClick = {
                 onEditTransactionIntent(EditTransactionIntent.OnUpdateClick)
             })
+    }
 
+    AnimatedVisibility(visible = editTransactionState.showCamera,
+        enter = slideInVertically { it },
+        exit = slideOutVertically { it }) {
+        Camera(
+            bitmaps = editTransactionState.transaction.images.toBitmap(),
+            dismiss = {
+                onEditTransactionIntent(EditTransactionIntent.DismissCamera)
+            },
+            onSave = {
+                onEditTransactionIntent(EditTransactionIntent.SaveImagesUri(it))
+            }
+        )
+    }
+    AnimatedVisibility(visible = editTransactionState.showGallery) {
+    }
+
+    AnimatedVisibility(
+        visible = editTransactionState.showImageGallery,
+        enter = scaleIn(
+            initialScale = 0.5f,
+            animationSpec = tween(durationMillis = 500)
+        ),
+        exit = scaleOut(
+            targetScale = 0.5f,
+            animationSpec = tween(durationMillis = 500)
+        )
+    ) {
+        ImageGallery(
+            images = editTransactionState.transaction.images.toBitmap(),
+            clickedIndex = editTransactionState.clickedIndex,
+            onDelete = { bitmap ->
+                onEditTransactionIntent(
+                    EditTransactionIntent.DeleteImage(
+                        editTransactionState.noteState.images.filter { it != bitmap })
+                )
+            },
+            close = { onEditTransactionIntent(EditTransactionIntent.CloseImageGallery) })
     }
 }
 
@@ -152,6 +211,7 @@ fun EditTransactionPrev() {
                 currentMonthId = 4, year = 2024,
                 categoryId = 2
             ),
+            showBSM = false,
             amountTfState = AmountTfState(
                 height = 54,
                 catIndex = 5464,

@@ -44,192 +44,192 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.CommonColor.disableButton
 
 @Composable
-    fun CustomOutlineTextField(
-        modifier: Modifier = Modifier,
-        top: Dp = 0.dp,
-        bottom: Dp = 0.dp,
-        start: Dp = 0.dp,
-        end: Dp = 0.dp,
-        leadingIcon: Int? = null,
-        trailingIcon: Int? = null,
-        cornerShape: Dp = 10.dp,
-        height: Dp = TextFieldDefaults.MinHeight,
-        placeHolderText: String,
-        textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-        singleLine: Boolean = true,
-        enabled: Boolean = true,
-        keyboardType: KeyboardType = KeyboardType.Decimal,
-        imeAction: ImeAction = ImeAction.Done,
-        capitalization: KeyboardCapitalization = KeyboardCapitalization.Words,
-        charLimit: Int = 10,
-        value: String,
-        onValueChange: (String) -> Unit,
-        action: () -> Unit = {},
-        onHeightChange: (Int) -> Unit = {},
-        fieldClickBack: () -> Unit = {},
-        trailingClick: () -> Unit = {},
-        hasFocus: (Boolean) -> Unit = {},
-        errorMsg: (String) -> Unit = {},
-    ) {
-        val focusManager = LocalFocusManager.current
-        val keyBoardControl = LocalSoftwareKeyboardController.current
-        val interaction = remember { MutableInteractionSource() }
-        val inFocus by interaction.collectIsFocusedAsState()
+fun CustomOutlineTextField(
+    modifier: Modifier = Modifier,
+    top: Dp = 0.dp,
+    bottom: Dp = 0.dp,
+    start: Dp = 0.dp,
+    end: Dp = 0.dp,
+    leadingIcon: Int? = null,
+    trailingIcon: Int? = null,
+    cornerShape: Dp = 10.dp,
+    height: Dp = TextFieldDefaults.MinHeight,
+    placeHolderText: String,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    singleLine: Boolean = true,
+    enabled: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Decimal,
+    imeAction: ImeAction = ImeAction.Done,
+    capitalization: KeyboardCapitalization = KeyboardCapitalization.Words,
+    charLimit: Int = 10,
+    value: String,
+    onValueChange: (String) -> Unit,
+    action: () -> Unit = {},
+    onHeightChange: (Int) -> Unit = {},
+    fieldClickBack: () -> Unit = {},
+    trailingClick: () -> Unit = {},
+    hasFocus: (Boolean) -> Unit = {},
+    errorMsg: (String) -> Unit = {},
+) {
+    val focusManager = LocalFocusManager.current
+    val keyBoardControl = LocalSoftwareKeyboardController.current
+    val interaction = remember { MutableInteractionSource() }
+    val inFocus by interaction.collectIsFocusedAsState()
 //        val width = LocalConfiguration.current.screenWidthDp
-        val context = LocalContext.current
+    val context = LocalContext.current
 
-        Row(horizontalArrangement = when {
-            leadingIcon != null && trailingIcon == null -> Arrangement.Start
-            leadingIcon == null && trailingIcon != null -> Arrangement.SpaceBetween
-            else -> Arrangement.Center
-        },
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(
-                    top = top, start = start, end = end, bottom = bottom
-                )
-                .onSizeChanged { size ->
-                    onHeightChange(size.height)
-                }
-                .border(width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary.takeIf { inFocus } ?: disableButton,
-                    shape = RoundedCornerShape(cornerShape))
-                .defaultMinSize(
-                    minWidth = TextFieldDefaults.MinWidth, minHeight = height
-                )
-                .background(
-                    MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(cornerShape)
-                )) {
-            if (leadingIcon != null) {
-                Image(
-                    painter = painterResource(id = leadingIcon),
-                    contentDescription = "LeadingIcon",
-                    contentScale = ContentScale.Inside,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
-                    modifier = Modifier
-                        .background(
-                            MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(
-                                topStart = cornerShape, bottomStart = cornerShape
-                            )
-                        )
-                        .size(width = TextFieldDefaults.MinHeight, height = height)
-                )
-                VerticalDivider(
-                    modifier = Modifier
-                        .size(width = 1.dp, height = height)
-                        .background(color = disableButton)
-                )
+    Row(horizontalArrangement = when {
+        leadingIcon != null && trailingIcon == null -> Arrangement.Start
+        leadingIcon == null && trailingIcon != null -> Arrangement.SpaceBetween
+        else -> Arrangement.Center
+    },
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = top, start = start, end = end, bottom = bottom
+            )
+            .onSizeChanged { size ->
+                onHeightChange(size.height)
             }
-            TextField(value = value,
-                textStyle = textStyle,
-                singleLine = singleLine,
-                enabled = enabled,
-                interactionSource = interaction,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = keyboardType,
-                    imeAction = imeAction,
-                    capitalization = capitalization
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        action()
-                        keyBoardControl?.hide()
-                        focusManager.clearFocus(true)
-                    },
-                    onNext = {
-                        focusManager.moveFocus(
-                            focusDirection = FocusDirection.Next
+            .border(width = 1.dp,
+                color = MaterialTheme.colorScheme.primary.takeIf { inFocus } ?: disableButton,
+                shape = RoundedCornerShape(cornerShape))
+            .defaultMinSize(
+                minWidth = TextFieldDefaults.MinWidth, minHeight = height
+            )
+            .background(
+                MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(cornerShape)
+            )) {
+        if (leadingIcon != null) {
+            Image(
+                painter = painterResource(id = leadingIcon),
+                contentDescription = "LeadingIcon",
+                contentScale = ContentScale.Inside,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(
+                            topStart = cornerShape, bottomStart = cornerShape
                         )
-                    },
-                    onGo = {
-                        action()
-                        keyBoardControl?.hide()
-                        focusManager.clearFocus(true)
-                    },
-                    onSearch = {
-                        action()
-                        keyBoardControl?.hide()
-                        focusManager.clearFocus(true)
-                    },
-                    onSend = {
-                        action()
-                        keyBoardControl?.hide()
-                        focusManager.clearFocus(true)
-                    },
-                ),
-                onValueChange = {
-                    when {
-                        it.length == charLimit -> {
-                            when (imeAction) {
-                                ImeAction.Next -> {
-                                    focusManager.moveFocus(
-                                        focusDirection = FocusDirection.Next
-                                    )
-                                }
-
-                                ImeAction.Done, ImeAction.Go, ImeAction.Search -> {
-                                    action()
-                                    keyBoardControl?.hide()
-                                    focusManager.clearFocus(true)
-                                }
-                            }
-                            onValueChange(it)
-                        }
-
-                        it.length <= charLimit -> {
-                            onValueChange(it)
-                        }
-
-                        else -> {
-                            errorMsg(context.getString(R.string.characterWarning))
-                            when (imeAction) {
-                                ImeAction.Done -> {
-
-                                    keyBoardControl?.hide()
-                                    focusManager.clearFocus()
-                                }
-
-                                ImeAction.Next -> {
-                                    focusManager.moveFocus(
-                                        focusDirection = FocusDirection.Next
-                                    )
-                                }
-                            }
-
-                        }
-                    }
-                },
-                placeholder = {
-                    Text(text = placeHolderText, style = textStyle.copy(color = disableButton))
-                },
-                shape = RoundedCornerShape(cornerShape),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    disabledContainerColor = MaterialTheme.colorScheme.background,
-                    focusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    disabledIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                modifier = if (leadingIcon == null && trailingIcon == null) {
-                    modifier
-                        .weight(1f)
-                        .clickable { fieldClickBack() }
-
-                } else modifier.clickable { fieldClickBack() })
-            if (trailingIcon != null) {
-                Image(painter = painterResource(id = trailingIcon),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                    contentDescription = "trailingIcon",
-                    contentScale = ContentScale.Inside,
-                    modifier = Modifier
-                        .size(height)
-                        .clickable { trailingClick() })
-            }
+                    )
+                    .size(width = TextFieldDefaults.MinHeight, height = height)
+            )
+            VerticalDivider(
+                modifier = Modifier
+                    .size(width = 1.dp, height = height)
+                    .background(color = disableButton)
+            )
         }
-        hasFocus(inFocus)
+        TextField(value = value,
+            textStyle = textStyle,
+            singleLine = singleLine,
+            enabled = enabled,
+            interactionSource = interaction,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction,
+                capitalization = capitalization
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    action()
+                    keyBoardControl?.hide()
+                    focusManager.clearFocus(true)
+                },
+                onNext = {
+                    focusManager.moveFocus(
+                        focusDirection = FocusDirection.Next
+                    )
+                },
+                onGo = {
+                    action()
+                    keyBoardControl?.hide()
+                    focusManager.clearFocus(true)
+                },
+                onSearch = {
+                    action()
+                    keyBoardControl?.hide()
+                    focusManager.clearFocus(true)
+                },
+                onSend = {
+                    action()
+                    keyBoardControl?.hide()
+                    focusManager.clearFocus(true)
+                },
+            ),
+            onValueChange = {
+                when {
+                    it.length == charLimit -> {
+                        when (imeAction) {
+                            ImeAction.Next -> {
+                                focusManager.moveFocus(
+                                    focusDirection = FocusDirection.Next
+                                )
+                            }
+
+                            ImeAction.Done, ImeAction.Go, ImeAction.Search -> {
+                                action()
+                                keyBoardControl?.hide()
+                                focusManager.clearFocus(true)
+                            }
+                        }
+                        onValueChange(it)
+                    }
+
+                    it.length <= charLimit -> {
+                        onValueChange(it)
+                    }
+
+                    else -> {
+                        errorMsg(context.getString(R.string.characterWarning))
+                        when (imeAction) {
+                            ImeAction.Done -> {
+
+                                keyBoardControl?.hide()
+                                focusManager.clearFocus()
+                            }
+
+                            ImeAction.Next -> {
+                                focusManager.moveFocus(
+                                    focusDirection = FocusDirection.Next
+                                )
+                            }
+                        }
+
+                    }
+                }
+            },
+            placeholder = {
+                Text(text = placeHolderText, style = textStyle.copy(color = disableButton))
+            },
+            shape = RoundedCornerShape(cornerShape),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.background,
+                focusedIndicatorColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                disabledIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            modifier = if (leadingIcon == null && trailingIcon == null) {
+                modifier
+                    .weight(1f)
+                    .clickable { fieldClickBack() }
+
+            } else modifier.clickable { fieldClickBack() })
+        if (trailingIcon != null) {
+            Image(painter = painterResource(id = trailingIcon),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                contentDescription = "trailingIcon",
+                contentScale = ContentScale.Inside,
+                modifier = Modifier
+                    .size(height)
+                    .clickable { trailingClick() })
+        }
     }
+    hasFocus(inFocus)
+}

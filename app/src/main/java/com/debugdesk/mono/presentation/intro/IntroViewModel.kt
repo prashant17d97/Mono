@@ -6,10 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects.INTRO_FINISHED
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreUtil
+import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.model.IntroModel
-import com.debugdesk.mono.presentation.addcategory.AddCategoryState
-import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.utils.enums.ExpenseType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -20,13 +19,13 @@ import kotlinx.coroutines.launch
 
 class IntroViewModel(
     private val dataStoreUtil: DataStoreUtil,
-    private val appConfigManager: AppConfigManager,
     private val repository: Repository
 ) : ViewModel() {
-    val isIntroCompleted = appConfigManager.isIntroCompleted
 
     init {
-        repository
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.fetchCategories()
+        }
     }
 
     fun getIntroModel(context: Context): List<IntroModel> = listOf(
@@ -48,31 +47,31 @@ class IntroViewModel(
     )
 
 
-    fun introFinished(context: Context, isIntroCompleted: Boolean) {
-        dataStoreUtil.saveKey(INTRO_FINISHED, isIntroCompleted)
-
+    fun saveSomeCategory(context: Context) {
         // Added default categories for new User
         viewModelScope.launch(Dispatchers.IO) {
+            val savedCategory = repository.categoryModelList.value
             listOf(
-                AddCategoryState(
+                CategoryModel(
                     category = context.getString(R.string.salary),
                     categoryIcon = R.drawable.bank,
                     categoryType = ExpenseType.Income.name,
                 ),
-                AddCategoryState(
+                CategoryModel(
                     category = context.getString(R.string.groceries),
                     categoryIcon = R.drawable.cook,
                     categoryType = ExpenseType.Expense.name,
                 ),
-                AddCategoryState(
+                CategoryModel(
                     category = context.getString(R.string.food),
                     categoryIcon = R.drawable.food,
                     categoryType = ExpenseType.Expense.name,
                 )
             ).forEach {
-                repository.saveCategories(it)
+                if (it !in savedCategory) {
+                    repository.saveCategories(it)
+                }
             }
-
         }
     }
 
@@ -83,4 +82,8 @@ class IntroViewModel(
             if (it in 0..9) "0$it" else it
         }
         .onEach { delay(1000) }
+
+    fun setIntroFinished(isIntroCompleted: Boolean) {
+        dataStoreUtil.saveKey(INTRO_FINISHED, isIntroCompleted)
+    }
 }

@@ -31,7 +31,10 @@ import com.debugdesk.mono.utils.Dp.dp60
 import com.debugdesk.mono.utils.states.AlertState
 
 @Composable
-fun Mono(appConfigProperties: AppConfigProperties, alertState: AlertState) {
+fun Mono(
+    appConfigProperties: AppConfigProperties,
+    alertState: AlertState
+) {
     val navHostController = rememberNavController()
 
     MonoTheme(appConfigProperties = appConfigProperties) {
@@ -79,21 +82,24 @@ private fun BottomNavigationView(navController: NavHostController) {
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
             NavigationBarItem(
-                modifier = Modifier.height(dp50).padding(vertical = Dp.dp4),
+                modifier = Modifier
+                    .height(dp50)
+                    .padding(vertical = Dp.dp4),
                 selected = currentRoute == item.route,
                 colors = NavigationBarItemColors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     selectedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     disabledIconColor = MaterialTheme.colorScheme.primary,
                     disabledTextColor = MaterialTheme.colorScheme.primary
                 ),
                 label = {
                     Text(
-                        text = item.name, style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        text = item.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 onClick = {

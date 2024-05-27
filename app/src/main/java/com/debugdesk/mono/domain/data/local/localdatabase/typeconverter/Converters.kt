@@ -1,22 +1,18 @@
 package com.debugdesk.mono.domain.data.local.localdatabase.typeconverter
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.room.TypeConverter
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-class ImageConverter {
-
+class Converters {
     @TypeConverter
-    fun fromBitmap(bitmap: Bitmap): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-        return outputStream.toByteArray()
+    fun fromString(value: String): List<String> {
+        val listType = object : TypeToken<List<String>>() {}.type
+        return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
-    fun toBitmap(byteArray: ByteArray): Bitmap {
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    fun fromList(list: List<String>): String {
+        return Gson().toJson(list)
     }
 }

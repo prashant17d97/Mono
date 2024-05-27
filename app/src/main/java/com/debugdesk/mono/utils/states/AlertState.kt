@@ -16,7 +16,7 @@ data class AlertState(
     @StringRes
     val negativeButtonText: Int = R.string.cancel,
     @DrawableRes
-    val iconDrawable: Int? = null,
+    val iconDrawable: Int? = R.drawable.ic_warning,
     val iconColor: Color = Color.Unspecified,
     val properties: DialogProperties = DialogProperties(
         dismissOnBackPress = true,

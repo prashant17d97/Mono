@@ -59,13 +59,13 @@ fun ExpenseCard(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.End,
             ) {
-                if (dailyTransaction.getExpenseAmount() > 0.0) {
+                if (dailyTransaction.getIncomeAmount() > 0.0) {
                     Text(
                         text = "+$currency ${dailyTransaction.getIncomeAmount()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
-                if (dailyTransaction.getIncomeAmount() > 0.0) {
+                if (dailyTransaction.getExpenseAmount() > 0.0) {
                     SpacerHeight(value = dp5)
                     Text(
                         text = "-$currency ${dailyTransaction.getExpenseAmount()}",
@@ -85,8 +85,7 @@ fun ExpenseCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier
-                        .weight(1f),
+                    modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -119,16 +118,15 @@ fun ExpenseCard(
 private fun ExpenseCardPrev() {
     PreviewTheme {
         ExpenseCard(
-            currency = "₹",
-            dailyTransaction = listOf(
+            currency = "₹", dailyTransaction = listOf(
                 DailyTransaction(
-                    date = 0,
+                    date = System.currentTimeMillis(),
                     type = ExpenseType.Expense.name,
                     note = "Coffee",
                     category = "Bevarages",
                     categoryIcon = R.drawable.ic_category,
                     amount = 2000.0,
-                    images = listOf("", ""),
+                    images = emptyList(),
                     currentMonthId = 0,
                     categoryId = 6
                 )

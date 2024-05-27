@@ -5,8 +5,6 @@ import androidx.room.PrimaryKey
 import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.takeWord
 
-typealias URI = String
-
 @Entity(
     tableName = "dailyTransaction",
 )

@@ -35,6 +35,7 @@ fun CalendarCard(
     }
     DatePickerDialog(
         openDialog = showDialog,
+        initial = date,
         openDialogChange = { onShowCalendarDialog(it) },
         value = { onDateChange(it) }
     )

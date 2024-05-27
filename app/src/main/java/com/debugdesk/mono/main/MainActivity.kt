@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -16,6 +17,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         toastMsg()
+        installSplashScreen()
+        /*enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                lightScrim = md_theme_light_scrim.toArgb(),
+                darkScrim = md_theme_dark_scrim.toArgb()
+            ), navigationBarStyle = SystemBarStyle.auto(
+                lightScrim = md_theme_light_scrim.toArgb(),
+                darkScrim = md_theme_dark_scrim.toArgb()
+            )
+        )*/
         setContent {
             val appConfigProperties by mainViewModel.appConfigProperties.collectAsState()
             val alertState by mainViewModel.alertState.collectAsState()

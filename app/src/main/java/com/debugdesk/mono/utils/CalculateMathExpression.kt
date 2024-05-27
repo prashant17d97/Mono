@@ -24,15 +24,19 @@ class CalculateMathExpression {
             "+" -> {
                 ((rightNum?.toDouble() ?: 0.0) + (leftNum?.toDouble() ?: 0.0))
             }
+
             "-" -> {
                 ((rightNum?.toDouble() ?: 0.0) - (leftNum?.toDouble() ?: 0.0))
             }
+
             "*" -> {
                 ((rightNum?.toDouble() ?: 0.0) * (leftNum?.toDouble() ?: 0.0))
             }
+
             "^" -> {
                 ((rightNum?.toDouble() ?: 0.0).pow(leftNum?.toDouble() ?: 0.0))
             }
+
             else -> {
                 ((rightNum?.toDouble() ?: 0.0) / (leftNum?.toDouble() ?: 0.0))
             }

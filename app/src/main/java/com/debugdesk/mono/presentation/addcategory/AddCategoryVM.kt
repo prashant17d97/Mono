@@ -3,6 +3,7 @@ package com.debugdesk.mono.presentation.addcategory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.repo.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,13 @@ class AddCategoryVM(
 
             is AddCategoryIntent.SaveCategory -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    repository.saveCategories(categoryModel.value.copy(categoryType = argument))
+                    repository.saveCategories(
+                        CategoryModel(
+                            category = categoryModel.value.category,
+                            categoryIcon = categoryModel.value.categoryIcon,
+                            categoryType = argument,
+                        )
+                    )
                 }.invokeOnCompletion { throwable ->
                     throwable?.let {
                         _categoryModel.tryEmit(

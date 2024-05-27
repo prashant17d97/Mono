@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.uicomponents
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,41 +49,39 @@ fun ScreenView(
             .verticalScroll(scrollState)).takeIf { isScrollEnabled } ?: (modifier.padding(
             top = top, bottom = bottom, start = start, end = end
         ))) {
-        AnimatedVisibility(visible = showBack || heading != "" || trailing != "") {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                if (showBack) {
-                    Text(text = stringResource(id = R.string.back),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .clickable { onBackClick() }
-                            .padding(horizontal = 2.dp))
-                }
-                if (heading != "") {
-                    Text(
-                        text = heading,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-                if (trailing != "") {
-                    Text(text = trailing,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = trailingColor),
-                        modifier = Modifier
-                            .clickable { onTrailClick() }
-                            .padding(horizontal = 2.dp))
-                }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            if (showBack) {
+                Text(text = stringResource(id = R.string.back),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .clickable { onBackClick() }
+                        .padding(horizontal = 2.dp))
             }
-
+            if (heading != "") {
+                Text(
+                    text = heading,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+            if (trailing != "") {
+                Text(text = trailing,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = trailingColor),
+                    modifier = Modifier
+                        .clickable { onTrailClick() }
+                        .padding(horizontal = 2.dp))
+            }
         }
+
         content()
     }
 }

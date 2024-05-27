@@ -14,12 +14,14 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun DatePickerDialog(
     openDialog: Boolean,
+    initial: Long = System.currentTimeMillis(),
     openDialogChange: (Boolean) -> Unit,
     value: (Long) -> Unit
 ) {
 
     if (openDialog) {
         val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = initial,
             yearRange = IntRange(2000, 2200),
         )
 

@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
+import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyIcon
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getExpenseAmount
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getIncomeAmount
@@ -41,6 +42,12 @@ class ReportVM(
         }.invokeOnCompletion { updateTab(0) }
     }
 
+    fun fetchTransaction() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getTransactionAll()
+            getMonthTransaction(getCurrentMonthYear())
+        }.invokeOnCompletion { updateTab(0) }
+    }
 
     private val _reportState: MutableStateFlow<ReportState> = MutableStateFlow(ReportState())
 
@@ -61,7 +68,7 @@ class ReportVM(
                     currentMonthExpense = allDailyMonthTransaction.getExpenseAmount(),
                     currentMonthIncome = allDailyMonthTransaction.getIncomeAmount(),
                     currentMonthAvailableBalance = allDailyMonthTransaction.getTotalAmount(),
-                    currency = appConfigProperties.currencyIcon,
+                    currency = appConfigProperties.selectedCurrencyCode.getCurrencyIcon(),
                 )
 
             }.collect {

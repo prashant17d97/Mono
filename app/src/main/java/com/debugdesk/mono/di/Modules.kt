@@ -17,7 +17,6 @@ import com.debugdesk.mono.presentation.setting.SettingVM
 import com.debugdesk.mono.presentation.setting.appearance.AppearanceVM
 import com.debugdesk.mono.presentation.setting.currency.CurrencyVM
 import com.debugdesk.mono.presentation.setting.reminder.ReminderVM
-import com.debugdesk.mono.presentation.splash.SplashViewModel
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppConfigurationManagerImpl
 import com.debugdesk.mono.ui.appconfig.AppStateManager
@@ -35,8 +34,7 @@ object Modules {
         factory { AppDatabase.getInstance(androidApplication().applicationContext).daoInterface() }
         single<Repository> {
             RepositoryImpl(
-                daoInterface = get(),
-                appDatabase = get()
+                daoInterface = get(), appDatabase = get()
             )
         }
         single<AppStateManager> { AppStateManagerImpl() }
@@ -57,13 +55,12 @@ object Modules {
         }
         viewModel {
             IntroViewModel(
-                dataStoreUtil = get(), appConfigManager = get(), repository = get()
+                dataStoreUtil = get(), repository = get()
             )
         }
         viewModel {
             ReportVM(
-                appConfigManager = get(),
-                repository = get()
+                appConfigManager = get(), repository = get()
             )
         }
 
@@ -95,13 +92,8 @@ object Modules {
         }
 
         viewModel {
-            SplashViewModel(
-                appConfigManager = get(), dataStoreUtil = get()
-            )
-        }
-        viewModel {
             MainViewModel(
-                appStateManager = get(), appConfigManager = get()
+                appStateManager = get(), appConfigManager = get(), dataStoreUtil = get()
             )
         }
 

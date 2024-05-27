@@ -11,5 +11,10 @@ data class EditTransactionState(
     val showCalendarDialog: Boolean = false,
     val amountTfState: AmountTfState = AmountTfState(),
     val noteState: NoteState = NoteState(),
-    val categoryList: List<CategoryModel> = emptyList()
+    val categoryList: List<CategoryModel> = emptyList(),
+    val showBSM: Boolean = false,
+    val showCamera: Boolean = false,
+    val showGallery: Boolean = false,
+    val showImageGallery: Boolean = false,
+    val clickedIndex: Int = 0
 )

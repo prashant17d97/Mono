@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -110,7 +110,7 @@ fun AddCategoryContainer(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(dp90),
         ) {
-            itemsIndexed(categoryIcons) { index, (itemIcon, itemName) ->
+            items(categoryIcons) { (itemIcon, itemName) ->
                 CategoryCard(
                     model = CategoryModel(
                         categoryIcon = itemIcon,
@@ -121,7 +121,8 @@ fun AddCategoryContainer(
                     onIntentChange(
                         AddCategoryIntent.AddCategory(
                             categoryState.copy(
-                                categoryIcon = it.categoryIcon
+                                categoryIcon = it.categoryIcon,
+                                category = it.category
                             )
                         )
                     )

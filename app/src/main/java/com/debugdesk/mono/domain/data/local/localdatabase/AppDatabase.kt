@@ -7,14 +7,14 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
-import com.debugdesk.mono.domain.data.local.localdatabase.typeconverter.StringListConverter
+import com.debugdesk.mono.domain.data.local.localdatabase.typeconverter.Converters
 
 @Database(
     entities = [DailyTransaction::class, CategoryModel::class],
     version = 1,
     exportSchema = false
 )
-@TypeConverters(StringListConverter::class)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun daoInterface(): DaoInterface
 

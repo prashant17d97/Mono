@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.report
 
+import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
 import com.debugdesk.mono.model.Tabs
@@ -23,7 +24,7 @@ data class ReportState(
     val currentMonthIncome: Double = allDailyMonthTransaction.getIncomeAmount(),
     val currentMonthAvailableBalance: Double = allDailyMonthTransaction.getTotalAmount(),
     val filters: List<Filter> = Filter.values.toList(),
-    val currency: String = "$",
+    val currency: Int = R.string.inrIcon,
     val showRest: Boolean = false,
     val isCalendarExpanded: Boolean = false,
     val tabs: List<Tabs> = Tabs.values,

@@ -89,6 +89,7 @@ sealed class Screens(
         route = reminder
     )
 
+
     companion object {
         /**
          * Routes
@@ -105,6 +106,7 @@ sealed class Screens(
         private const val appearance = "Appearance"
         private const val reminder = "Reminder"
         private const val EDIT_TRANSACTION = "EditTransaction"
+        private const val CAMERA = "Camera"
 
         /**
          * ARGUMENTS

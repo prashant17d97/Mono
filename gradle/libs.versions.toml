@@ -1,6 +1,8 @@
 [versions]
 agp = "8.5.0-alpha08"
+coilCompose = "2.6.0"
 constraintlayoutCompose = "1.1.0-alpha13"
+coreSplashscreen = "1.0.1"
 datastorePreferences = "1.1.1"
 gson = "2.10.1"
 koin-androidx-compose = "3.5.3"
@@ -12,7 +14,7 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.8.0"
 activity-compose = "1.9.0"
-composeBom = "2023.08.00"
+composeBom = "2024.05.00"
 lottieCompose = "4.0.0"
 retrofit = "2.9.0"
 navigationCompose = "2.7.7"
@@ -28,6 +30,8 @@ kotlinCompilerExtensionVersion = "1.5.10"
 
 
 [libraries]
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
