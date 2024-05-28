@@ -1,8 +1,6 @@
 package com.debugdesk.mono.presentation.uicomponents.notetf
 
-import android.graphics.Bitmap
-
 data class NoteState(
-    val images: List<Bitmap> = emptyList(),
+    val images: List<String> = emptyList(),
     val noteValue: String = ""
 )

@@ -1,15 +1,10 @@
 package com.debugdesk.mono.domain.data.local.localdatabase.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.takeWord
 
-@Entity(
-    tableName = "dailyTransaction",
-)
+
 data class DailyTransaction(
-    @PrimaryKey(autoGenerate = true)
     val transactionId: Int = 0,
     val date: Long,
     val type: String,
@@ -19,9 +14,11 @@ data class DailyTransaction(
     val categoryId: Int,
     val amount: Double,
     val images: List<String> = emptyList(),
+    val transactionImage: List<TransactionImage> = emptyList(),
     val currentMonthId: Int = 0,
     val year: Int? = null
 ) {
+
     val notes: String
         get() = if (note.isNotEmpty()) "$category (${note.takeWord(2)})" else category
 }

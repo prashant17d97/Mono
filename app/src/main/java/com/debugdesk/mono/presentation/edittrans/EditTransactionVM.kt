@@ -1,7 +1,6 @@
 package com.debugdesk.mono.presentation.edittrans
 
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -16,8 +15,6 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteState
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
-import com.debugdesk.mono.utils.ImageUtils.toBase64String
-import com.debugdesk.mono.utils.ImageUtils.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
@@ -26,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EditTransactionVM(
     private val appStateManager: AppStateManager,
@@ -53,21 +51,16 @@ class EditTransactionVM(
                 repository.transaction
             ) { appConfigProperties, categoryModels, transaction: DailyTransaction ->
                 initialTransaction = transaction
-                EditTransactionState(
-                    transaction = transaction,
-                    amountTfState = AmountTfState(
-                        currencyIcon = appConfigProperties.currencyIcon,
-                        amountValue = transaction.amount.toString(),
-                    ), noteState = NoteState(
-                        images = transaction.images.toBitmap()
-                            .filter { it.height != 0 && it.width != 0 },
-                        noteValue = transaction.note
-                    ), categoryList = categoryModels.map { categoryModel ->
-                        categoryModel.copy(
-                            isSelected = categoryModel.categoryId == transaction.categoryId
-                        )
-                    }
-                )
+                EditTransactionState(transaction = transaction, amountTfState = AmountTfState(
+                    currencyIcon = appConfigProperties.currencyIcon,
+                    amountValue = transaction.amount.toString(),
+                ), noteState = NoteState(
+                    images = transaction.images, noteValue = transaction.note
+                ), categoryList = categoryModels.map { categoryModel ->
+                    categoryModel.copy(
+                        isSelected = categoryModel.categoryId == transaction.categoryId
+                    )
+                })
             }.collect {
                 _editTransactionState.tryEmit(it)
             }
@@ -99,19 +92,22 @@ class EditTransactionVM(
             is EditTransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
             is EditTransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
             is EditTransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
-                transactionIntent.editCategoryIntent,
-                navHostController
+                transactionIntent.editCategoryIntent, navHostController
             )
 
             is EditTransactionIntent.UpdateDate -> updateDate(transactionIntent.date)
             is EditTransactionIntent.UpdateNote -> updateNote(transactionIntent.noteIntent)
             EditTransactionIntent.DismissCamera -> dismissCamera()
             EditTransactionIntent.DismissGallery -> dismissGallery()
-            is EditTransactionIntent.SaveImagesUri -> saveImages(transactionIntent.images, context)
+            is EditTransactionIntent.SaveImagesFilePath -> saveImages(
+                transactionIntent.imagePaths,
+                context
+            )
+
             EditTransactionIntent.CloseBSM -> dismissBSM()
             EditTransactionIntent.OpenCamera -> showCamera()
             EditTransactionIntent.OpenGallery -> showGallery()
-            is EditTransactionIntent.DeleteImage -> deleteImage(transactionIntent.images)
+            is EditTransactionIntent.DeleteImage -> deleteImage(transactionIntent.imagePaths)
             EditTransactionIntent.CloseImageGallery -> _editTransactionState.tryEmit(
                 editTransactionState.value.copy(
                     showImageGallery = false
@@ -120,14 +116,13 @@ class EditTransactionVM(
         }
     }
 
-    private fun saveImages(images: List<Bitmap>, context: Context) {
+    private fun saveImages(images: List<String>, context: Context) {
         val editData = editTransactionState.value
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(
                 transaction = editData.transaction.copy(
-                    images = images.toBase64String()
-                ),
-                noteState = editData.noteState.copy(images = images)
+                    images = images
+                ), noteState = editData.noteState.copy(images = images)
             )
         )
         dismissGallery()
@@ -135,14 +130,12 @@ class EditTransactionVM(
     }
 
     private fun deleteTransactionWithAlert(navHostController: NavHostController) {
-        appStateManager.showAlertDialog(
-            message = R.string.transaction_deleted_alert,
+        appStateManager.showAlertDialog(message = R.string.transaction_deleted_alert,
             onPositiveClick = {
                 deleteTransaction(
                     navHostController
                 )
-            }
-        )
+            })
     }
 
     private fun updateCalendarDialog(showDialog: Boolean) {
@@ -161,13 +154,16 @@ class EditTransactionVM(
                 editTransactionState.value.transaction
             )
             repository.getAllTransactionByMonth(
-                getCurrentMonthYear().first,
-                getCurrentMonthYear().second
+                getCurrentMonthYear().first, getCurrentMonthYear().second
             )
         }.invokeOnCompletion {
-            appStateManager.showToastState(toastMsg = R.string.transaction_updated)
+            viewModelScope.launch {
+                withContext(Dispatchers.Main) {
+                    appStateManager.showToastState(toastMsg = R.string.transaction_updated)
+                    navHostController.popBackStack()
+                }
+            }
         }
-        navHostController.popBackStack()
     }
 
     private fun deleteTransaction(
@@ -178,8 +174,7 @@ class EditTransactionVM(
                 editTransactionState.value.transaction
             )
             repository.getAllTransactionByMonth(
-                getCurrentMonthYear().first,
-                getCurrentMonthYear().second
+                getCurrentMonthYear().first, getCurrentMonthYear().second
             )
         }.invokeOnCompletion {
             appStateManager.showToastState(toastMsg = R.string.transaction_deleted)
@@ -196,21 +191,19 @@ class EditTransactionVM(
                     editTransactionState.value.copy(
                         transaction = editTransactionState.value.transaction.copy(
                             note = noteIntent.value
-                        ),
-                        noteState = editTransactionState.value.noteState.copy(
+                        ), noteState = editTransactionState.value.noteState.copy(
                             noteValue = noteIntent.value
                         )
                     )
                 )
             }
 
-            is NoteIntent.DeleteImage -> deleteImage(noteIntent.bitmaps)
+            is NoteIntent.DeleteImage -> deleteImage(noteIntent.absolutePath)
 
             is NoteIntent.ShowGallery -> {
                 _editTransactionState.tryEmit(
                     editTransactionState.value.copy(
-                        showImageGallery = true,
-                        clickedIndex = noteIntent.selectedIndex
+                        showImageGallery = true, clickedIndex = noteIntent.selectedIndex
                     )
                 )
             }
@@ -235,8 +228,7 @@ class EditTransactionVM(
                     editTransactionState.value.copy(
                         transaction = editTransactionState.value.transaction.copy(
                             amount = amountIntent.value.double()
-                        ),
-                        amountTfState = editTransactionState.value.amountTfState.copy(
+                        ), amountTfState = editTransactionState.value.amountTfState.copy(
                             amountValue = amountIntent.value
                         )
                     )
@@ -257,8 +249,7 @@ class EditTransactionVM(
     }
 
     private fun updateCategoryIntent(
-        categoryIntent: EditCategoryIntent,
-        navHostController: NavHostController
+        categoryIntent: EditCategoryIntent, navHostController: NavHostController
     ) {
         when (categoryIntent) {
             is EditCategoryIntent.OnCategoryListChange -> {
@@ -291,13 +282,12 @@ class EditTransactionVM(
         )
     }
 
-    private fun deleteImage(images: List<Bitmap>) {
+    private fun deleteImage(images: List<String>) {
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
-                    images = images.toBase64String()
-                ),
-                noteState = editTransactionState.value.noteState.copy(
+                    images = images
+                ), noteState = editTransactionState.value.noteState.copy(
                     images = images
                 )
             )

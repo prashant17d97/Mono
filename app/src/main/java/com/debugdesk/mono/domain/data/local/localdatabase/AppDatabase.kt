@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
-import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
+import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
+import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.domain.data.local.localdatabase.typeconverter.Converters
 
 @Database(
-    entities = [DailyTransaction::class, CategoryModel::class],
+    entities = [Transaction::class, CategoryModel::class, TransactionImage::class],
     version = 1,
     exportSchema = false
 )

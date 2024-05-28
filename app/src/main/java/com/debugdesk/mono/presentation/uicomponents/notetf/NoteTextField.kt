@@ -54,8 +54,7 @@ fun NoteTextField(
                         ?: CommonColor.disableButton,
                     shape = RoundedCornerShape(dp10))) {
 
-            MonoOutlineTextField(
-                trailingIcon = R.drawable.ic_camera,
+            MonoOutlineTextField(trailingIcon = R.drawable.ic_camera,
                 placeHolderText = stringResource(id = R.string.input),
                 textStyle = MaterialTheme.typography.bodyMedium,
                 charLimit = 100,
@@ -70,24 +69,22 @@ fun NoteTextField(
                 },
                 enabled = true,
                 trailingClick = { onNoteChange(NoteIntent.OnTrailIconClick) },
-                fieldClickBack = { }
-            )
+                fieldClickBack = { })
 
             AnimatedVisibility(visible = noteState.images.isNotEmpty()) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(
-                        space = dp10,
-                        alignment = Alignment.Start
-                    ),
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier.fillMaxWidth()
+                        space = dp10, alignment = Alignment.Start
+                    ), verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()
                 ) {
                     itemsIndexed(noteState.images) { index, item ->
                         ImageCard(modifier = Modifier,
-                            bitmap = item,
+                            absolutePath = item,
                             onImageClick = { onNoteChange(NoteIntent.ShowGallery(index)) },
-                            onDelete = { bitmap ->
-                                onNoteChange(NoteIntent.DeleteImage(noteState.images.filter { it != bitmap }))
+                            onDelete = { filePath ->
+                                onNoteChange(NoteIntent.DeleteImage(noteState.images.filter {
+                                    it != filePath
+                                }))
                             })
                     }
                 }

@@ -34,7 +34,9 @@ object Modules {
         factory { AppDatabase.getInstance(androidApplication().applicationContext).daoInterface() }
         single<Repository> {
             RepositoryImpl(
-                daoInterface = get(), appDatabase = get()
+                daoInterface = get(),
+                appDatabase = get(),
+                context = androidApplication().applicationContext
             )
         }
         single<AppStateManager> { AppStateManagerImpl() }

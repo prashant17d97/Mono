@@ -29,7 +29,6 @@ import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
 import com.debugdesk.mono.presentation.report.ReportIntent
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp
-import com.debugdesk.mono.utils.ImageUtils.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDate
 
 @Composable
@@ -113,7 +112,7 @@ fun TransactionCard(
 
             LazyRow(content = {
 
-                items(dailyTransaction.images.toBitmap()) {
+                items(dailyTransaction.images) {
                     // Image
                 }
             })

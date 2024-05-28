@@ -1,7 +1,6 @@
 package com.debugdesk.mono.presentation.uicomponents
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,43 +24,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.FileProvider
-import com.debugdesk.mono.BuildConfig
 import com.debugdesk.mono.R
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.CameraFunction.createImageFile
 import com.debugdesk.mono.utils.CameraFunction.deleteImage
+import com.debugdesk.mono.utils.CameraFunction.getUriFromFile
+import com.debugdesk.mono.utils.CameraFunction.toUriFromFilePath
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.ImageCard
-import com.debugdesk.mono.utils.ImageUtils.bitmapToUri
-import com.debugdesk.mono.utils.ImageUtils.toBitMaps
-import com.debugdesk.mono.utils.ImageUtils.uriToBitmap
 import com.debugdesk.mono.utils.PermissionLauncherHandler
 import org.koin.compose.koinInject
-import java.util.Objects
 
 @Composable
 fun Camera(
-    bitmaps: List<Bitmap>? = null,
+    filePaths: List<String> = emptyList(),
     dismiss: () -> Unit = {},
-    onSave: (List<Bitmap>) -> Unit = {},
+    onSave: (absolutePaths: List<String>) -> Unit = {},
 ) {
     val context = LocalContext.current
     var imageUris: List<Uri> by remember {
-        mutableStateOf(bitmaps?.bitmapToUri(context) ?: emptyList())
+        mutableStateOf(filePaths.toUriFromFilePath(context))
+    }
+
+    var absolutePaths: List<String> by remember {
+        mutableStateOf(filePaths)
     }
     val appStateManager: AppStateManager = koinInject()
     val file = context.createImageFile()
-    val uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file
-    )
+    val uri = getUriFromFile(context, file)
 
     var requestPermission by remember {
         mutableStateOf(false)
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        Log.e("Camera", "Camera: $uri, ${uri.path}")
+        Log.e("Camera", "Camera: $uri, ${uri.path}, ${file.absolutePath}")
+        absolutePaths += file.absolutePath
         imageUris += uri
         requestPermission = false
     }
@@ -104,23 +102,24 @@ fun Camera(
                 }
                 dismiss()
             },
-            onTrailClick = { onSave(imageUris.toBitMaps(context)) }
+            onTrailClick = { onSave(absolutePaths) }
 
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(dp10, alignment = Alignment.Top)
             ) {
-                items(imageUris) { bitmapItem ->
-                    if (bitmapItem.path?.isNotEmpty() == true) {
-                        ImageCard(bitmap = uriToBitmap(context, bitmapItem), onDelete = { bitmap ->
-                            deleteImage(
-                                context = context,
-                                uri = bitmapItem,
+                items(absolutePaths) { absolutePath ->
+                    if (absolutePath.isNotEmpty()) {
+                        ImageCard(absolutePath = absolutePath, onDelete = { absPath ->
+                            deleteImage(context = context,
+                                absolutePath = absolutePath,
                                 returnMessage = { toast ->
                                     appStateManager.showToastState(toastMsg = toast)
                                 }) { selectedUri ->
-                                imageUris = imageUris.filter { it != selectedUri }
+                                imageUris = imageUris.filter { uri -> uri != selectedUri }
+                                absolutePaths =
+                                    absolutePaths.filter { path -> path != absPath }
                             }
                         })
                     }

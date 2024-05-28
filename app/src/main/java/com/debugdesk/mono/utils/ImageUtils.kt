@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -72,6 +73,17 @@ object ImageUtils {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
+    fun Bitmap.toBase64(): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        compress(
+            Bitmap.CompressFormat.PNG,
+            100,
+            byteArrayOutputStream
+        ) // Adjust compression ratio as needed
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
     fun base64ToBitmap(base64String: String): Bitmap {
         try {
             val decodedString = Base64.decode(base64String, Base64.DEFAULT)
@@ -96,10 +108,10 @@ object ImageUtils {
         return base64
     }
 
-    fun List<String>.toBitmap(): List<Bitmap> {
+    fun List<TransactionImage>.toBitmap(): List<Bitmap> {
         val bitmaps: MutableList<Bitmap> = mutableListOf()
         forEach {
-            bitmaps.add(base64ToBitmap(it))
+            bitmaps.add(base64ToBitmap(it.filePath))
         }
         return bitmaps
     }

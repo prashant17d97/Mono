@@ -1,6 +1,5 @@
 package com.debugdesk.mono.utils
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,9 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
+import com.debugdesk.mono.utils.CameraFunction.rememberAbsolutePathPainter
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.Dp.dp120
 import com.debugdesk.mono.utils.Dp.dp16
@@ -36,8 +35,8 @@ import com.debugdesk.mono.utils.Dp.dp6
 @Composable
 fun ImageCard(
     modifier: Modifier = Modifier,
-    bitmap: Bitmap,
-    onDelete: (Bitmap) -> Unit = {},
+    absolutePath: String,
+    onDelete: (absolutePaths: String) -> Unit = {},
     onImageClick: () -> Unit = {}
 ) {
     Box(
@@ -61,11 +60,11 @@ fun ImageCard(
                 )
                 .clip(RoundedCornerShape(dp16))
                 .clickable { onImageClick() },
-            painter = rememberAsyncImagePainter(model = bitmap),
+            painter = rememberAbsolutePathPainter(path = absolutePath),
             contentScale = ContentScale.FillBounds,
             contentDescription = null
         )
-        IconButton(onClick = { onDelete(bitmap) }) {
+        IconButton(onClick = { onDelete(absolutePath) }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_trash),
                 contentDescription = "Delete",
@@ -80,6 +79,6 @@ fun ImageCard(
 @Composable
 private fun ImageCardPrev() {
     PreviewTheme {
-        ImageCard(bitmap = ImageUtils.createEmptyBitmap())
+        ImageCard(absolutePath = "/storage/emulated/0/Android/data/com.debugdesk.mono/files/Pictures/MONO_20240528_103742_2037037548647594284.jpg")
     }
 }

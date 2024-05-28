@@ -42,7 +42,6 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteState
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
-import com.debugdesk.mono.utils.ImageUtils.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDateWeek
 import com.debugdesk.mono.utils.enums.Buttons
 import org.koin.androidx.compose.koinViewModel
@@ -157,12 +156,12 @@ fun EditTransactionContainer(
         enter = slideInVertically { it },
         exit = slideOutVertically { it }) {
         Camera(
-            bitmaps = editTransactionState.transaction.images.toBitmap(),
+            filePaths = editTransactionState.transaction.images,
             dismiss = {
                 onEditTransactionIntent(EditTransactionIntent.DismissCamera)
             },
             onSave = {
-                onEditTransactionIntent(EditTransactionIntent.SaveImagesUri(it))
+                onEditTransactionIntent(EditTransactionIntent.SaveImagesFilePath(it))
             }
         )
     }
@@ -181,12 +180,13 @@ fun EditTransactionContainer(
         )
     ) {
         ImageGallery(
-            images = editTransactionState.transaction.images.toBitmap(),
+            images = editTransactionState.transaction.images,
             clickedIndex = editTransactionState.clickedIndex,
-            onDelete = { bitmap ->
+            onDelete = { imagePath ->
                 onEditTransactionIntent(
                     EditTransactionIntent.DeleteImage(
-                        editTransactionState.noteState.images.filter { it != bitmap })
+                        editTransactionState.noteState.images.filter { it != imagePath }
+                    )
                 )
             },
             close = { onEditTransactionIntent(EditTransactionIntent.CloseImageGallery) })

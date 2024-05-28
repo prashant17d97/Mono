@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.edittrans
 
-import android.graphics.Bitmap
 import com.debugdesk.mono.presentation.uicomponents.amounttf.TextFieldCalculatorIntent
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
@@ -22,6 +21,6 @@ sealed class EditTransactionIntent {
     data object OpenGallery : EditTransactionIntent()
     data object CloseImageGallery : EditTransactionIntent()
     data object CloseBSM : EditTransactionIntent()
-    data class SaveImagesUri(val images: List<Bitmap>) : EditTransactionIntent()
-    data class DeleteImage(val images: List<Bitmap>) : EditTransactionIntent()
+    data class SaveImagesFilePath(val imagePaths: List<String>) : EditTransactionIntent()
+    data class DeleteImage(val imagePaths: List<String>) : EditTransactionIntent()
 }

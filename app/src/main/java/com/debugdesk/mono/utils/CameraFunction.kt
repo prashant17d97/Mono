@@ -9,11 +9,18 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import com.debugdesk.mono.BuildConfig
 import com.debugdesk.mono.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Objects
 
 object CameraFunction {
 
@@ -33,7 +40,32 @@ object CameraFunction {
         }
     }
 
-    fun deleteFile(context: Context, file: File): Boolean {
+    @Composable
+    fun rememberAbsolutePathPainter(path: String): AsyncImagePainter {
+        val context = LocalContext.current
+        return rememberAsyncImagePainter(model = getUriFromFilePath(context, path))
+    }
+
+    private fun getUriFromFilePath(context: Context, filePath: String): Uri {
+        val file = File(filePath)
+        return FileProvider.getUriForFile(
+            Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file
+        )
+
+    }
+
+    fun List<String>.toUriFromFilePath(context: Context): List<Uri> {
+        return map { getUriFromFilePath(context, it) }
+    }
+
+    fun getUriFromFile(context: Context, file: File): Uri {
+        return FileProvider.getUriForFile(
+            Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file
+        )
+
+    }
+
+    private fun deleteFile(context: Context, file: File): Boolean {
         return try {
             // Check if file exists
             if (file.exists()) {
@@ -106,6 +138,34 @@ object CameraFunction {
             returnMessage(R.string.image_deleted_error)
             false
         }
+    }
+
+
+    fun deleteImage(
+        context: Context, absolutePath: String,
+        returnMessage: (message: Int) -> Unit = {},
+        onSuccess: (uri: Uri) -> Unit = {}
+    ): Boolean {
+        /*return try {
+            val contentResolver = context.contentResolver
+            val rowsDeleted = contentResolver.delete(absolutePath, null, null)
+            if (rowsDeleted > 0) {
+                Log.d("FileDelete", "File deleted successfully: $uri")
+                returnMessage(R.string.image_deleted)
+                uri.path?.let { File(it) }?.let { deleteFile(context, it) }
+                onSuccess(uri)
+                true
+            } else {
+                Log.e("FileDelete", "Failed to delete file: $uri")
+                returnMessage(R.string.image_deleted_failed)
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("FileDelete", "Error deleting file: $uri", e)
+            returnMessage(R.string.image_deleted_error)
+            false
+        }*/
+        return true
     }
 
     fun List<String>.toUris(): List<Uri> {

@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.uicomponents
 
-import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -29,8 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.R
+import com.debugdesk.mono.utils.CameraFunction.rememberAbsolutePathPainter
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp16
@@ -41,9 +40,9 @@ import com.debugdesk.mono.utils.Dp.dp40
 fun ImageGallery(
     modifier: Modifier = Modifier,
     clickedIndex: Int = 0,
-    images: List<Bitmap> = emptyList(),
+    images: List<String> = emptyList(),
     close: () -> Unit,
-    onDelete: (Bitmap) -> Unit
+    onDelete: (imagePath:String) -> Unit
 ) {
     val pagerState = rememberPagerState {
         images.size
@@ -97,7 +96,7 @@ fun ImageGallery(
             modifier = modifier
                 .clip(MaterialTheme.shapes.large)
         ) {
-            ImageGalleryCard(bitmap = images[it])
+            ImageGalleryCard(imagePath = images[it])
         }
     }
 }
@@ -105,7 +104,7 @@ fun ImageGallery(
 @Composable
 private fun ImageGalleryCard(
     modifier: Modifier = Modifier,
-    bitmap: Bitmap
+    imagePath: String
 ) {
     Box(
         contentAlignment = Alignment.TopEnd,
@@ -116,7 +115,7 @@ private fun ImageGalleryCard(
         Image(
             modifier = modifier
                 .clip(MaterialTheme.shapes.large),
-            painter = rememberAsyncImagePainter(model = bitmap),
+            painter = rememberAbsolutePathPainter(path = imagePath),
             contentScale = ContentScale.Inside,
             contentDescription = "Image"
         )
