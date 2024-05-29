@@ -250,7 +250,6 @@ fun CustomDateRange(
             DateText(
                 modifier = Modifier.weight(1f),
                 text = endDate?.toDate() ?: stringResource(id = R.string.end),
-                initialDateInMillis = endDate
             ) { endDate = it }
 
         }

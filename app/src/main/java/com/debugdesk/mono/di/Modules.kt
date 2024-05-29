@@ -42,8 +42,6 @@ object Modules {
         single<AppStateManager> { AppStateManagerImpl() }
         single<AppConfigManager> { AppConfigurationManagerImpl(dataStoreUtil = get()) }
 
-
-
         viewModel {
             AddCategoryVM(repository = get())
         }
