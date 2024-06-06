@@ -3,11 +3,17 @@ package com.debugdesk.mono.utils
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.debugdesk.mono.R
 
 object CommonColor {
     val inActiveButton = Color(0xFFFE7474)
     val disableButton = Color(0xFF898A93)
     val brandColor = Color(0xFF5986F2)
+}
+
+object Tabs{
+    val tabs: List<Int> = listOf(R.string.expense, R.string.income)
+
 }
 
 object Dp {

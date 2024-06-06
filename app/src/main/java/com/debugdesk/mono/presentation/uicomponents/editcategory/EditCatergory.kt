@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R.drawable
 import com.debugdesk.mono.R.string
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
+import com.debugdesk.mono.presentation.edittrans.TransactionIntent
 import com.debugdesk.mono.presentation.uicomponents.CategoryCard
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.utils.Dp
@@ -29,7 +30,7 @@ import com.debugdesk.mono.utils.Dp.dp0
 @Composable
 fun EditCategoryCard(
     list: List<CategoryModel> = emptyList(),
-    onCategoryEdit: (EditCategoryIntent) -> Unit,
+    onCategoryEdit: (TransactionIntent) -> Unit,
 ) {
     Column {
         Row(
@@ -48,7 +49,7 @@ fun EditCategoryCard(
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 10.dp)
                     .clickable {
-                        onCategoryEdit(EditCategoryIntent.OnEditCategoryClicked)
+                        onCategoryEdit(TransactionIntent.UpdateCategoryIntent(EditCategoryIntent.OnEditCategoryClicked))
                     })
         }
 
@@ -58,10 +59,12 @@ fun EditCategoryCard(
                 itemsIndexed(list) { index, item ->
                     CategoryCard(model = item) {
                         onCategoryEdit(
-                            EditCategoryIntent.OnCategoryListChange(
-                                list.mapIndexed { j, item ->
-                                    item.copy(isSelected = index == j)
-                                })
+                            TransactionIntent.UpdateCategoryIntent(
+                                EditCategoryIntent.OnCategoryListChange(
+                                    list.mapIndexed { j, item ->
+                                        item.copy(isSelected = index == j)
+                                    })
+                            )
 
                         )
                     }

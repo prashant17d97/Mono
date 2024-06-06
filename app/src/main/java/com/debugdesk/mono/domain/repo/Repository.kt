@@ -2,6 +2,7 @@ package com.debugdesk.mono.domain.repo
 
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
+import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import kotlinx.coroutines.flow.StateFlow
 
 interface Repository {
@@ -28,4 +29,5 @@ interface Repository {
     suspend fun fetchCategories()
     suspend fun removeCategories(categories: List<CategoryModel>)
     suspend fun getTransactionByDateRange(startDate: Long, endDate: Long)
+    suspend fun deleteTransactionImage(transactionImage: TransactionImage, onSuccess:()->Unit)
 }

@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.uicomponents.tf
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.utils.CommonColor
+import com.debugdesk.mono.utils.Dp.dp1
+import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp56
 
 @Composable
@@ -53,8 +57,9 @@ fun MonoOutlineTextField(
     trailingIcon: Int? = null,
     placeHolderText: String,
     textStyle: TextStyle,
-    cornerShape: Dp = 10.dp,
+    cornerShape: Dp = dp10,
     charLimit: Int = 10,
+    borderWidth: Dp = dp1,
     keyBoardControl: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     height: Dp = TextFieldDefaults.MinHeight,
@@ -63,25 +68,36 @@ fun MonoOutlineTextField(
     singleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
     value: String,
+    textOutlineEnabled: Boolean = true,
     focusManager: FocusManager = LocalFocusManager.current,
     onValueChange: (String) -> Unit,
     enabled: Boolean = true,
     trailingClick: () -> Unit,
     errorMsg: (String) -> Unit = {},
     onAction: () -> Unit = {},
-    fieldClickBack: () -> Unit
+    fieldClickBack: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val color by animateColorAsState(
+        targetValue = when {
+            inFocus -> MaterialTheme.colorScheme.primary
+            textOutlineEnabled -> CommonColor.disableButton
+            else -> Color.Transparent
+        }, label = "color"
+    )
 
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .height(height)
-        .border(width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.takeIf { inFocus }
-                ?: CommonColor.disableButton,
-            shape = RoundedCornerShape(cornerShape)),
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .border(
+                width = borderWidth,
+                color = color,
+                shape = RoundedCornerShape(cornerShape)
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
+        horizontalArrangement = Arrangement.Center
+    ) {
         leadingIcon?.let {
             Image(
                 painter = painterResource(id = leadingIcon),
@@ -199,24 +215,21 @@ fun MonoOutlineTextField(
     }
 }
 
-object MonoOutlineTextField {
-    val fieldHeight = dp56
-}
-
 @Preview
 @Composable
 fun MonoOutlineTextFieldPrev() {
     PreviewTheme {
-        MonoOutlineTextField(placeHolderText = "Enter Amount",
-            textStyle = TextStyle(),
-            leadingIcon = R.drawable.ic_rupee,
+        MonoOutlineTextField(leadingIcon = R.drawable.ic_rupee,
             trailingIcon = R.drawable.camera,
+            placeHolderText = "Enter Amount",
+            textStyle = TextStyle(),
             height = dp56,
             imeAction = ImeAction.Done,
             value = "",
+            textOutlineEnabled = false,
             onValueChange = {},
             enabled = true,
-            fieldClickBack = {},
-            trailingClick = {})
+            trailingClick = {},
+            fieldClickBack = {})
     }
 }

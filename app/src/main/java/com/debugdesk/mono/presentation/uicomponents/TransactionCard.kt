@@ -112,7 +112,7 @@ fun TransactionCard(
 
             LazyRow(content = {
 
-                items(dailyTransaction.images) {
+                items(dailyTransaction.transactionImage) {
                     // Image
                 }
             })

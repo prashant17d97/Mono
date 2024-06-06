@@ -6,4 +6,9 @@ enum class ExpenseType {
     Neutral
 }
 
+enum class ImageFrom {
+    CAMERA,
+    GALLERY,
+}
+
 val expenseType = { index: Int -> ExpenseType.Expense.takeIf { index == 0 } ?: ExpenseType.Income }

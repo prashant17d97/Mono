@@ -1,11 +1,11 @@
 package com.debugdesk.mono.presentation.edittrans
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
+import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTfState
@@ -15,24 +15,30 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteState
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
+import com.debugdesk.mono.utils.CameraFunction.deleteImageFile
+import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
+import com.debugdesk.mono.utils.enums.ExpenseType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class EditTransactionVM(
-    private val appStateManager: AppStateManager,
+    val appStateManager: AppStateManager,
     private val appConfigManager: AppConfigManager,
     private val repository: Repository,
 ) : ViewModel() {
 
-    private val _editTransactionState = MutableStateFlow(EditTransactionState())
-    val editTransactionState: StateFlow<EditTransactionState> = _editTransactionState
+    private val _editTransactionState = MutableStateFlow(TransactionState())
+    val editTransactionState: StateFlow<TransactionState>
+        get() = _editTransactionState
 
     private var initialTransaction: DailyTransaction? = null
 
@@ -51,29 +57,43 @@ class EditTransactionVM(
                 repository.transaction
             ) { appConfigProperties, categoryModels, transaction: DailyTransaction ->
                 initialTransaction = transaction
-                EditTransactionState(transaction = transaction, amountTfState = AmountTfState(
-                    currencyIcon = appConfigProperties.currencyIcon,
-                    amountValue = transaction.amount.toString(),
-                ), noteState = NoteState(
-                    images = transaction.images, noteValue = transaction.note
-                ), categoryList = categoryModels.map { categoryModel ->
-                    categoryModel.copy(
-                        isSelected = categoryModel.categoryId == transaction.categoryId
-                    )
-                })
+                TransactionState(
+                    transaction = transaction, amountTfState = AmountTfState(
+                        currencyIcon = appConfigProperties.currencyIcon,
+                        amountValue = transaction.amount.toString(),
+                    ), noteState = NoteState(
+                        transactionImages = transaction.transactionImage,
+                        noteValue = transaction.note
+                    ), categoryList = categoryModels.map { categoryModel ->
+                        categoryModel.copy(
+                            isSelected = categoryModel.categoryId == transaction.categoryId
+                        )
+                    },
+                    appStateManager = appStateManager
+                )
             }.collect {
                 _editTransactionState.tryEmit(it)
             }
         }
+        listenChanges()
+    }
+
+    private fun listenChanges() {
+        editTransactionState.onEach {
+            _editTransactionState.tryEmit(
+                it.copy(
+                    changesFound = it.transaction != initialTransaction
+                )
+            )
+        }.launchIn(viewModelScope)
     }
 
     fun handleTransactionIntent(
-        transactionIntent: EditTransactionIntent,
+        transactionIntent: TransactionIntent,
         navHostController: NavHostController,
-        context: Context,
     ) {
         when (transactionIntent) {
-            EditTransactionIntent.OnBackClick -> {
+            TransactionIntent.OnBackClick -> {
                 if (initialTransaction == null || initialTransaction == editTransactionState.value.transaction) {
                     navHostController.popBackStack()
                 } else {
@@ -87,47 +107,63 @@ class EditTransactionVM(
                 }
             }
 
-            EditTransactionIntent.OnDeleteClick -> deleteTransactionWithAlert(navHostController)
-            EditTransactionIntent.OnUpdateClick -> updateTransaction(navHostController)
-            is EditTransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
-            is EditTransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
-            is EditTransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
+            TransactionIntent.OnDeleteClick -> deleteTransactionWithAlert(navHostController)
+            TransactionIntent.OnUpdateClick -> updateTransaction(navHostController)
+            is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(transactionIntent.type)
+            is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
+            is TransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
+            is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
                 transactionIntent.editCategoryIntent, navHostController
             )
 
-            is EditTransactionIntent.UpdateDate -> updateDate(transactionIntent.date)
-            is EditTransactionIntent.UpdateNote -> updateNote(transactionIntent.noteIntent)
-            EditTransactionIntent.DismissCamera -> dismissCamera()
-            EditTransactionIntent.DismissGallery -> dismissGallery()
-            is EditTransactionIntent.SaveImagesFilePath -> saveImages(
-                transactionIntent.imagePaths,
-                context
+            is TransactionIntent.UpdateDate -> updateDate(transactionIntent.date)
+            is TransactionIntent.UpdateNote -> updateNote(transactionIntent.noteIntent)
+            TransactionIntent.DismissCameraAndGalleryWindow -> closeCameraAndGalleryWindow()
+            is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
+
+            is TransactionIntent.SaveImagesFilePath -> saveImages(
+                transactionIntent.transactionImages
             )
 
-            EditTransactionIntent.CloseBSM -> dismissBSM()
-            EditTransactionIntent.OpenCamera -> showCamera()
-            EditTransactionIntent.OpenGallery -> showGallery()
-            is EditTransactionIntent.DeleteImage -> deleteImage(transactionIntent.imagePaths)
-            EditTransactionIntent.CloseImageGallery -> _editTransactionState.tryEmit(
+            is TransactionIntent.DeleteImage -> deleteImage(transactionIntent.transactionImages)
+            TransactionIntent.CloseImageGallery -> _editTransactionState.tryEmit(
                 editTransactionState.value.copy(
                     showImageGallery = false
                 )
             )
+
+            is TransactionIntent.DeleteFromDB -> deleteDBImage(transactionIntent.transactionImage)
         }
     }
 
-    private fun saveImages(images: List<String>, context: Context) {
+    private fun saveNewTransaction(type: ExpenseType) {
+        viewModelScope.launch {
+            repository.insert(editTransactionState.value.transaction.copy(type = type.name))
+        }
+    }
+
+    private fun saveImages(images: List<TransactionImage>) {
         val editData = editTransactionState.value
+        val transactionId = editData.transaction.transactionId
+        val existingImages = editData.transaction.transactionImage.associateBy { it.absolutePath }
+
+        val updatedImages = images.map { transactionImage ->
+            val imageId = existingImages[transactionImage.absolutePath]?.imageId ?: 0
+            transactionImage.copy(transactionId = transactionId, imageId = imageId)
+        }
+
+        val updatedTransaction = editData.transaction.copy(transactionImage = updatedImages)
+        val updatedNoteState = editData.noteState.copy(transactionImages = images)
+
         _editTransactionState.tryEmit(
-            editTransactionState.value.copy(
-                transaction = editData.transaction.copy(
-                    images = images
-                ), noteState = editData.noteState.copy(images = images)
+            editData.copy(
+                transaction = updatedTransaction,
+                noteState = updatedNoteState
             )
         )
-        dismissGallery()
-        dismissCamera()
+        closeCameraAndGalleryWindow()
     }
+
 
     private fun deleteTransactionWithAlert(navHostController: NavHostController) {
         appStateManager.showAlertDialog(message = R.string.transaction_deleted_alert,
@@ -184,7 +220,7 @@ class EditTransactionVM(
 
     private fun updateNote(noteIntent: NoteIntent) {
         when (noteIntent) {
-            NoteIntent.OnTrailIconClick -> showBSM()
+            NoteIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
 
             is NoteIntent.OnValueChange -> {
                 _editTransactionState.tryEmit(
@@ -198,7 +234,7 @@ class EditTransactionVM(
                 )
             }
 
-            is NoteIntent.DeleteImage -> deleteImage(noteIntent.absolutePath)
+            is NoteIntent.DeleteImages -> deleteImage(noteIntent.transactionImage)
 
             is NoteIntent.ShowGallery -> {
                 _editTransactionState.tryEmit(
@@ -206,6 +242,10 @@ class EditTransactionVM(
                         showImageGallery = true, clickedIndex = noteIntent.selectedIndex
                     )
                 )
+            }
+
+            is NoteIntent.DeleteFromDB -> {
+                deleteDBImage(noteIntent.transactionImage)
             }
         }
 
@@ -273,60 +313,59 @@ class EditTransactionVM(
     }
 
     private fun updateDate(date: Long) {
+        val (month, year) = CommonFunctions.getMonthAndYearFromLong(date)
+
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
-                    date = date
+                    date = date,
+                    currentMonthId = month,
+                    year = year
                 )
             )
         )
     }
 
-    private fun deleteImage(images: List<String>) {
+    private fun deleteImage(images: List<TransactionImage>) {
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
-                    images = images
+                    transactionImage = images
                 ), noteState = editTransactionState.value.noteState.copy(
-                    images = images
+                    transactionImages = images
                 )
             )
         )
+        images.forEach {
+            it.deleteImageFile(
+                deleteFromDB = {
+                    deleteDBImage(it)
+                }
+            )
+        }
     }
 
-    private fun dismissCamera() {
+
+    private fun closeCameraAndGalleryWindow() {
+        if (editTransactionState.value.showCameraAndGallery) {
+            _editTransactionState.tryEmit(
+                editTransactionState.value.copy(showCameraAndGallery = false)
+            )
+        }
+    }
+
+
+    private fun openCameraAndGalleryWindow() {
         _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showCamera = false)
+            editTransactionState.value.copy(showCameraAndGallery = true)
         )
     }
 
-    private fun dismissGallery() {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showGallery = false)
-        )
-    }
-
-    private fun dismissBSM() {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showBSM = false)
-        )
-    }
-
-    private fun showCamera() {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showCamera = true)
-        )
-    }
-
-    private fun showGallery() {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showGallery = true)
-        )
-    }
-
-    private fun showBSM() {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(showBSM = true)
-        )
+    private fun deleteDBImage(transactionImage: TransactionImage) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteTransactionImage(transactionImage, onSuccess = {
+                appStateManager.showToastState(toastMsg = R.string.image_deleted)
+            })
+        }
     }
 }

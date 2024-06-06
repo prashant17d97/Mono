@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
@@ -118,17 +119,16 @@ fun ExpenseCard(
 private fun ExpenseCardPrev() {
     PreviewTheme {
         ExpenseCard(
-            currency = "₹", dailyTransaction = listOf(
+            currency = stringResource(id = R.string.inrIcon), dailyTransaction = listOf(
                 DailyTransaction(
                     date = System.currentTimeMillis(),
                     type = ExpenseType.Expense.name,
                     note = "Coffee",
                     category = "Bevarages",
                     categoryIcon = R.drawable.ic_category,
+                    categoryId = 6,
                     amount = 2000.0,
-                    images = emptyList(),
-                    currentMonthId = 0,
-                    categoryId = 6
+                    currentMonthId = 0
                 )
             )
         )

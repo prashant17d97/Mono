@@ -13,7 +13,6 @@
     <string name="your_device_offline">You\'re offline</string>
     <string name="note">Note</string>
     <string name="all">All</string>
-    <string name="expense">Expense</string>
     <string name="category">Category</string>
     <string name="addCategory">Add Category</string>
     <string name="editCategory">Edit Category</string>
@@ -24,7 +23,6 @@
     <string name="delete">Delete</string>
     <string name="no_data">There is no data to delete!</string>
     <string name="dark_mode">Dark mode</string>
-    <string name="income">Income</string>
     <string name="currentBalance">Current Balance</string>
     <string name="totalBalance">Total Available Balance</string>
     <string name="thisMonthTotalBalance">%s Balance</string>
@@ -146,6 +144,15 @@
         <item>@string/Oct</item>
         <item>@string/Nov</item>
         <item>@string/Dec</item>
+    </string-array>
+    <!--Transaction Type-->
+
+    <string name="expense">Expense</string>
+    <string name="income">Income</string>
+
+    <string-array name="expenses">
+        <item>@string/expense</item>
+        <item>@string/income</item>
     </string-array>
 
 
@@ -492,11 +499,18 @@
     <string name="discard">Discard</string>
     <string name="permission_access">Permission Access Denied</string>
     <string name="permission_denied_setting">Permission denied. Please grant permission from app settings.</string>
-    <string name="camera_permission">In order to access camera, please grant the permission to continue.</string>
-    <string name="image_deleted">Selected Image deleted successfully.</string>
+    <string name="camera_permission">In order to access camera, please grant the permission.</string>
+    <string name="gallery_permission">In order to access gallery images, please grant the permission.</string>
+    <string name="image_deleted">Image deleted!</string>
     <string name="image_deleted_failed">Failed to delete image.</string>
     <string name="image_deleted_error">Error deleting image.</string>
     <string name="groceries">Groceries</string>
+    <string name="preview">Preview</string>
+    <string name="image_not_found">Image not found!</string>
+    <string name="gallery_permission_denied">We couldn\'t access the gallery because the required permissions were not granted. Please enable the permissions in the app settings to access your gallery images.</string>
+    <string name="gallery_camera_denied">We couldn\'t obtain camera permission in previous attempts. Please grant the permission from the app settings to access the camera.</string>
+    <string name="no_data_found">No data found!</string>
+    <string name="transaction_added">New Transaction Added.</string>
 
 
 </resources>

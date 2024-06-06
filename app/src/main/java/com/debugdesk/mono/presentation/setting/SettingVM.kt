@@ -9,7 +9,6 @@ import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingModel
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingNameEnum
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyDrawableIcon
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,12 +24,12 @@ class SettingVM(
 
     val allDataCount = repository.allItemSize
 
-    val settings = { currency: String ->
+    val settings = { currency: Int ->
         listOf(
             SettingModel(icon = R.drawable.ic_category, name = SettingNameEnum.Category),
             SettingModel(icon = R.drawable.ic_wrench, name = SettingNameEnum.Appearance),
             SettingModel(
-                icon = currency.getCurrencyDrawableIcon(),
+                icon = currency,
                 name = SettingNameEnum.Currency
             ),
             SettingModel(icon = R.drawable.ic_reminder, name = SettingNameEnum.Reminder),

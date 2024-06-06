@@ -1,21 +1,13 @@
 package com.debugdesk.mono.utils.commonfunctions
 
-import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.Base64
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.window.DialogProperties
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
@@ -26,10 +18,7 @@ import com.debugdesk.mono.ui.appconfig.defaultconfig.ThemeMode
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.enums.ExpenseType
 import com.debugdesk.mono.utils.states.AlertState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
@@ -127,48 +116,6 @@ object CommonFunctions {
     }
 
 
-    suspend fun uriToBase64(contentResolver: ContentResolver, uri: Uri): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                // Decode URI to bitmap
-                val inputStream = contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-
-                // Convert bitmap to byte array
-                val outputStream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                val byteArray = outputStream.toByteArray()
-
-                // Encode byte array to Base64 string
-                val base64String = Base64.encodeToString(byteArray, Base64.DEFAULT)
-
-                base64String
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-
-    // Convert Base64 String to ImageBitmap
-    @Composable
-    fun toImageBitmap(base64String: String): ImageBitmap {
-        val decodedImage = remember(base64String) {
-            val byteArray = Base64.decode(base64String, Base64.DEFAULT)
-            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-            bitmap.asImageBitmap()
-        }
-
-        return if (decodedImage.width > 0 && decodedImage.height > 0) {
-            // Image loaded successfully
-            decodedImage
-        } else {
-            // Handle error or display placeholder
-            ImageBitmap(100, 100) // Placeholder with desired dimensions
-        }
-    }
-
     fun Long.longToDateString(datePattern: String = "yyyy-MM-dd"): String {
         val date = Date(this)
         val format = SimpleDateFormat(datePattern, Locale.getDefault())
@@ -260,7 +207,6 @@ object CommonFunctions {
         } else {
             calendar.add(Calendar.MONTH, 1)
         }
-        val month = calendar.get(Calendar.MONTH)
         val year = calendar.get(Calendar.YEAR)
         val monthString =
             calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
@@ -333,7 +279,25 @@ object CommonFunctions {
                 onPositiveClick()
             }
 
-        ))
+        )
+        )
     }
 
+    fun Long.formatFileSize(): String {
+        val sizeInBytes: Long = this
+        val kb = 1024.0
+        val mb = kb * 1024
+        val gb = mb * 1024
+        val tb = gb * 1024
+
+        val (format, value) = when {
+            sizeInBytes < kb -> "%.0f Bytes" to sizeInBytes.toDouble()
+            sizeInBytes < mb -> "%.2f KB" to sizeInBytes / kb
+            sizeInBytes < gb -> "%.2f MB" to sizeInBytes / mb
+            sizeInBytes < tb -> "%.2f GB" to sizeInBytes / gb
+            else -> "%.2f TB" to sizeInBytes / tb
+        }
+
+        return String.format(Locale.getDefault(), format, value)
+    }
 }

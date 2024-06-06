@@ -2,10 +2,6 @@ package com.debugdesk.mono.presentation.report
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,12 +14,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,11 +36,13 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.model.Tabs
 import com.debugdesk.mono.presentation.uicomponents.CalendarBar
 import com.debugdesk.mono.presentation.uicomponents.ExpenseCard
+import com.debugdesk.mono.presentation.uicomponents.NoDataFound
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.ScreenView
 import com.debugdesk.mono.presentation.uicomponents.TransactionCard
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp120
 import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp8
 import com.debugdesk.mono.utils.Dp.dp80
@@ -139,31 +134,12 @@ private fun ReportContainer(
             }
         }
 
-        AnimatedVisibility(
-            visible = !reportState.isTransactionEmpty,
-            enter = slideInHorizontally { -it } + fadeIn(),
-            exit = slideOutHorizontally { -it }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(
-                    space = dp8,
-                    alignment = Alignment.CenterVertically
-                ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.no_entry),
-                    contentDescription = "No Transaction Found",
-                    modifier = Modifier.size(dp80),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                Text(text = stringResource(id = R.string.noTransactionFound))
-            }
-        }
+        NoDataFound(
+            show = !reportState.isTransactionEmpty,
+            text = R.string.noTransactionFound,
+            imageSize = dp120,
+            modifier = Modifier.padding(top = dp80)
+        )
     }
 }
 

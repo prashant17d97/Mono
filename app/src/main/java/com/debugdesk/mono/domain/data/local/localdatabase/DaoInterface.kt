@@ -58,8 +58,11 @@ interface DaoInterface {
     suspend fun deleteAllTransactions()
 
 
-    @Query("SELECT * FROM transaction_images WHERE transactionId = :transactionId")
-    suspend fun getImage(transactionId: Int): List<TransactionImage>
+    @Query("SELECT * FROM transaction_images WHERE transactionUniqueId = :transactionUniqueId")
+    suspend fun getImage(transactionUniqueId: String): List<TransactionImage>
+
+    @Query("SELECT * FROM transaction_images")
+    suspend fun getAllImage(): List<TransactionImage>
 
     @Insert
     suspend fun insertImage(image: TransactionImage)
@@ -67,8 +70,8 @@ interface DaoInterface {
     @Update
     suspend fun updateImage(image: TransactionImage)
 
-    @Query("DELETE FROM transaction_images WHERE transactionId = :transactionId")
-    suspend fun deleteImagesForTransaction(transactionId: Int)
+    @Query("DELETE FROM transaction_images WHERE transactionUniqueId = :transactionUniqueId")
+    suspend fun deleteImagesForTransaction(transactionUniqueId: String)
 
     @Delete(TransactionImage::class)
     suspend fun deleteImage(transactionImage: TransactionImage)

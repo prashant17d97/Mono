@@ -11,7 +11,7 @@ import com.debugdesk.mono.presentation.addcategory.AddCategory
 import com.debugdesk.mono.presentation.editcategory.EditCategory
 import com.debugdesk.mono.presentation.edittrans.EditTransaction
 import com.debugdesk.mono.presentation.graph.Graph
-import com.debugdesk.mono.presentation.input.state.Input
+import com.debugdesk.mono.presentation.input.Input
 import com.debugdesk.mono.presentation.intro.Intro
 import com.debugdesk.mono.presentation.report.Report
 import com.debugdesk.mono.presentation.setting.Setting

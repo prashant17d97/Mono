@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val transactionId: Int = 0,
+    val transactionUniqueId: String,
     val date: Long,
     val type: String,
     val note: String,

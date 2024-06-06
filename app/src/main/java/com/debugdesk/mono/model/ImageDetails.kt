@@ -1,23 +1,11 @@
-package com.debugdesk.mono.domain.data.local.localdatabase.model
+package com.debugdesk.mono.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.formatFileSize
-import com.debugdesk.mono.utils.enums.ImageFrom
 import com.google.gson.annotations.SerializedName
 
-@Entity(
-    tableName = "transaction_images",
-)
-data class TransactionImage(
-    @PrimaryKey(autoGenerate = true)
-    val imageId: Int = 0,
-    @SerializedName("transactionId")
-    val transactionId: Int,
+data class ImageDetails(
     @SerializedName("absolutePath")
     val absolutePath: String,
-    @SerializedName("transactionUniqueId")
-    val transactionUniqueId: String,
     @SerializedName("fileName")
     val fileName: String,
     @SerializedName("fileSize")
@@ -31,9 +19,7 @@ data class TransactionImage(
     @SerializedName("height")
     val height: Int,
     @SerializedName("orientation")
-    val orientation: String,
-    @SerializedName("from")
-    val from: String
+    val orientation: String
 ) {
 
     val size: String get() = fileSize.formatFileSize()
@@ -50,9 +36,7 @@ data class TransactionImage(
     }
 }
 
-val emptyTransactionImageDetail = TransactionImage(
-    imageId = 0,
-    transactionId = 0,
+val emptyImageDetails = ImageDetails(
     absolutePath = "",
     fileName = "",
     fileSize = 0,
@@ -60,7 +44,5 @@ val emptyTransactionImageDetail = TransactionImage(
     width = 0,
     height = 0,
     orientation = "",
-    transactionUniqueId = "",
-    isEmpty = true,
-    from = ImageFrom.CAMERA.name
+    isEmpty = true
 )

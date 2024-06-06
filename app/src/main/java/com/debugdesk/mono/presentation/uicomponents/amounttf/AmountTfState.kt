@@ -1,12 +1,14 @@
 package com.debugdesk.mono.presentation.uicomponents.amounttf
 
+import androidx.annotation.DrawableRes
 import com.debugdesk.mono.R
 
 data class AmountTfState(
-    val currencyIcon: Int = R.string.inrIcon,
+    @DrawableRes
+    val currencyIcon: Int = R.drawable.ic_rupee,
     val height: Int = 56,
     val catIndex: Int = 0,
     val openDialog: Boolean = false,
     val hasFocus: Boolean = false,
-    val amountValue: String = "0.0",
+    val amountValue: String = "",
 )

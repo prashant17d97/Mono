@@ -23,11 +23,17 @@ fun AmountTextFieldCalculator(
         leadingIcon = amountTfState.currencyIcon,
         placeHolderText = stringResource(id = R.string.zero),
         textStyle = MaterialTheme.typography.titleLarge,
+        height = dp65,
         imeAction = ImeAction.Next,
         value = amountTfState.amountValue,
+        onValueChange = {
+            onTextFieldCalculatorIntent(
+                TextFieldCalculatorIntent.OnValueChange(
+                    amountTfState.amountValue
+                )
+            )
+        },
         enabled = false,
-        height = dp65,
-        onValueChange = { onTextFieldCalculatorIntent(TextFieldCalculatorIntent.OnValueChange(it)) },
         trailingClick = {
             onTextFieldCalculatorIntent(
                 TextFieldCalculatorIntent.OpenDialog(

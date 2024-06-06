@@ -48,7 +48,7 @@ fun Setting(
     ScreenView(
         heading = stringResource(id = R.string.setting),
         onBackClick = { navHostController.popBackStack() }) {
-        settingVM.settings(appConfigProperties.selectedCurrencyCode)
+        settingVM.settings(appConfigProperties.currencyIcon)
             .forEach { settingModel ->
                 SettingItem(settingModel = settingModel, navHostController = navHostController)
             }

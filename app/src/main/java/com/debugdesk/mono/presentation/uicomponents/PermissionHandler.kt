@@ -1,12 +1,13 @@
-package com.debugdesk.mono.utils
+package com.debugdesk.mono.presentation.uicomponents
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,18 +15,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import com.debugdesk.mono.R
-import com.debugdesk.mono.ui.appconfig.AppStateManager
+import com.debugdesk.mono.presentation.uicomponents.media.PermissionHandler
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 
 @Composable
 fun PermissionLauncherHandler(
-    permissions: Array<String>,
-    appStateManager: AppStateManager,
-    @StringRes errorMsg: Int,
+    permissionHandler: PermissionHandler,
     onGranted: () -> Unit,
-    onPermissionDenial: () -> Unit,
+    onPermissionDenial: () -> Unit
 ) {
     var requestPermission by remember {
         mutableStateOf(true)
@@ -35,23 +35,23 @@ fun PermissionLauncherHandler(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionMap ->
+        val isRational = shouldShowRequestPermissionRationaleForList(
+            activity,
+            permissionHandler.permissionStrings
+        )
         checkPermissions(
             permissionMap = permissionMap,
-            permissions = permissions,
+            permissions = permissionHandler.permissionStrings,
             onError = {
-                appStateManager.showAlertDialog(
+                permissionHandler.appStateManager.showAlertDialog(
                     title = R.string.permission_access,
-                    message = errorMsg,
+                    message = permissionHandler.message(isRational),
                     iconDrawable = null,
                     onPositiveClick = {
-                        if (!shouldShowRequestPermissionRationaleForList(
-                                activity,
-                                permissions
-                            )
-                        ) {
-                            navigateToAppSettings(activity)
-                        } else {
+                        if (isRational) {
                             requestPermission = true
+                        } else {
+                            navigateToAppSettings(activity)
                         }
                     },
                     onNegativeClick = onPermissionDenial
@@ -62,7 +62,7 @@ fun PermissionLauncherHandler(
     }
     LaunchedEffect(requestPermission) {
         if (requestPermission) {
-            permissionLauncher.launch(permissions)
+            permissionLauncher.launch(permissionHandler.permissionStrings)
             requestPermission = false
         }
     }
@@ -112,6 +112,15 @@ private fun shouldShowRequestPermissionRationaleForList(
             permission
         )
     }
+}
+
+fun Context.hasPermission(permission: Array<String>): Boolean {
+    return permission.map {
+        ActivityCompat.checkSelfPermission(
+            this,
+            it
+        ) == PackageManager.PERMISSION_GRANTED
+    }.all { it }
 }
 
 

@@ -1,6 +1,8 @@
 package com.debugdesk.mono.presentation.uicomponents.notetf
 
+import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
+
 data class NoteState(
-    val images: List<String> = emptyList(),
+    val transactionImages: List<TransactionImage> = emptyList(),
     val noteValue: String = ""
 )

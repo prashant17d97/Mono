@@ -1,19 +1,19 @@
 package com.debugdesk.mono.domain.data.local.localdatabase.model
 
-import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.takeWord
+import java.util.Date
 
 
 data class DailyTransaction(
     val transactionId: Int = 0,
-    val date: Long,
+    val transactionUniqueId: String = "",
+    val date: Long = Date().time,
     val type: String,
     val note: String,
     val category: String,
     val categoryIcon: Int,
     val categoryId: Int,
     val amount: Double,
-    val images: List<String> = emptyList(),
     val transactionImage: List<TransactionImage> = emptyList(),
     val currentMonthId: Int = 0,
     val year: Int? = null
@@ -21,19 +21,16 @@ data class DailyTransaction(
 
     val notes: String
         get() = if (note.isNotEmpty()) "$category (${note.takeWord(2)})" else category
+
+    val absolutePaths: List<String> get() = transactionImage.map { it.absolutePath }
 }
 
 val emptyTransaction: DailyTransaction
     get() = DailyTransaction(
-        transactionId = 8014,
-        date = 1715507975498,
-        type = "Expense",
-        note = "None",
-        category = "Salary",
-        categoryIcon = R.drawable.bank,
-        amount = 65500.0,
-        images = listOf(),
-        currentMonthId = 4,
-        categoryId = 4,
-        year = 2024
+        type = "",
+        note = "",
+        category = "",
+        categoryIcon = 0,
+        categoryId = 0,
+        amount = 0.0,
     )
