@@ -11,7 +11,7 @@ object CommonColor {
     val brandColor = Color(0xFF5986F2)
 }
 
-object Tabs{
+object Tabs {
     val tabs: List<Int> = listOf(R.string.expense, R.string.income)
 
 }

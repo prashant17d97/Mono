@@ -26,7 +26,7 @@ import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.presentation.uicomponents.CategoryCard
 import com.debugdesk.mono.presentation.uicomponents.CustomOutlineTextField
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.utils.Dp.dp90
 import com.debugdesk.mono.utils.Icons.categoryIcons
 import org.koin.androidx.compose.koinViewModel
@@ -68,7 +68,7 @@ fun AddCategoryContainer(
     categoryState: AddCategoryState,
     onIntentChange: (AddCategoryIntent) -> Unit
 ) {
-    ScreenView(
+    MonoColumn(
         verticalArrangement = Arrangement.Top,
         isScrollEnabled = false,
         heading = stringResource(id = R.string.addCategory),

@@ -98,8 +98,7 @@ fun NoteTextField(
                             bottom = dp16
                         )
                 ) {
-                    itemsIndexed(noteState.transactionImages.sortedByDescending { it.from }
-                        .reversed()) { index, item ->
+                    itemsIndexed(noteState.transactionImages) { index, item ->
                         ImageCard(
                             absolutePath = item.absolutePath,
                             onDelete = {

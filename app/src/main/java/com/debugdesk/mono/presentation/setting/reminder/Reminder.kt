@@ -39,7 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.utils.Dp.dp10
@@ -51,6 +51,7 @@ import dev.chrisbanes.snapper.rememberLazyListSnapperLayoutInfo
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @Composable
 fun Reminder(
@@ -67,10 +68,10 @@ fun Reminder(
     val minute = reminder.time[1].toInt()
 
     val initialTimeSelected = "${
-        String.format("%02d", hour - (12.takeIf { hour > 12 }
+        String.format(Locale.getDefault(),"%02d", hour - (12.takeIf { hour > 12 }
             ?: 0))
     }:${
-        String.format(
+        String.format(Locale.getDefault(),
             "%02d",
             minute
         )
@@ -78,7 +79,7 @@ fun Reminder(
 
 
     Log.e("Reminder", "Reminder: $initialTimeSelected === $currentTimeSelected")
-    ScreenView(modifier = Modifier.fillMaxSize(),
+    MonoColumn(modifier = Modifier.fillMaxSize(),
         trailing = "Back",
         showBack = true,
         isScrollEnabled = false,

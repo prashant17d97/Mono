@@ -21,6 +21,7 @@ sealed class ReportIntent {
     data class EditTransaction(val transactionId: Int) : ReportIntent()
     data object DeleteTransaction : ReportIntent()
     data object CloseTransactionCard : ReportIntent()
+    data class ChangeReportView(val reportView: ReportView) : ReportIntent()
 }
 
 

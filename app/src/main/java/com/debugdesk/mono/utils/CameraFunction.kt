@@ -51,6 +51,29 @@ object CameraFunction {
         }
     }
 
+    fun clearPicturesFolder(context: Context) {
+        try {
+            val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            deleteDir(picturesDir)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun deleteDir(dir: File?): Boolean {
+        if (dir != null && dir.isDirectory) {
+            val children = dir.list()
+            for (child in children) {
+                val success = deleteDir(File(dir, child))
+                if (!success) {
+                    return false
+                }
+            }
+        }
+        return dir?.delete() ?: false
+    }
+
+
     @Composable
     fun rememberAbsolutePathPainter(path: String): AsyncImagePainter {
         val context = LocalContext.current
@@ -274,6 +297,28 @@ object CameraFunction {
         } else {
             onResult(false, true)
             Log.e(TAG, "deleteFile: false")
+        }
+    }
+
+    fun deleteNonExistingFiles(context: Context) {
+        val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        picturesDir?.takeIf { it.isDirectory }?.list()?.let { children ->
+            for (child in children) {
+                val file = File(picturesDir, child)
+                val fileImage = file.absolutePath.getTransactionImage(
+                    transactionId = 0,
+                    from = ImageFrom.CAMERA
+                )
+                if (file.exists() && fileImage.fileSize == 0L) {
+                    if (file.delete()) {
+                        Log.e(TAG, "Deleted non-existing camera file: $child")
+                    } else {
+                        Log.e(TAG, "Failed to delete file: $child")
+                    }
+                }
+            }
+        } ?: run {
+            Log.e(TAG, "Pictures directory is not accessible or not a directory")
         }
     }
 

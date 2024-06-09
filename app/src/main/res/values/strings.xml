@@ -511,6 +511,9 @@
     <string name="gallery_camera_denied">We couldn\'t obtain camera permission in previous attempts. Please grant the permission from the app settings to access the camera.</string>
     <string name="no_data_found">No data found!</string>
     <string name="transaction_added">New Transaction Added.</string>
+    <string name="month_report">Month Report</string>
+    <string name="category_report">Category</string>
+    <string name="calender_report">Calendar Report</string>
 
 
 </resources>

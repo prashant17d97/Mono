@@ -68,6 +68,8 @@ fun ImageCard(
 @Composable
 private fun ImageCardPrev() {
     PreviewTheme {
-        ImageCard(absolutePath = "/storage/emulated/0/Android/data/com.debugdesk.mono/files/Pictures/MONO_20240528_103742_2037037548647594284.jpg")
+        ImageCard(
+            absolutePath = "/storage/emulated/0/Android/data/com.debugdesk.mono/files/Pictures/MONO_20240528_103742_2037037548647594284.jpg"
+        )
     }
 }

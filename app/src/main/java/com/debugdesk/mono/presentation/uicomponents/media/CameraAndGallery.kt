@@ -34,10 +34,11 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.presentation.edittrans.TransactionIntent
 import com.debugdesk.mono.presentation.uicomponents.ImageCard
-import com.debugdesk.mono.presentation.uicomponents.NoDataFound
+import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
 import com.debugdesk.mono.presentation.uicomponents.PermissionLauncherHandler
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.ui.appconfig.AppStateManager
+import com.debugdesk.mono.utils.CameraFunction
 import com.debugdesk.mono.utils.CameraFunction.createImageFile
 import com.debugdesk.mono.utils.CameraFunction.deleteAllFile
 import com.debugdesk.mono.utils.CameraFunction.deleteFile
@@ -161,7 +162,7 @@ fun CameraAndGallery(
                 }
             }
         }) {
-        ScreenView(modifier = Modifier
+        MonoColumn(modifier = Modifier
             .fillMaxSize()
             .padding(it),
             isScrollEnabled = false,
@@ -175,10 +176,13 @@ fun CameraAndGallery(
                     TransactionIntent.DismissCameraGallery
                 )
             },
-            onTrailClick = { onProcess(TransactionIntent.SaveImagesFilePath(transactionImages)) }
+            onTrailClick = {
+                CameraFunction.deleteNonExistingFiles(context = context)
+                onProcess(TransactionIntent.SaveImagesFilePath(transactionImages))
+            }
 
         ) {
-            NoDataFound(
+            NoDataFoundLayout(
                 text = R.string.no_data_found,
                 show = transactionImages.isEmpty()
             )
@@ -189,7 +193,8 @@ fun CameraAndGallery(
             ) {
                 items(transactionImages) { transactionImage ->
                     if (transactionImage.absolutePath.isNotEmpty()) {
-                        ImageCard(absolutePath = transactionImage.absolutePath,
+                        ImageCard(
+                            absolutePath = transactionImage.absolutePath,
                             applyFixedSize = false,
                             onDelete = { absPath ->
                                 Log.e(

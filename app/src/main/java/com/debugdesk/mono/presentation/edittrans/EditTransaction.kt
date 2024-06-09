@@ -28,7 +28,7 @@ import com.debugdesk.mono.presentation.uicomponents.CalendarCard
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
 import com.debugdesk.mono.presentation.uicomponents.ImageGallery
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
@@ -73,7 +73,7 @@ fun EditTransactionContainer(
             .padding(vertical = dp10),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        ScreenView(
+        MonoColumn(
             heading = transactionState.transaction.date.toDateWeek(),
             showBack = true,
             isScrollEnabled = false,

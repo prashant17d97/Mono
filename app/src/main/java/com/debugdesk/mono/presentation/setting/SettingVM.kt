@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.setting
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.debugdesk.mono.R
@@ -8,6 +9,7 @@ import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingModel
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingNameEnum
+import com.debugdesk.mono.utils.CameraFunction.clearPicturesFolder
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +40,7 @@ class SettingVM(
 
     val appConfigProperties = appConfigManager.appConfigProperties
 
-    fun deleteAllData() {
+    fun deleteAllData(context: Context) {
         appStateManager.showAlertDialog(
             iconDrawable = R.drawable.ic_trash,
             iconColor = inActiveButton,
@@ -53,6 +55,7 @@ class SettingVM(
                     } else {
                         appStateManager.showToastState(toastMsgString = it?.localizedMessage)
                     }
+                    clearPicturesFolder(context = context)
                 }
             }
         )

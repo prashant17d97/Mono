@@ -50,7 +50,7 @@ import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.model.FontModel
 import com.debugdesk.mono.model.LanguageModel
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.presentation.uicomponents.Switch2
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
@@ -124,7 +124,7 @@ private fun AppearanceContainer(
     onAppearanceStateChanges: (AppearanceState) -> Unit,
     requestDynamicColors: (Boolean) -> Unit = {}
 ) {
-    ScreenView(
+    MonoColumn(
         heading = stringResource(id = R.string.appearance),
         showBack = true,
         isScrollEnabled = false,

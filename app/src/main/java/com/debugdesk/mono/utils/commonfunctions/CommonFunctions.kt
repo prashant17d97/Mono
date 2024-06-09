@@ -1,6 +1,7 @@
 package com.debugdesk.mono.utils.commonfunctions
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -22,6 +23,9 @@ import kotlinx.coroutines.delay
 import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Calendar
 import java.util.Currency
 import java.util.Date
@@ -299,5 +303,53 @@ object CommonFunctions {
         }
 
         return String.format(Locale.getDefault(), format, value)
+    }
+
+    fun getDateOfMonthFromTimestamp(timestamp: Long): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val instant = Instant.ofEpochMilli(timestamp)
+            val zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+            zonedDateTime.dayOfMonth
+        } else {
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = timestamp
+            }
+            calendar.get(Calendar.DAY_OF_MONTH)
+        }
+    }
+
+    val getCurrentDate: Int get() = getDateComponentsFromTimestamp().first
+    val getCurrentMonth: Int get() = getDateComponentsFromTimestamp().second
+    val getCurrentYear: Int get() = getDateComponentsFromTimestamp().third
+
+    private fun getDateComponentsFromTimestamp(timestamp: Long = System.currentTimeMillis()): Triple<Int, Int, Int> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val instant = Instant.ofEpochMilli(timestamp)
+            val zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+            Triple(zonedDateTime.dayOfMonth, zonedDateTime.monthValue - 1, zonedDateTime.year)
+        } else {
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = timestamp
+            }
+            Triple(
+                first = calendar.get(Calendar.DAY_OF_MONTH),
+                second = calendar.get(Calendar.MONTH),
+                third = calendar.get(Calendar.YEAR)
+            )
+        }
+    }
+
+
+    fun String.toIntIfEmpty(): Int {
+        return if (this.isNotEmpty() && isNotBlank()) {
+            toInt()
+        } else {
+            0
+        }
+    }
+
+    fun getDayOfWeekName(pattern: String = "EEE"): String {
+        val calendar = Calendar.getInstance()
+        return SimpleDateFormat(pattern, Locale.getDefault()).format(calendar.time)
     }
 }

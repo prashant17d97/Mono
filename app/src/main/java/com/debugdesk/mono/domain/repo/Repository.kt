@@ -17,6 +17,7 @@ interface Repository {
     val categoryModelList: StateFlow<List<CategoryModel>>
 
     suspend fun getTransactionAll()
+    suspend fun getYearRange():IntRange
     suspend fun fetchTransactionFromId(transactionId: Int)
     suspend fun insert(dailyTransaction: DailyTransaction)
     suspend fun deleteTransaction(dailyTransaction: DailyTransaction)

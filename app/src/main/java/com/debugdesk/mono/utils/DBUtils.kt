@@ -48,4 +48,6 @@ object DBUtils {
         year = this.year
     )
 
+    inline fun <T> List<T>.orIfEmpty(): List<T> = this.ifEmpty { emptyList() }
+
 }

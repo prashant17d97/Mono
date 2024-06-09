@@ -64,7 +64,7 @@ interface DaoInterface {
     @Query("SELECT * FROM transaction_images")
     suspend fun getAllImage(): List<TransactionImage>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertImage(image: TransactionImage)
 
     @Update
@@ -75,6 +75,9 @@ interface DaoInterface {
 
     @Delete(TransactionImage::class)
     suspend fun deleteImage(transactionImage: TransactionImage)
+
+    @Query("DELETE FROM transaction_images")
+    suspend fun deleteAllImage()
 
 
 }

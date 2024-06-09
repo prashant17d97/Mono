@@ -18,6 +18,7 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.CameraFunction.deleteImageFile
+import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
@@ -322,10 +323,6 @@ class InputVM(
                 transactionType = transactionType
             )
         )
-    }
-
-    private fun NavHostController.navigateTo(screens: Screens) {
-        navigate(screens.route)
     }
 }
 

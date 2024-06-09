@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingModel
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingNameEnum
@@ -44,8 +45,9 @@ fun Setting(
     val appConfigProperties by settingVM.appConfigProperties.collectAsState()
 
     val allItems by settingVM.allDataCount.collectAsState()
+    val context = LocalContext.current
 
-    ScreenView(
+    MonoColumn(
         heading = stringResource(id = R.string.setting),
         onBackClick = { navHostController.popBackStack() }) {
         settingVM.settings(appConfigProperties.currencyIcon)
@@ -53,7 +55,7 @@ fun Setting(
                 SettingItem(settingModel = settingModel, navHostController = navHostController)
             }
         DeleteAllRow(isDataAvailable = allItems > 0) {
-            settingVM.deleteAllData()
+            settingVM.deleteAllData(context = context)
         }
     }
 }

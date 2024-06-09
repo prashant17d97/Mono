@@ -21,9 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
+import com.debugdesk.mono.utils.Dp.dp10
 
 @Composable
-fun ScreenView(
+fun MonoColumn(
     modifier: Modifier = Modifier,
     heading: String = "",
     trailing: String = "",
@@ -35,20 +36,11 @@ fun ScreenView(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     scrollState: ScrollState = rememberScrollState(),
     isScrollEnabled: Boolean = true,
-    bottom: Dp = 10.dp,
-    start: Dp = 10.dp,
-    top: Dp = 10.dp,
-    end: Dp = 10.dp,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        modifier = (modifier
-            .fillMaxWidth()
-            .padding(top = top, bottom = bottom, start = start, end = end)
-            .verticalScroll(scrollState)).takeIf { isScrollEnabled } ?: (modifier.padding(
-            top = top, bottom = bottom, start = start, end = end
-        ))) {
+    top: Dp = dp10,
+    bottom: Dp = top,
+    start: Dp = top,
+    end: Dp = top,
+    header: @Composable () -> Unit = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,6 +73,18 @@ fun ScreenView(
                         .padding(horizontal = 2.dp))
             }
         }
+    },
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        modifier = (modifier
+            .fillMaxWidth()
+            .padding(top = top, bottom = bottom, start = start, end = end)
+            .verticalScroll(scrollState)).takeIf { isScrollEnabled } ?: (modifier.padding(
+            top = top, bottom = bottom, start = start, end = end
+        ))) {
+        header()
 
         content()
     }

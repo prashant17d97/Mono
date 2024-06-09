@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.CurrencyCard
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
 import com.debugdesk.mono.utils.CommonColor.disableButton
@@ -40,7 +40,7 @@ fun Currency(
         currencyVM.revertTheAppConfigPropertiesChange()
         navHostController.popBackStack()
     }
-    ScreenView(heading = stringResource(id = R.string.currency),
+    MonoColumn(heading = stringResource(id = R.string.currency),
         showBack = true,
         trailing = stringResource(id = R.string.save),
         onBackClick = {

@@ -23,7 +23,7 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.CategoryCard
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
@@ -60,7 +60,7 @@ fun EditCategory(
     LaunchedEffect(Unit) {
         viewModel.init()
     }
-    ScreenView(
+    MonoColumn(
         verticalArrangement = Arrangement.Top,
         isScrollEnabled = false,
         heading = stringResource(id = R.string.editCategory),

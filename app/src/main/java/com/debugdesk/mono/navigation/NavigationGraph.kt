@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.debugdesk.mono.presentation.addcategory.AddCategory
+import com.debugdesk.mono.presentation.calendar.CalendarPage
 import com.debugdesk.mono.presentation.editcategory.EditCategory
 import com.debugdesk.mono.presentation.edittrans.EditTransaction
 import com.debugdesk.mono.presentation.graph.Graph
@@ -88,6 +89,9 @@ fun NavigationGraph(navHostController: NavHostController) {
         }
         composable(route = Screens.Reminder.route) {
             Reminder(navHostController)
+        }
+        composable(route = Screens.CalendarPage.route) {
+            CalendarPage(navHostController = navHostController)
         }
     }
 

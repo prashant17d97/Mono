@@ -71,7 +71,7 @@ class CalculateMathExpression {
         return allIndex
     }
 
-    private fun parseSimple(query: String?): Double? {
+    private fun parseSimple(query: String?): Double {
         val operations = listOf("^", "/", "*", "-", "+")
         var allIndex: Array<Int> = arrayOf()
 
@@ -136,9 +136,9 @@ class CalculateMathExpression {
         return listOf(-1, -1)
     }
 
-    private fun evaluate(query: String?): Double? {
+    private fun evaluate(query: String?): Double {
         var calcQuery = query
-        var index = 0;
+        var index = 0
         // Check if brackets are present
         while (calcQuery?.contains('(')!! && index < 200) {
             val startBrackets = getBrackets(calcQuery)[0]

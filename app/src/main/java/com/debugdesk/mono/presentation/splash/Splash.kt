@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.main.MainViewModel
 import com.debugdesk.mono.navigation.Screens
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp240
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.TimerDelay
@@ -32,7 +32,7 @@ fun WelcomeScreen(
     viewModel: MainViewModel = koinViewModel()
 ) {
     val isIntroCompleted by viewModel.isIntroCompleted.collectAsState()
-    ScreenView(
+    MonoColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.logoBackground))

@@ -7,49 +7,39 @@ sealed class Screens(
     val name: String,
     val selectedIcon: Int = 0,
     val notSelectedIcon: Int = 0,
-    val route: String
+    val route: String = name
 ) {
-    data object WelcomeScreen : Screens(name = welcomeScreen, route = welcomeScreen)
-    data object Intro : Screens(name = intro, route = intro)
+    data object WelcomeScreen : Screens(name = welcomeScreen)
+
+    data object Intro : Screens(name = intro)
     data object Input : Screens(
         name = input,
         selectedIcon = R.drawable.input,
         notSelectedIcon = R.drawable.unselected_input,
-        route = input
     )
 
     data object Report : Screens(
         name = report,
         selectedIcon = R.drawable.report,
         notSelectedIcon = R.drawable.unselected_report,
-        route = report
     )
 
     data object Graph : Screens(
         name = graph,
         selectedIcon = R.drawable.ic_selected_graph,
         notSelectedIcon = R.drawable.ic_graph,
-        route = graph
     )
 
     data object Setting : Screens(
         name = setting,
         selectedIcon = R.drawable.settings,
         notSelectedIcon = R.drawable.unselected_settings,
-        route = setting
     )
 
-    data object EditCategory : Screens(
-        name = editCategory,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
-        route = editCategory
-    )
+    data object EditCategory : Screens(name = editCategory)
 
     data object EditTransaction : Screens(
         name = EDIT_TRANSACTION,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
         route = "$EDIT_TRANSACTION/{$EDIT_TRANSACTION_ARGS}"
     ) {
         fun passTransactionId(transactionId: Int): String {
@@ -59,8 +49,6 @@ sealed class Screens(
 
     data object AddCategory : Screens(
         name = addCategory,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
         route = "$addCategory/{$AddCategoryArgs}"
     ) {
         fun passAddCategoryArgs(stringArgs: String): String {
@@ -68,26 +56,13 @@ sealed class Screens(
         }
     }
 
-    data object Currency : Screens(
-        name = currency,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
-        route = currency
-    )
+    data object Currency : Screens(name = currency)
 
-    data object Appearance : Screens(
-        name = appearance,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
-        route = appearance
-    )
+    data object Appearance : Screens(name = appearance)
 
-    data object Reminder : Screens(
-        name = reminder,
-        selectedIcon = 0,
-        notSelectedIcon = 0,
-        route = reminder
-    )
+    data object CalendarPage : Screens(name = CALENDAR_PAGE)
+
+    data object Reminder : Screens(name = reminder)
 
 
     companion object {
@@ -107,6 +82,7 @@ sealed class Screens(
         private const val reminder = "Reminder"
         private const val EDIT_TRANSACTION = "EditTransaction"
         private const val CAMERA = "Camera"
+        private const val CALENDAR_PAGE = "CALENDAR_PAGE"
 
         /**
          * ARGUMENTS

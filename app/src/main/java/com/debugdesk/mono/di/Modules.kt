@@ -8,6 +8,7 @@ import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.domain.repo.RepositoryImpl
 import com.debugdesk.mono.main.MainViewModel
 import com.debugdesk.mono.presentation.addcategory.AddCategoryVM
+import com.debugdesk.mono.presentation.calendar.CalendarPageVM
 import com.debugdesk.mono.presentation.editcategory.EditCategoryVM
 import com.debugdesk.mono.presentation.edittrans.EditTransactionVM
 import com.debugdesk.mono.presentation.input.InputVM
@@ -45,6 +46,10 @@ object Modules {
         }
         viewModel {
             EditCategoryVM(repository = get())
+        }
+
+        viewModel {
+            CalendarPageVM(repository = get(), appConfigManager = get())
         }
         viewModel {
             InputVM(

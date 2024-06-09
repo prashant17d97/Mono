@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
@@ -110,13 +108,6 @@ fun TransactionCard(
                 style = MaterialTheme.typography.bodyLarge,
             )
 
-            LazyRow(content = {
-
-                items(dailyTransaction.transactionImage) {
-                    // Image
-                }
-            })
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
@@ -151,7 +142,7 @@ fun TransactionCardPrev() {
     PreviewTheme {
         TransactionCard(
             dailyTransaction = emptyTransaction,
-            currency = "$"
+            currency = stringResource(id = R.string.inrIcon)
         )
     }
 }

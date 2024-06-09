@@ -3,10 +3,11 @@ package com.debugdesk.mono.presentation.report
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
+import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyIcon
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getExpenseAmount
@@ -137,7 +138,7 @@ class ReportVM(
     fun updateReportState(
         context: Context,
         reportIntent: ReportIntent,
-        navHostController: NavController
+        navHostController: NavHostController
     ) {
         when (reportIntent) {
             is ReportIntent.ResetClick -> {
@@ -254,6 +255,23 @@ class ReportVM(
                     )
                 )
             }
+
+            is ReportIntent.ChangeReportView -> updateView(
+                navHostController,
+                reportIntent.reportView
+            )
+        }
+    }
+
+    private fun updateView(navHostController: NavHostController, reportView: ReportView) {
+        when (reportView) {
+            ReportView.MonthlyReport, ReportView.CategoryReport -> _reportState.tryEmit(
+                reportState.value.copy(
+                    selectedReportView = reportView.stringValue
+                )
+            )
+
+            ReportView.CalendarReport -> navHostController.navigateTo(Screens.CalendarPage)
         }
     }
 }

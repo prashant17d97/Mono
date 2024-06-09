@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.IntroCard
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -51,7 +51,7 @@ fun Intro(
     LaunchedEffect(Unit) {
         viewModel.saveSomeCategory(context)
     }
-    ScreenView {
+    MonoColumn {
         val introModel = viewModel.getIntroModel(context = context)
 
         HorizontalPager(state = pagerState) { index ->

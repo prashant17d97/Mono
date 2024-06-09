@@ -33,6 +33,7 @@ import com.debugdesk.mono.utils.enums.ExpenseType
 
 @Composable
 fun ExpenseCard(
+    modifier: Modifier=Modifier,
     currency: String,
     dailyTransaction: List<DailyTransaction>,
     onTap: (transitionId: DailyTransaction) -> Unit = {}
@@ -41,7 +42,7 @@ fun ExpenseCard(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier

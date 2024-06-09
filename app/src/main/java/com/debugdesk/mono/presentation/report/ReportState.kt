@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.report
 
+import androidx.annotation.StringRes
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
@@ -30,9 +31,17 @@ data class ReportState(
     val tabs: List<Tabs> = Tabs.values,
     val showTransactionCard: Boolean = false,
     val showClickedTransaction: DailyTransaction = emptyTransaction,
+    val reportView: List<ReportView> = ReportView.entries,
+    val selectedReportView: Int = ReportView.MonthlyReport.stringValue
 ) {
     val distributedTransaction = transaction.distributeTransactionsByDate()
-    val isTransactionEmpty = distributedTransaction.isNotEmpty()
+    val isTransactionEmpty = distributedTransaction.isEmpty()
 
     val calendarTitleString = filterString ?: "$monthString, $year"
+}
+
+enum class ReportView(@StringRes val stringValue: Int) {
+    MonthlyReport(stringValue = R.string.month_report),
+    CategoryReport(stringValue = R.string.category_report),
+    CalendarReport(stringValue = R.string.calender_report)
 }

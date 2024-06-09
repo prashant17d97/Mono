@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,41 +19,46 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.model.Tabs
 import com.debugdesk.mono.presentation.uicomponents.CalendarBar
+import com.debugdesk.mono.presentation.uicomponents.DropDown
 import com.debugdesk.mono.presentation.uicomponents.ExpenseCard
-import com.debugdesk.mono.presentation.uicomponents.NoDataFound
+import com.debugdesk.mono.presentation.uicomponents.MonoColumn
+import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.presentation.uicomponents.ScreenView
-import com.debugdesk.mono.presentation.uicomponents.TransactionCard
 import com.debugdesk.mono.utils.CommonColor.disableButton
+import com.debugdesk.mono.utils.Dp
+import com.debugdesk.mono.utils.Dp.dp0
 import com.debugdesk.mono.utils.Dp.dp10
-import com.debugdesk.mono.utils.Dp.dp120
 import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp8
-import com.debugdesk.mono.utils.Dp.dp80
 import com.debugdesk.mono.utils.Dp.dp84
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun Report(
-    navHostController: NavHostController,
-    viewModel: ReportVM = koinViewModel()
+    navHostController: NavHostController, viewModel: ReportVM = koinViewModel()
 ) {
     val scroll = rememberScrollState(0)
     val reportState by viewModel.reportState.collectAsState()
@@ -64,17 +70,15 @@ fun Report(
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchTransaction()
     }
-    ReportContainer(
-        scrollState = scroll,
+    ReportContainer(scrollState = scroll,
         reportState = reportState,
-        onIntentChange = {
+        onIntentChange = { reportIntent ->
             viewModel.updateReportState(
                 context = context,
-                reportIntent = it,
+                reportIntent = reportIntent,
                 navHostController = navHostController
             )
-        }
-    )
+        })
 }
 
 
@@ -85,61 +89,59 @@ private fun ReportContainer(
     currency: String = stringResource(id = reportState.currency),
     onIntentChange: (ReportIntent) -> Unit
 ) {
-    if (reportState.showTransactionCard) {
-        TransactionCard(
-            currency = currency,
-            dailyTransaction = reportState.showClickedTransaction,
-            onIntentChange = onIntentChange
-        )
-    }
-    ScreenView(
-        scrollState = scrollState,
-        verticalArrangement = Arrangement.spacedBy(dp10, Alignment.Top),
-    ) {
-        CalendarBar(
-            modifier = Modifier.padding(0.dp),
-            reportState = reportState,
-            onIntentChange = onIntentChange
-        )
+    MonoColumn(modifier = Modifier.fillMaxSize(), isScrollEnabled = false, top = dp0, header = {
 
-        TotalLeftBalanceCard(
-            currency = currency,
-            amount = reportState.totalAmount
-        )
-
-        MonthBalanceSummary(
-            currency = currency,
-            income = reportState.currentMonthIncome,
-            expense = reportState.currentMonthExpense
-        )
-        CurrentMonthAvlBalance(
-            currency = currency,
-            currentMonth = reportState.monthString,
-            availableBalance = reportState.currentMonthAvailableBalance
-        )
-
-        TabRow(tabsList = reportState.tabs, onTabSelected = { _, index ->
-            onIntentChange(ReportIntent.UpdateTab(index))
-        })
-
-        if (reportState.isTransactionEmpty) {
-            Column {
-                reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
-                    ExpenseCard(
-                        currency = currency,
-                        dailyTransaction = dailyTransaction,
-                        onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) }
-                    )
-                }
+    }) {
+        MonoColumn(scrollState = scrollState,
+            verticalArrangement = Arrangement.spacedBy(dp10, Alignment.Top),
+            header = {
+                ReportViewDropDown(
+                    reportState = reportState,
+                    onSelected = onIntentChange
+                )
             }
-        }
+        ) {
+            CalendarBar(
+                modifier = Modifier.padding(0.dp),
+                reportState = reportState,
+                onIntentChange = onIntentChange
+            )
 
-        NoDataFound(
-            show = !reportState.isTransactionEmpty,
-            text = R.string.noTransactionFound,
-            imageSize = dp120,
-            modifier = Modifier.padding(top = dp80)
-        )
+            TotalLeftBalanceCard(
+                currency = currency, amount = reportState.totalAmount
+            )
+
+            MonthBalanceSummary(
+                currency = currency,
+                income = reportState.currentMonthIncome,
+                expense = reportState.currentMonthExpense
+            )
+            CurrentMonthAvlBalance(
+                currency = currency,
+                currentMonth = reportState.monthString,
+                availableBalance = reportState.currentMonthAvailableBalance
+            )
+
+            TabRow(tabsList = reportState.tabs, onTabSelected = { _, index ->
+                onIntentChange(ReportIntent.UpdateTab(index))
+            })
+
+            NoDataFoundLayout(
+                show = reportState.isTransactionEmpty,
+                text = R.string.noTransactionFound,
+                imageSize = Dp.dp120,
+                modifier = Modifier.padding(top = Dp.dp80),
+                content = {
+                    Column {
+                        reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
+                            ExpenseCard(currency = currency,
+                                dailyTransaction = dailyTransaction,
+                                onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) })
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -235,8 +237,7 @@ private fun CurrentMonthAvlBalance(
             modifier = Modifier.padding(dp8)
         )
         Text(
-            text = "$currency $availableBalance",
-            modifier = Modifier.padding(dp8)
+            text = "$currency $availableBalance", modifier = Modifier.padding(dp8)
         )
     }
 }
@@ -296,12 +297,52 @@ fun TabRow(
     }
 }
 
+@Composable
+fun ReportViewDropDown(
+    modifier: Modifier = Modifier,
+    reportState: ReportState,
+    onSelected: (ReportIntent) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dp10)
+            .clickable { expanded = !expanded },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(id = reportState.selectedReportView),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
+        DropDown(
+            selectedValue = stringResource(id = reportState.selectedReportView),
+            items = reportState.reportView.map { stringResource(id = it.stringValue) },
+            expanded = expanded,
+            onSelected = { _, index ->
+                onSelected(ReportIntent.ChangeReportView(reportState.reportView[index]))
+            },
+            onExpend = { expanded = it },
+            heading = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_caret_down),
+                    contentDescription = "",
+                )
+            }
+        )
+    }
+
+}
 
 @Preview
 @Composable
 fun ReportPreview() = PreviewTheme {
-    ReportContainer(
-        scrollState = rememberScrollState(),
+    ReportContainer(scrollState = rememberScrollState(),
         reportState = ReportState(),
         onIntentChange = { })
 }
