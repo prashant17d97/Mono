@@ -4,8 +4,8 @@ coilCompose = "2.6.0"
 constraintlayoutCompose = "1.1.0-alpha13"
 coreSplashscreen = "1.0.1"
 datastorePreferences = "1.1.1"
-gson = "2.10.1"
-koin-androidx-compose = "3.5.3"
+gson = "2.11.0"
+koin-androidx-compose = "3.5.6"
 kotlin = "2.0.0"
 ksp = "2.0.0-1.0.21"
 core-ktx = "1.13.1"
@@ -16,8 +16,8 @@ lifecycle-runtime-ktx = "2.8.1"
 activity-compose = "1.9.0"
 composeBom = "2024.05.00"
 compose-plugin = "1.6.20-dev1646"
-lottieCompose = "4.0.0"
-retrofit = "2.9.0"
+lottieCompose = "6.4.1"
+retrofit = "2.11.0"
 navigationCompose = "2.7.7"
 snapper = "0.3.0"
 uiUtil = "1.6.7"
@@ -34,7 +34,7 @@ applicationId = "com.debugdesk.mono"
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version = "2.11.0" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
