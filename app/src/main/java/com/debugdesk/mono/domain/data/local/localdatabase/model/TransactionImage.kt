@@ -1,10 +1,7 @@
 package com.debugdesk.mono.domain.data.local.localdatabase.model
 
-import androidx.compose.runtime.Composable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import coil.compose.AsyncImagePainter
-import com.debugdesk.mono.utils.CameraFunction.rememberAbsolutePathPainter
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.formatFileSize
 import com.debugdesk.mono.utils.enums.ImageFrom
 import com.google.gson.annotations.SerializedName
@@ -52,9 +49,6 @@ data class TransactionImage(
                 "isEmpty = $isEmpty"
     }
 
-    val imagePainter: AsyncImagePainter
-        @Composable
-        get() = rememberAbsolutePathPainter(absolutePath)
 }
 
 val emptyTransactionImageDetail = TransactionImage(

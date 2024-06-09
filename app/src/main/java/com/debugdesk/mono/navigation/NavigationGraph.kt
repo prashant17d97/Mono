@@ -39,8 +39,17 @@ fun NavigationGraph(navHostController: NavHostController) {
         composable(route = Screens.Report.route) {
             Report(navHostController)
         }
-        composable(route = Screens.Graph.route) {
-            Graph(navHostController)
+        composable(route = Screens.Graph.route,
+            arguments = listOf(
+                navArgument(Screens.GRAPH_ARGS) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
+            )) {
+            Graph(
+                navHostController = navHostController,
+                categoryId = it.extractIntArgument(Screens.GRAPH_ARGS)?:0
+            )
         }
         composable(route = Screens.Setting.route) {
             Setting(navHostController)
@@ -67,14 +76,14 @@ fun NavigationGraph(navHostController: NavHostController) {
         composable(
             route = Screens.AddCategory.route,
             arguments = listOf(
-                navArgument(Screens.AddCategoryArgs) {
+                navArgument(Screens.ADD_CATEGORY_ARGS) {
                     type = NavType.StringType
                 }
             )
         ) {
             AddCategory(
                 navHostController,
-                argument = it.extractStringArgument(Screens.AddCategoryArgs)
+                argument = it.extractStringArgument(Screens.ADD_CATEGORY_ARGS)
                     ?: ExpenseType.Expense.name
             )
         }

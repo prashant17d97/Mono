@@ -125,7 +125,7 @@ private fun ExpenseCardPrev() {
                     date = System.currentTimeMillis(),
                     type = ExpenseType.Expense.name,
                     note = "Coffee",
-                    category = "Bevarages",
+                    category = "Beverages",
                     categoryIcon = R.drawable.ic_category,
                     categoryId = 6,
                     amount = 2000.0,

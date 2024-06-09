@@ -1,3 +1,5 @@
+@file:Suppress("unused", "unused", "unused", "unused", "unused", "unused", "unused")
+
 package com.debugdesk.mono.presentation.uicomponents
 
 import androidx.compose.foundation.layout.fillMaxWidth

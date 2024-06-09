@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
 import java.time.LocalDate
 import java.time.temporal.WeekFields
-import java.util.Calendar.JANUARY
 import java.util.Locale
 
 @Composable
@@ -37,7 +37,7 @@ fun Calendars() {
     var selectedDate by rememberSaveable {
         mutableStateOf(LocalDate.now())
     }
-    val today = LocalDate.of(2024, JANUARY, 7)
+    val today = LocalDate.now()
     val daysOfWeek = stringArrayResource(id = R.array.weeks)
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val width = screenWidth / 7
@@ -112,5 +112,13 @@ fun Calendars() {
             }
             week = week.plusWeeks(1)
         }
+    }
+}
+
+@Preview
+@Composable
+private fun VC() {
+    PreviewTheme {
+        Calendars()
     }
 }

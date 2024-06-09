@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.SP.sp48
 
 @Composable
 fun MonoColumn(
@@ -30,8 +32,10 @@ fun MonoColumn(
     trailing: String = "",
     trailingColor: Color = MaterialTheme.colorScheme.primary,
     showBack: Boolean = false,
+    enableClick: Boolean = true,
     onBackClick: () -> Unit = {},
     onTrailClick: () -> Unit = {},
+    headingStyle: TextStyle = MaterialTheme.typography.titleLarge,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     scrollState: ScrollState = rememberScrollState(),
@@ -40,11 +44,26 @@ fun MonoColumn(
     bottom: Dp = top,
     start: Dp = top,
     end: Dp = top,
+    headerBotPadding :Dp= dp10,
+    trailingCompose: @Composable () -> Unit = {
+        if (trailing != "") {
+            Text(text = trailing,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge.copy(color = trailingColor),
+                modifier = Modifier
+                    .clickable {
+                        if (enableClick) {
+                            onTrailClick()
+                        }
+                    }
+                    .padding(horizontal = 2.dp))
+        }
+    },
     header: @Composable () -> Unit = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 10.dp),
+                .padding(bottom = headerBotPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -52,8 +71,13 @@ fun MonoColumn(
                 Text(text = stringResource(id = R.string.back),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
+                    lineHeight = sp48,
                     modifier = Modifier
-                        .clickable { onBackClick() }
+                        .clickable {
+                            if (enableClick) {
+                                onBackClick()
+                            }
+                        }
                         .padding(horizontal = 2.dp))
             }
             if (heading != "") {
@@ -61,17 +85,10 @@ fun MonoColumn(
                     text = heading,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleLarge
+                    style = headingStyle
                 )
             }
-            if (trailing != "") {
-                Text(text = trailing,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = trailingColor),
-                    modifier = Modifier
-                        .clickable { onTrailClick() }
-                        .padding(horizontal = 2.dp))
-            }
+            trailingCompose()
         }
     },
     content: @Composable ColumnScope.() -> Unit

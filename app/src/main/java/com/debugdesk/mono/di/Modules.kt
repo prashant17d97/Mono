@@ -11,6 +11,7 @@ import com.debugdesk.mono.presentation.addcategory.AddCategoryVM
 import com.debugdesk.mono.presentation.calendar.CalendarPageVM
 import com.debugdesk.mono.presentation.editcategory.EditCategoryVM
 import com.debugdesk.mono.presentation.edittrans.EditTransactionVM
+import com.debugdesk.mono.presentation.graph.GraphVM
 import com.debugdesk.mono.presentation.input.InputVM
 import com.debugdesk.mono.presentation.intro.IntroViewModel
 import com.debugdesk.mono.presentation.report.ReportVM
@@ -52,6 +53,9 @@ object Modules {
             CalendarPageVM(repository = get(), appConfigManager = get())
         }
         viewModel {
+            GraphVM(repository = get(), appConfigManager = get())
+        }
+        viewModel {
             InputVM(
                 repository = get(), appConfigManager = get(), appStateManager = get()
             )
@@ -84,13 +88,13 @@ object Modules {
 
         viewModel {
             CurrencyVM(
-                dataStoreUtil = get(), appConfigManager = get()
+                appConfigManager = get()
             )
         }
 
         viewModel {
             ReminderVM(
-                dataStoreUtil = get(), appConfigManager = get(), appStateManager = get()
+                appStateManager = get()
             )
         }
 

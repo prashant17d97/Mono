@@ -39,6 +39,7 @@ class ReportVM(
         listenStateChanges()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getTransactionAll()
+            repository.fetchCategories()
             getMonthTransaction(getCurrentMonthYear())
         }.invokeOnCompletion { updateTab(0) }
     }
@@ -60,8 +61,9 @@ class ReportVM(
                 appConfigManager.appConfigProperties,
                 repository.allDailyTransaction,
                 repository.allDailyMonthTransaction,
-                repository.allDailyYearTransaction
-            ) { appConfigProperties, allDailyTransaction, allDailyMonthTransaction, _ ->
+                repository.allDailyYearTransaction,
+                repository.categoryModelList
+            ) { appConfigProperties, allDailyTransaction, allDailyMonthTransaction, _, categories ->
                 ReportState(
                     allDailyMonthTransaction = allDailyMonthTransaction,
                     transaction = allDailyMonthTransaction,
@@ -70,6 +72,7 @@ class ReportVM(
                     currentMonthIncome = allDailyMonthTransaction.getIncomeAmount(),
                     currentMonthAvailableBalance = allDailyMonthTransaction.getTotalAmount(),
                     currency = appConfigProperties.selectedCurrencyCode.getCurrencyIcon(),
+                    categories = categories
                 )
 
             }.collect {
@@ -83,6 +86,7 @@ class ReportVM(
                         currentMonthIncome = it.currentMonthIncome,
                         currentMonthAvailableBalance = it.currentMonthAvailableBalance,
                         currency = it.currency,
+                        categories = it.categories
                     )
                 )
                 updateTab(0)
@@ -260,10 +264,16 @@ class ReportVM(
                 navHostController,
                 reportIntent.reportView
             )
+
+            is ReportIntent.NavigateToGraph -> navHostController.navigateTo(
+                Screens.Graph.passCategoryId(
+                    reportIntent.categoryId
+                )
+            )
         }
     }
 
-    private fun updateView(navHostController: NavHostController, reportView: ReportView) {
+    fun updateView(navHostController: NavHostController, reportView: ReportView) {
         when (reportView) {
             ReportView.MonthlyReport, ReportView.CategoryReport -> _reportState.tryEmit(
                 reportState.value.copy(

@@ -2,6 +2,13 @@ package com.debugdesk.mono.presentation.report
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +23,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -42,11 +52,13 @@ import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.model.Tabs
 import com.debugdesk.mono.presentation.uicomponents.CalendarBar
+import com.debugdesk.mono.presentation.uicomponents.CategoryCard
 import com.debugdesk.mono.presentation.uicomponents.DropDown
 import com.debugdesk.mono.presentation.uicomponents.ExpenseCard
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
+import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp
 import com.debugdesk.mono.utils.Dp.dp0
@@ -69,6 +81,10 @@ fun Report(
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchTransaction()
+        viewModel.updateView(
+            navHostController = navHostController,
+            reportView = ReportView.MonthlyReport
+        )
     }
     ReportContainer(scrollState = scroll,
         reportState = reportState,
@@ -89,59 +105,157 @@ private fun ReportContainer(
     currency: String = stringResource(id = reportState.currency),
     onIntentChange: (ReportIntent) -> Unit
 ) {
-    MonoColumn(modifier = Modifier.fillMaxSize(), isScrollEnabled = false, top = dp0, header = {
-
-    }) {
-        MonoColumn(scrollState = scrollState,
-            verticalArrangement = Arrangement.spacedBy(dp10, Alignment.Top),
-            header = {
-                ReportViewDropDown(
-                    reportState = reportState,
-                    onSelected = onIntentChange
-                )
-            }
-        ) {
-            CalendarBar(
-                modifier = Modifier.padding(0.dp),
+    MonoColumn(
+        modifier = Modifier.fillMaxSize(),
+        isScrollEnabled = false,
+        top = dp10,
+        start = dp0,
+        end = dp0,
+        header = {
+            ReportViewDropDown(
                 reportState = reportState,
-                onIntentChange = onIntentChange
-            )
-
-            TotalLeftBalanceCard(
-                currency = currency, amount = reportState.totalAmount
-            )
-
-            MonthBalanceSummary(
-                currency = currency,
-                income = reportState.currentMonthIncome,
-                expense = reportState.currentMonthExpense
-            )
-            CurrentMonthAvlBalance(
-                currency = currency,
-                currentMonth = reportState.monthString,
-                availableBalance = reportState.currentMonthAvailableBalance
-            )
-
-            TabRow(tabsList = reportState.tabs, onTabSelected = { _, index ->
-                onIntentChange(ReportIntent.UpdateTab(index))
-            })
-
-            NoDataFoundLayout(
-                show = reportState.isTransactionEmpty,
-                text = R.string.noTransactionFound,
-                imageSize = Dp.dp120,
-                modifier = Modifier.padding(top = Dp.dp80),
-                content = {
-                    Column {
-                        reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
-                            ExpenseCard(currency = currency,
-                                dailyTransaction = dailyTransaction,
-                                onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) })
-                        }
-                    }
-                }
+                onSelected = onIntentChange
             )
         }
+    ) {
+        AnimatedContent(
+            targetState = reportState.selectedReportView,
+            transitionSpec = {
+                if (targetState > initialState) {
+                    (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> -height } + fadeOut())
+                } else {
+                    (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> height } + fadeOut())
+                }.using(
+                    SizeTransform(clip = false)
+                )
+            },
+            label = ""
+        ) {
+            when (it) {
+                ReportView.MonthlyReport.stringValue -> MonthReport(
+                    scrollState = scrollState,
+                    reportState = reportState,
+                    currency = currency,
+                    onIntentChange = onIntentChange
+                )
+
+                ReportView.CategoryReport.stringValue -> CategoryReport(
+                    reportState = reportState,
+                    onIntentChange = onIntentChange
+                )
+                else -> {}
+            }
+
+        }
+
+    }
+}
+
+@Composable
+private fun MonthReport(
+    scrollState: ScrollState = rememberScrollState(),
+    reportState: ReportState,
+    currency: String = stringResource(id = reportState.currency),
+    onIntentChange: (ReportIntent) -> Unit
+) {
+    MonoColumn(scrollState = scrollState,
+        verticalArrangement = Arrangement.spacedBy(dp10, Alignment.Top),
+        header = {}
+    ) {
+        CalendarBar(
+            modifier = Modifier.padding(0.dp),
+            reportState = reportState,
+            onIntentChange = onIntentChange
+        )
+
+        TotalLeftBalanceCard(
+            currency = currency, amount = reportState.totalAmount
+        )
+
+        MonthBalanceSummary(
+            currency = currency,
+            income = reportState.currentMonthIncome,
+            expense = reportState.currentMonthExpense
+        )
+        CurrentMonthAvlBalance(
+            currency = currency,
+            currentMonth = reportState.monthString,
+            availableBalance = reportState.currentMonthAvailableBalance
+        )
+
+        TabRow(tabsList = reportState.tabs, onTabSelected = { _, index ->
+            onIntentChange(ReportIntent.UpdateTab(index))
+        })
+
+        NoDataFoundLayout(
+            show = reportState.isTransactionEmpty,
+            text = R.string.noTransactionFound,
+            imageSize = Dp.dp120,
+            modifier = Modifier.padding(top = Dp.dp80),
+            content = {
+                Column {
+                    reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
+                        ExpenseCard(currency = currency,
+                            dailyTransaction = dailyTransaction,
+                            onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) })
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun CategoryReport(
+    reportState: ReportState,
+    onIntentChange: (ReportIntent) -> Unit
+) {
+    MonoColumn(
+        verticalArrangement = Arrangement.Top,
+        isScrollEnabled = false,
+        trailingColor = disableButton,
+    ) {
+        Text(
+            text = stringResource(id = R.string.expense),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+        )
+
+        LazyVerticalGrid(columns = GridCells.Adaptive(Dp.dp70)) {
+            items(
+                reportState.expenseCategory
+            ) { model ->
+                CategoryCard(
+                    model = model,
+                    onClick = {
+                        onIntentChange(ReportIntent.NavigateToGraph(it.categoryId))
+                    }
+                )
+            }
+
+        }
+
+        SpacerHeight(value = dp10)
+        Text(
+            text = stringResource(id = R.string.income),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+        )
+        LazyVerticalGrid(columns = GridCells.Adaptive(Dp.dp70)) {
+            items(
+                reportState.incomeCategory
+            ) { model ->
+                CategoryCard(
+                    model = model,
+                    onClick = {
+                        onIntentChange(ReportIntent.NavigateToGraph(it.categoryId))
+                    }
+                )
+            }
+        }
+
     }
 }
 
@@ -305,7 +419,7 @@ fun ReportViewDropDown(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = dp10)
             .clickable { expanded = !expanded },

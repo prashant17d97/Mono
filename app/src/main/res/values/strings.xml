@@ -422,6 +422,16 @@
     <string name="last_six_month">Last Six Month</string>
     <string name="custom_range">Custom Range</string>
 
+    <!--Tab-->
+    <string name="month">Month</string>
+    <string name="week">Week</string>
+
+    <!--Tabs-->
+
+    <array name="tabs">
+        <item>@string/month</item>
+        <item>@string/week</item>
+    </array>
 
     <!--Icons-->
     <string name="baby">Baby</string>
@@ -512,7 +522,7 @@
     <string name="no_data_found">No data found!</string>
     <string name="transaction_added">New Transaction Added.</string>
     <string name="month_report">Month Report</string>
-    <string name="category_report">Category</string>
+    <string name="category_report">Category Report</string>
     <string name="calender_report">Calendar Report</string>
 
 

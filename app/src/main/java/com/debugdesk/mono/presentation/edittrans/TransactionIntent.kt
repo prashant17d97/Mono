@@ -20,7 +20,9 @@ sealed class TransactionIntent {
     data object OnBackClick : TransactionIntent()
     data object DismissCameraAndGalleryWindow : TransactionIntent()
     data object CloseImageGallery : TransactionIntent()
-    data class SaveImagesFilePath(val transactionImages: List<TransactionImage>) : TransactionIntent()
+    data class SaveImagesFilePath(val transactionImages: List<TransactionImage>) :
+        TransactionIntent()
+
     data class DeleteFromDB(val transactionImage: TransactionImage) : TransactionIntent()
     data object DismissCameraGallery : TransactionIntent()
 

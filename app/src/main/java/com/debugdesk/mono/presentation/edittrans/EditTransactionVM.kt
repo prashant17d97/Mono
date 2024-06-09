@@ -338,8 +338,8 @@ class EditTransactionVM(
         )
         images.forEach {
             it.deleteImageFile(
-                deleteFromDB = {
-                    deleteDBImage(it)
+                deleteFromDB = { transactionImage ->
+                    deleteDBImage(transactionImage)
                 }
             )
         }

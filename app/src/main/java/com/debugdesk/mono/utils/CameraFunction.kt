@@ -208,16 +208,6 @@ object CameraFunction {
     }
 
 
-    fun List<String>.getTransactionImageList(
-        transactionId: Int = 0, imageId: Int = 0, from: ImageFrom
-    ): List<TransactionImage> {
-        return map {
-            it.getTransactionImage(
-                transactionId = transactionId, imageId = imageId, from = from
-            )
-        }
-    }
-
     @Composable
     fun getImageHeightInDp(absolutePath: String): Dp {
         val screenHeight = LocalConfiguration.current.screenHeightDp * 0.8

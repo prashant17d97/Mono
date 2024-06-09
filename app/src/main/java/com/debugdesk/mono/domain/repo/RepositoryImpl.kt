@@ -33,6 +33,10 @@ class RepositoryImpl(
         MutableStateFlow(emptyList())
     override val allDailyTransaction: StateFlow<List<DailyTransaction>> = _transactionAll
 
+    private val _categoryTransactionAll: MutableStateFlow<List<DailyTransaction>> =
+        MutableStateFlow(emptyList())
+    override val categoryTransactionAll: StateFlow<List<DailyTransaction>> = _categoryTransactionAll
+
     private val _allItemSize: MutableStateFlow<Int> = MutableStateFlow(0)
     override val allItemSize: StateFlow<Int> = _allItemSize
 
@@ -179,6 +183,15 @@ class RepositoryImpl(
             daoInterface.deleteCategory(category)
         }
         fetchCategories()
+    }
+
+    override suspend fun fetchAllTransactionFromCategoryID(categoryID: Int) {
+        val categoryTransaction = daoInterface.fetchAllTransactionFromCategoryID(categoryID)
+        val transaction = categoryTransaction.map { transaction ->
+            val images = daoInterface.getImage(transaction.transactionUniqueId)
+            transaction.toDailyTransactionWithId(images)
+        }.orIfEmpty()
+        _categoryTransactionAll.tryEmit(transaction)
     }
 
     override suspend fun getTransactionByDateRange(startDate: Long, endDate: Long) {

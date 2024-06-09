@@ -59,10 +59,12 @@ fun Mono(
 @Composable
 private fun showBnm(navHostController: NavHostController): Boolean {
     return when (currentRoute(navHostController)) {
-        Screens.Input.route -> true
-        Screens.Report.route -> true
-        Screens.Graph.route -> true
+        Screens.CalendarPage.route,
+        Screens.Input.route,
+        Screens.Report.route,
+        Screens.Graph.route,
         Screens.Setting.route -> true
+
         else -> false
     }
 }
@@ -70,7 +72,7 @@ private fun showBnm(navHostController: NavHostController): Boolean {
 @Composable
 private fun BottomNavigationView(navController: NavHostController) {
     val items = listOf(
-        Screens.Report, Screens.Input, Screens.Graph, Screens.Setting
+        Screens.Report, Screens.Input, Screens.Setting
     )
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,

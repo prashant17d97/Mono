@@ -6,6 +6,5 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object DataStoreObjects {
     val APP_CONFIG_PROPERTIES by lazy { stringPreferencesKey("AppConfigProperties") }
     val INTRO_FINISHED by lazy { booleanPreferencesKey("BOOLEAN") }
-    val CATEGORIES_LIST by lazy { stringPreferencesKey("CategoryList") }
 
 }

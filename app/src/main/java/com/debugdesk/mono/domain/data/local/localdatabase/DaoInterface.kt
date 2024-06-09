@@ -9,7 +9,6 @@ import androidx.room.Update
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
 import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
-import com.debugdesk.mono.utils.enums.ExpenseType
 
 @Dao
 interface DaoInterface {
@@ -38,13 +37,6 @@ interface DaoInterface {
     @Query("SELECT * FROM transactionEntry WHERE date BETWEEN :startDate AND :endDate")
     suspend fun findItemsInDateRange(startDate: Long, endDate: Long): List<Transaction>
 
-
-    @Query("SELECT * FROM transactionEntry WHERE type = :income ORDER BY date DESC")
-    suspend fun getAllIncomeTransaction(income: String = ExpenseType.Income.name): List<Transaction>
-
-    @Query("SELECT * FROM transactionEntry WHERE type = :expense ORDER BY date DESC")
-    suspend fun getAllExpenseTransaction(expense: String = ExpenseType.Expense.name): List<Transaction>
-
     @Query("SELECT * FROM categoryModel")
     suspend fun getAllCategory(): List<CategoryModel>
 
@@ -57,6 +49,8 @@ interface DaoInterface {
     @Query("DELETE FROM transactionEntry")
     suspend fun deleteAllTransactions()
 
+    @Query("SELECT * FROM transactionEntry WHERE categoryId = :categoryId")
+    suspend fun fetchAllTransactionFromCategoryID(categoryId:Int): List<Transaction>
 
     @Query("SELECT * FROM transaction_images WHERE transactionUniqueId = :transactionUniqueId")
     suspend fun getImage(transactionUniqueId: String): List<TransactionImage>

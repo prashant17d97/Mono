@@ -9,13 +9,12 @@ class CalculateMathExpression {
     companion object {
         private val calculateMathExpression = CalculateMathExpression()
         fun String.calculate() = with(calculateMathExpression) {
-            df.format(evaluate(this@calculate) ?: 0.0)
+            df.format(evaluate(this@calculate))
                 .takeIf {
-                    (evaluate(this@calculate) ?: 0.0) - (evaluate(this@calculate)
-                        ?: 0.0).toInt() != 0.0
-                } ?: (evaluate(
+                    evaluate(this@calculate) - evaluate(this@calculate).toInt() != 0.0
+                } ?: evaluate(
                 this@calculate
-            ) ?: 0.0).toInt()
+            ).toInt()
         }
     }
 
@@ -164,7 +163,7 @@ class CalculateMathExpression {
             index++
         }
 
-        return parseSimple(calcQuery) ?: 0.0
+        return parseSimple(calcQuery)
     }
 }
 

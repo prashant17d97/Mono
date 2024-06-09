@@ -132,7 +132,7 @@ private fun ImageGalleryCard(
         Image(
             modifier = modifier
                 .clip(MaterialTheme.shapes.large),
-            painter = CameraFunction.rememberAbsolutePathPainter(path = imageDetails.absolutePath,),
+            painter = CameraFunction.rememberAbsolutePathPainter(path = imageDetails.absolutePath),
             contentScale = ContentScale.Inside,
             contentDescription = "Image"
         )

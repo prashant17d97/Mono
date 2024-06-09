@@ -10,6 +10,7 @@ interface Repository {
      * Room DB
      * */
     val allDailyTransaction: StateFlow<List<DailyTransaction>>
+    val categoryTransactionAll: StateFlow<List<DailyTransaction>>
     val allDailyMonthTransaction: StateFlow<List<DailyTransaction>>
     val allDailyYearTransaction: StateFlow<List<DailyTransaction>>
     val transaction: StateFlow<DailyTransaction>
@@ -28,6 +29,7 @@ interface Repository {
     suspend fun getAllTransactionByYear(year: Int)
     suspend fun saveCategories(categoryModel: CategoryModel)
     suspend fun fetchCategories()
+    suspend fun fetchAllTransactionFromCategoryID(categoryID:Int)
     suspend fun removeCategories(categories: List<CategoryModel>)
     suspend fun getTransactionByDateRange(startDate: Long, endDate: Long)
     suspend fun deleteTransactionImage(transactionImage: TransactionImage, onSuccess:()->Unit)

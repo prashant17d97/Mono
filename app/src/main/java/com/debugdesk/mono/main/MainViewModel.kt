@@ -10,7 +10,7 @@ import com.debugdesk.mono.ui.appconfig.AppStateManager
 class MainViewModel(
     private val appStateManager: AppStateManager,
     private val appConfigManager: AppConfigManager,
-    private val dataStoreUtil: DataStoreUtil
+    dataStoreUtil: DataStoreUtil
 ) : ViewModel() {
 
     val toastMsg = appStateManager.toastState
