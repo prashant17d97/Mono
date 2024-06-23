@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.uicomponents.notetf
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -71,17 +70,12 @@ fun NoteTextField(
                 onValueChange = {
                     onNoteChange(TransactionIntent.UpdateNote(NoteIntent.OnValueChange(it)))
                 },
-                enabled = true,
                 trailingClick = {
                     focusManager.clearFocus()
                     onNoteChange(TransactionIntent.UpdateNote(NoteIntent.OnTrailIconClick))
                 },
             )
 
-            Log.d(
-                "TAG",
-                "NoteTextField: ${noteState.imagePath.isEmpty()} ${noteState.imagePath}"
-            )
             ImageCard(
                 imageByteArray = noteState.imagePath,
                 onDelete = {
