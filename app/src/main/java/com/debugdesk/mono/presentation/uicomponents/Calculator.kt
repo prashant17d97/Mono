@@ -31,6 +31,13 @@ import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.CalculateMathExpression.Companion.calculate
 import com.debugdesk.mono.utils.CalculatorEnum
+import com.debugdesk.mono.utils.Dp.dp0
+import com.debugdesk.mono.utils.Dp.dp1
+import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp120
+import com.debugdesk.mono.utils.Dp.dp130
+import com.debugdesk.mono.utils.Dp.dp150
+import com.debugdesk.mono.utils.Dp.dp20
 import com.debugdesk.mono.utils.enums.CellCounts
 
 @Composable
@@ -49,7 +56,7 @@ fun Calculator(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color.Transparent, shape = RoundedCornerShape(10.dp)
+                color = Color.Transparent, shape = RoundedCornerShape(dp10)
             )
             .defaultMinSize(
                 minHeight = 400.dp
@@ -62,22 +69,22 @@ fun Calculator(
                 .fillMaxWidth()
                 .background(
                     color = cardBackground, shape = RoundedCornerShape(
-                        topStart = 10.dp,
-                        topEnd = 10.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 0.dp,
+                        topStart = dp10,
+                        topEnd = dp10,
+                        bottomEnd = dp0,
+                        bottomStart = dp0,
                     )
                 )
-                .height(150.dp)
+                .height(dp150)
         ) {
             Column(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier
-                    .height(120.dp)
+                    .height(dp120)
                     .weight(3.5f)
                     .defaultMinSize(
-                        minHeight = 150.dp
+                        minHeight = dp150
                     )
             ) {
                 Text(
@@ -86,7 +93,7 @@ fun Calculator(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         textAlign = TextAlign.End
                     ),
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier.padding(horizontal = dp20)
                 )
                 Text(
                     text = valueChange,
@@ -94,14 +101,14 @@ fun Calculator(
                     style = MaterialTheme.typography.headlineMedium.copy(
                         textAlign = TextAlign.End
                     ),
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier.padding(horizontal = dp20)
                 )
             }
 
             VerticalDivider(
                 modifier = Modifier
-                    .height(130.dp)
-                    .width(1.dp)
+                    .height(dp130)
+                    .width(dp1)
                     .background(color = MaterialTheme.colorScheme.primary)
             )
 
@@ -159,10 +166,10 @@ fun Calculator(
         VerticalGridCells(
             list = char,
             spanCounts = CellCounts.Four.int,
-            top = 0.dp,
-            bottom = 0.dp,
-            start = 0.dp,
-            end = 0.dp,
+            top = dp1,
+            bottom = dp1,
+            start = dp1,
+            end = dp1,
         ) { character, _, spanCount ->
             CharacterCard(character = character, itemPerRow = spanCount, action = { string ->
                 isDotContained = if (string.contains(".")) {
@@ -216,10 +223,10 @@ fun Calculator(
                 .fillMaxWidth()
                 .background(
                     cardBackground, shape = RoundedCornerShape(
-                        bottomEnd = 10.dp, bottomStart = 10.dp
+                        bottomEnd = dp10, bottomStart = dp10
                     )
                 )
-                .padding(20.dp)
+                .padding(dp20)
         ) {
             Text(text = stringResource(id = R.string.cancel),
                 style = MaterialTheme.typography.titleMedium,

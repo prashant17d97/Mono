@@ -32,7 +32,7 @@ class GraphVM(
         appConfigManager.appConfigProperties.collect { appConfigProperties ->
             _graphState.tryEmit(
                 graphState.value.copy(
-                    currencyIcon = appConfigProperties.currencyIconString,
+                    currencyIcon = appConfigProperties.selectedCurrencyIconString,
                 )
             )
         }

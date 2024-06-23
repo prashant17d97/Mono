@@ -92,33 +92,6 @@ object CommonFunctions {
         }
     }
 
-    fun String.getCurrencyIcon(): Int {
-        return when (this) {
-            "INR" -> R.string.inrIcon
-            "USD" -> R.string.usdIcon
-            "EUR" -> R.string.eurIcon
-            else -> R.string.inrIcon
-        }
-    }
-
-    fun String.getCurrencyCode(): Int {
-        return when (this) {
-            "INR" -> R.string.inr
-            "USD" -> R.string.usd
-            "EUR" -> R.string.eur
-            else -> R.string.inr
-        }
-    }
-
-    fun String.getCurrencyDrawableIcon(): Int {
-        return when (this) {
-            "INR" -> R.drawable.ic_rupee
-            "USD" -> R.drawable.ic_dollar
-            "EUR" -> R.drawable.ic_euro
-            else -> R.drawable.ic_rupee
-        }
-    }
-
 
     fun Long.longToDateString(datePattern: String = "yyyy-MM-dd"): String {
         val date = Date(this)

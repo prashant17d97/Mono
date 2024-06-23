@@ -63,7 +63,9 @@ import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp
 import com.debugdesk.mono.utils.Dp.dp0
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp2
 import com.debugdesk.mono.utils.Dp.dp40
+import com.debugdesk.mono.utils.Dp.dp5
 import com.debugdesk.mono.utils.Dp.dp8
 import com.debugdesk.mono.utils.Dp.dp84
 import org.koin.androidx.compose.koinViewModel
@@ -102,7 +104,7 @@ fun Report(
 private fun ReportContainer(
     scrollState: ScrollState = rememberScrollState(),
     reportState: ReportState,
-    currency: String = stringResource(id = reportState.currency),
+    currency: String = stringResource(id =R.string.inrIcon),
     onIntentChange: (ReportIntent) -> Unit
 ) {
     MonoColumn(
@@ -137,7 +139,6 @@ private fun ReportContainer(
                 ReportView.MonthlyReport.stringValue -> MonthReport(
                     scrollState = scrollState,
                     reportState = reportState,
-                    currency = currency,
                     onIntentChange = onIntentChange
                 )
 
@@ -157,7 +158,6 @@ private fun ReportContainer(
 private fun MonthReport(
     scrollState: ScrollState = rememberScrollState(),
     reportState: ReportState,
-    currency: String = stringResource(id = reportState.currency),
     onIntentChange: (ReportIntent) -> Unit
 ) {
     MonoColumn(scrollState = scrollState,
@@ -165,22 +165,22 @@ private fun MonthReport(
         header = {}
     ) {
         CalendarBar(
-            modifier = Modifier.padding(0.dp),
+            modifier = Modifier.padding(dp0),
             reportState = reportState,
             onIntentChange = onIntentChange
         )
 
         TotalLeftBalanceCard(
-            currency = currency, amount = reportState.totalAmount
+            currency = stringResource(id = reportState.currency), amount = reportState.totalAmount
         )
 
         MonthBalanceSummary(
-            currency = currency,
+            currency = stringResource(id = reportState.currency),
             income = reportState.currentMonthIncome,
             expense = reportState.currentMonthExpense
         )
         CurrentMonthAvlBalance(
-            currency = currency,
+            currency = stringResource(id = reportState.currency),
             currentMonth = reportState.monthString,
             availableBalance = reportState.currentMonthAvailableBalance
         )
@@ -197,7 +197,7 @@ private fun MonthReport(
             content = {
                 Column {
                     reportState.distributedTransaction.forEach { (_, dailyTransaction) ->
-                        ExpenseCard(currency = currency,
+                        ExpenseCard(currency = stringResource(id = reportState.currency),
                             dailyTransaction = dailyTransaction,
                             onTap = { onIntentChange(ReportIntent.EditTransaction(it.transactionId)) })
                     }
@@ -220,7 +220,7 @@ private fun CategoryReport(
         Text(
             text = stringResource(id = R.string.expense),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+            modifier = Modifier.padding(horizontal = dp2, vertical = dp5)
         )
 
         LazyVerticalGrid(columns = GridCells.Adaptive(Dp.dp70)) {

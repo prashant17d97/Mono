@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-05-25T15:19:10.920657Z">
+        <DropdownSelection timestamp="2024-06-20T12:29:15.695578Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/prashant.singh/.android/avd/Pixel_6a_API_33.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=38141JEHN03403" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -26,10 +26,7 @@
           </targets>
         </DialogSelection>
       </SelectionState>
-      <SelectionState runConfigName="EditTransactionPrev">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="TransactionDropPrev">
+      <SelectionState runConfigName="MediaBottomSheetPrev">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

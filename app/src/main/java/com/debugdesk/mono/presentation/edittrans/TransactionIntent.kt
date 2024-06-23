@@ -1,10 +1,10 @@
 package com.debugdesk.mono.presentation.edittrans
 
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.presentation.uicomponents.amounttf.TextFieldCalculatorIntent
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.utils.enums.ExpenseType
+import com.debugdesk.mono.utils.enums.ImageSource
 
 sealed class TransactionIntent {
     data class UpdateDate(val date: Long) : TransactionIntent()
@@ -19,12 +19,12 @@ sealed class TransactionIntent {
     data object OnDeleteClick : TransactionIntent()
     data object OnBackClick : TransactionIntent()
     data object DismissCameraAndGalleryWindow : TransactionIntent()
-    data object CloseImageGallery : TransactionIntent()
-    data class SaveImagesFilePath(val transactionImages: List<TransactionImage>) :
+    data class SaveImage(
+        val imagePath: ByteArray,
+        val imageSource: ImageSource,
+        val createdOn: Long = System.currentTimeMillis()
+    ) :
         TransactionIntent()
 
-    data class DeleteFromDB(val transactionImage: TransactionImage) : TransactionIntent()
     data object DismissCameraGallery : TransactionIntent()
-
-    data class DeleteImage(val transactionImages: List<TransactionImage>) : TransactionIntent()
 }

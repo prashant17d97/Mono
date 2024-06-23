@@ -4,15 +4,11 @@ import com.debugdesk.mono.domain.data.local.localdatabase.AppDatabase
 import com.debugdesk.mono.domain.data.local.localdatabase.DaoInterface
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
-import com.debugdesk.mono.utils.CameraFunction
 import com.debugdesk.mono.utils.DBUtils.orIfEmpty
-import com.debugdesk.mono.utils.DBUtils.toDailyTransactionWithId
-import com.debugdesk.mono.utils.DBUtils.toTransactionWithId
-import com.debugdesk.mono.utils.DBUtils.toTransactionWithoutId
+import com.debugdesk.mono.utils.DBUtils.toDailyTransaction
+import com.debugdesk.mono.utils.DBUtils.toTransaction
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentYear
-import com.debugdesk.mono.utils.enums.ImageFrom
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,68 +69,33 @@ class RepositoryImpl(
         val allTransaction = daoInterface.getAllTransaction()
         val dailyTransaction = mutableListOf<DailyTransaction>()
         allTransaction.forEach { transaction ->
-            val images = daoInterface.getImage(transaction.transactionUniqueId)
-            dailyTransaction.add(transaction.toDailyTransactionWithId(images))
+            dailyTransaction.add(transaction.toDailyTransaction())
         }
         _transactionAll.tryEmit(dailyTransaction.orIfEmpty())
         _allItemSize.tryEmit(daoInterface.getAllTransaction().size)
     }
 
     override suspend fun insert(dailyTransaction: DailyTransaction) {
-        val idAppliedTransaction = dailyTransaction.toTransactionWithoutId()
+        val transactionWithImgId = dailyTransaction.toTransaction()
         daoInterface.insert(
-            idAppliedTransaction
+            transactionWithImgId
         )
-        dailyTransaction.transactionImage.forEach {
-            daoInterface.insertImage(
-                it.copy(
-                    transactionId = idAppliedTransaction.transactionId,
-                    transactionUniqueId = idAppliedTransaction.transactionUniqueId
-                )
-            )
-        }
         getTransactionAll()
     }
 
     override suspend fun updateTransaction(dailyTransaction: DailyTransaction) {
-        daoInterface.updateTransaction(dailyTransaction.toTransactionWithId())
-        val imagesInDB = daoInterface.getImage(dailyTransaction.transactionUniqueId)
-        val filterPath =
-            imagesInDB.filter { it.absolutePath !in dailyTransaction.absolutePaths }
-
-        dailyTransaction.transactionImage.forEach { imagePath ->
-            if (imagePath !in imagesInDB.map { it }) {
-                daoInterface.insertImage(
-                    imagePath.copy(
-                        transactionId = dailyTransaction.transactionId,
-                        transactionUniqueId = dailyTransaction.transactionUniqueId,
-                    )
-                )
-            }
-        }
-        filterPath.forEach {
-            daoInterface.deleteImage(it)
-        }
+        daoInterface.updateTransaction(dailyTransaction.toTransaction())
         getTransactionAll()
     }
 
 
     override suspend fun deleteTransaction(dailyTransaction: DailyTransaction) {
-        daoInterface.deleteTransaction(dailyTransaction.toTransactionWithId())
-        dailyTransaction.transactionImage.forEach { _ ->
-            daoInterface.deleteImagesForTransaction(dailyTransaction.transactionUniqueId)
-        }
+        daoInterface.deleteTransaction(dailyTransaction.toTransaction())
         getTransactionAll()
     }
 
     override suspend fun deleteAllTransaction() {
         daoInterface.deleteAllTransactions()
-        daoInterface.getAllImage().forEach {
-            if (it.from == ImageFrom.CAMERA.name) {
-                CameraFunction.deleteFile(it.absolutePath)
-            }
-        }
-        daoInterface.deleteAllImage()
         getTransactionAll()
     }
 
@@ -148,8 +109,7 @@ class RepositoryImpl(
             daoInterface.getAllTransactionByMonth(
                 month = month, year = year
             ).map { transaction ->
-                val images = daoInterface.getImage(transaction.transactionUniqueId)
-                transaction.toDailyTransactionWithId(images)
+                transaction.toDailyTransaction()
             }.orIfEmpty()
         )
     }
@@ -158,8 +118,7 @@ class RepositoryImpl(
         _allDailyYearTransaction.tryEmit(
             daoInterface.getAllTransactionByYear(year = year)
                 .map { transaction ->
-                    val images = daoInterface.getImage(transaction.transactionUniqueId)
-                    transaction.toDailyTransactionWithId(images)
+                    transaction.toDailyTransaction()
                 }.orIfEmpty()
         )
     }
@@ -188,8 +147,7 @@ class RepositoryImpl(
     override suspend fun fetchAllTransactionFromCategoryID(categoryID: Int) {
         val categoryTransaction = daoInterface.fetchAllTransactionFromCategoryID(categoryID)
         val transaction = categoryTransaction.map { transaction ->
-            val images = daoInterface.getImage(transaction.transactionUniqueId)
-            transaction.toDailyTransactionWithId(images)
+            transaction.toDailyTransaction()
         }.orIfEmpty()
         _categoryTransactionAll.tryEmit(transaction)
     }
@@ -199,29 +157,16 @@ class RepositoryImpl(
             startDate = startDate, endDate = endDate
         )
         _allDailyMonthTransaction.tryEmit(allMonthTransaction.map { transaction ->
-            val images = daoInterface.getImage(transaction.transactionUniqueId)
-            transaction.toDailyTransactionWithId(images)
+            transaction.toDailyTransaction()
         }.orIfEmpty())
     }
 
     override suspend fun fetchTransactionFromId(transactionId: Int) {
-        daoInterface.fetchTransactionFromId(transactionId)
-            .also {
-                _transaction.tryEmit(
-                    it.toDailyTransactionWithId(daoInterface.getImage(it.transactionUniqueId))
-                )
-            }
+        val transaction = daoInterface.fetchTransactionFromId(transactionId)
+        _transaction.tryEmit(
+            transaction.toDailyTransaction()
+        )
 
     }
 
-    override suspend fun deleteTransactionImage(
-        transactionImage: TransactionImage,
-        onSuccess: () -> Unit
-    ) {
-        val dbImages = daoInterface.getAllImage()
-        if (transactionImage in dbImages) {
-            daoInterface.deleteImage(transactionImage)
-            onSuccess()
-        }
-    }
 }

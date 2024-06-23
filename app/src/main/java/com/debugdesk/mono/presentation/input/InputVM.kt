@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
@@ -17,12 +16,12 @@ import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryInt
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
-import com.debugdesk.mono.utils.CameraFunction.deleteImageFile
 import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 import com.debugdesk.mono.utils.enums.ExpenseType
+import com.debugdesk.mono.utils.enums.ImageSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -70,7 +69,9 @@ class InputVM(
                 repository.categoryModelList
             ) { appConfigProperties, categoryModels ->
                 InputState(
-                    amountTfState = AmountTfState(currencyIcon = appConfigProperties.currencyIcon),
+                    amountTfState = AmountTfState(
+                        currencyIcon = appConfigProperties.selectedCurrencyIconDrawable
+                    ),
                     categoryList = categoryModels,
                     appStateManager = appStateManager
                 )
@@ -117,18 +118,21 @@ class InputVM(
                 inputIntent.type,
                 navHostController
             )
+
             is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(inputIntent.showDialog)
             is TransactionIntent.UpdateAmount -> updateAmount(inputIntent.amountTFIntent)
+            is TransactionIntent.UpdateDate -> updateDate(inputIntent.date)
+            is TransactionIntent.UpdateNote -> updateNoteIntent(inputIntent.noteIntent)
+            TransactionIntent.DismissCameraAndGalleryWindow, is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
+            is TransactionIntent.SaveImage -> saveImages(
+                inputIntent
+            )
+
             is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
                 inputIntent.editCategoryIntent,
                 navHostController
             )
-            is TransactionIntent.UpdateDate -> updateDate(inputIntent.date)
-            is TransactionIntent.UpdateNote -> updateNoteIntent(inputIntent.noteIntent)
-            TransactionIntent.DismissCameraAndGalleryWindow, is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
-            is TransactionIntent.SaveImagesFilePath -> saveImages(inputIntent.transactionImages)
-            is TransactionIntent.DeleteImage -> deleteImage(inputIntent.transactionImages)
-            TransactionIntent.CloseImageGallery -> closeGallery()
+
             else -> {}
         }
     }
@@ -146,10 +150,6 @@ class InputVM(
                 onPositiveClick = { navHostController.popBackStack() }
             )
         }
-    }
-
-    private fun closeGallery() {
-        stateFlow.tryEmit(state.copy(showImageGallery = false))
     }
 
     private fun saveNewTransaction(type: ExpenseType, navHostController: NavHostController) {
@@ -178,21 +178,19 @@ class InputVM(
         }
     }
 
-    private fun saveImages(images: List<TransactionImage>) {
-        val transactionId = state.transaction.transactionId
-        val existingImages = state.transaction.transactionImage.associateBy { it.absolutePath }
-
-        val updatedImages = images.map { transactionImage ->
-            transactionImage.copy(
-                transactionId = transactionId,
-                imageId = existingImages[transactionImage.absolutePath]?.imageId ?: 0
-            )
-        }
-
+    private fun saveImages(intent: TransactionIntent.SaveImage) {
         stateFlow.tryEmit(
             state.copy(
-                transaction = state.transaction.copy(transactionImage = updatedImages),
-                noteState = state.noteState.copy(transactionImages = images)
+                transaction = state.transaction.copy(
+                    imagePath = intent.imagePath,
+                    imageSource = intent.imageSource,
+                    createdOn = intent.createdOn
+                ),
+                noteState = state.noteState.copy(
+                    imagePath = intent.imagePath,
+                    imageSource = intent.imageSource,
+                    createdOn = intent.createdOn
+                )
             )
         )
         closeCameraAndGalleryWindow()
@@ -213,11 +211,12 @@ class InputVM(
                     noteState = state.noteState.copy(noteValue = noteIntent.value)
                 )
             )
-            is NoteIntent.DeleteImages -> deleteImage(noteIntent.transactionImage)
-            is NoteIntent.ShowGallery -> stateFlow.tryEmit(
-                state.copy(showImageGallery = true, clickedIndex = noteIntent.selectedIndex)
+
+            is NoteIntent.DeleteImage -> deleteImage(
+                noteIntent.imagePath,
+                imageSource = noteIntent.imageSource
             )
-            else -> {}
+
         }
     }
 
@@ -230,6 +229,7 @@ class InputVM(
                     )
                 )
             }
+
             is TextFieldCalculatorIntent.OnValueChange -> {
                 state.copy(
                     transaction = state.transaction.copy(
@@ -239,6 +239,7 @@ class InputVM(
                     )
                 )
             }
+
             is TextFieldCalculatorIntent.OpenDialog -> {
                 state.copy(
                     amountTfState = state.amountTfState.copy(
@@ -268,6 +269,7 @@ class InputVM(
                     )
                 )
             }
+
             EditCategoryIntent.OnEditCategoryClicked -> navHostController.navigateTo(Screens.EditCategory)
         }
     }
@@ -285,14 +287,36 @@ class InputVM(
         )
     }
 
-    private fun deleteImage(images: List<TransactionImage>) {
+
+    private fun deleteImage(imagePath: ByteArray, imageSource: ImageSource) {
         stateFlow.tryEmit(
             state.copy(
-                transaction = state.transaction.copy(transactionImage = images),
-                noteState = state.noteState.copy(transactionImages = images)
+                transaction = state.transaction.copy(
+                    imagePath = byteArrayOf(),
+                    imageSource = ImageSource.NONE
+                ),
+                noteState = state.noteState.copy(
+                    imagePath = byteArrayOf(),
+                    imageSource = ImageSource.NONE
+                )
             )
         )
-        images.forEach { it.deleteImageFile() }
+//        imagePath.deleteImageFile(
+//            imageSource = imageSource,
+//            deleteFromDB = {
+//                appStateManager.showToastState(toastMsg = R.string.image_deleted)
+//            },
+//            onResult = { success, notFound ->
+//                val message = if (notFound) {
+//                    R.string.image_deleted
+//                } else if (success) {
+//                    R.string.image_deleted
+//                } else {
+//                    R.string.image_deleted_failed
+//                }
+//                appStateManager.showToastState(toastMsg = message)
+//            }
+//        )
     }
 
     private fun closeCameraAndGalleryWindow() {
@@ -309,7 +333,6 @@ class InputVM(
             incomeState.value.copy(
                 showCalendarDialog = false,
                 showCameraAndGallery = false,
-                showImageGallery = false,
                 changesFound = false,
                 transactionType = transactionType
             )
@@ -318,7 +341,6 @@ class InputVM(
             expenseState.value.copy(
                 showCalendarDialog = false,
                 showCameraAndGallery = false,
-                showImageGallery = false,
                 changesFound = false,
                 transactionType = transactionType
             )

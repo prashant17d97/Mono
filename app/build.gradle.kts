@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = libs.versions.applicationId.get()
-        minSdk = libs.versions.minSdk.get().toInt()
+        minSdkVersion(libs.versions.minSdk.get().toInt())
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = libs.versions.versionCode.get().toInt()
         versionName = libs.versions.versionName.get()
@@ -21,7 +21,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        signingConfig = signingConfigs.getByName("debug")
     }
 
     buildTypes {

@@ -1,14 +1,14 @@
 package com.debugdesk.mono.ui.appconfig.defaultconfig
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontStyle.Companion.Normal
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyCode
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyDrawableIcon
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrencyIcon
+import com.debugdesk.mono.R
 
 data class AppConfigProperties(
-    val isDarkTheme: ThemeMode = ThemeMode.Dark,
+    val isDarkTheme: ThemeMode = ThemeMode.Default,
     val fontFamily: String = "Poppins",
     val fontStyle: FontStyle = Normal,
     val textDarkColor: Color = Color.White,
@@ -16,12 +16,30 @@ data class AppConfigProperties(
     val dynamicColor: Boolean = false,
     val language: String = "English",
     val dynamicPrimaryColor: Color? = null,
-    val selectedCurrencyCode: String = "INR",
+    val selectedCurrencyCode: Int = R.string.inr,
+    val selectedCurrencyIconString: Int = R.string.inrIcon,
+    val selectedCurrencyIconDrawable: Int = R.drawable.ic_rupee,
 ) {
-    val currencyIcon: Int
-        get() = selectedCurrencyCode.getCurrencyDrawableIcon()
-    val currencyIconString: Int
-        get() = selectedCurrencyCode.getCurrencyIcon()
-    val currencyCodeString: Int
-        get() = selectedCurrencyCode.getCurrencyCode()
+
+    val isNightTheme: Boolean
+        @Composable
+        get() = when (isDarkTheme) {
+            ThemeMode.Dark -> true
+            ThemeMode.Light -> false
+            else -> isSystemInDarkTheme()
+        }
 }
+
+val DefaultConfigProperties = AppConfigProperties(
+    isDarkTheme = ThemeMode.Default,
+    fontFamily = "Poppins",
+    fontStyle = Normal,
+    textDarkColor = Color.White,
+    textLightColor = Color.Black,
+    dynamicColor = false,
+    language = "English",
+    dynamicPrimaryColor = null,
+    selectedCurrencyCode = R.string.inr,
+    selectedCurrencyIconString = R.string.inrIcon,
+    selectedCurrencyIconDrawable = R.drawable.ic_rupee,
+)

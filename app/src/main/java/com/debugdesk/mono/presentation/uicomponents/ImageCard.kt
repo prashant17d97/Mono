@@ -4,8 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,58 +16,55 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.debugdesk.mono.R
-import com.debugdesk.mono.utils.CameraFunction.getImageHeightInDp
-import com.debugdesk.mono.utils.CameraFunction.rememberAbsolutePathPainter
-import com.debugdesk.mono.utils.Dp.dp140
-import com.debugdesk.mono.utils.Dp.dp24
-import com.debugdesk.mono.utils.Dp.dp6
+import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
+import com.debugdesk.mono.utils.Dp
 
 @Composable
 fun ImageCard(
-    absolutePath: String,
-    applyFixedSize: Boolean = true,
-    onDelete: (absolutePaths: String) -> Unit = {},
+    imageByteArray: ByteArray,
+    onDelete: (imageByteArray: ByteArray) -> Unit = {},
     onImageClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .padding(dp6)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(dp6)
-            ), contentAlignment = Alignment.TopEnd
-    ) {
-        Image(
-            modifier = if (applyFixedSize) {
-                Modifier.size(dp140)
-            } else {
-                Modifier
-                    .fillMaxWidth()
-                    .height(getImageHeightInDp(absolutePath = absolutePath))
-            }
-                .clip(RoundedCornerShape(dp6))
-                .clickable { onImageClick() },
-            painter = rememberAbsolutePathPainter(path = absolutePath),
-            contentScale = ContentScale.FillBounds,
-            contentDescription = null
-        )
-        Image(
-            painter = painterResource(id = R.drawable.remove),
-            contentDescription = "Delete",
+    if (imageByteArray.isNotEmpty() && imageByteArray.toImageBitmap() != null) {
+        Box(
             modifier = Modifier
-                .size(dp24)
-                .clickable(onClick = { onDelete(absolutePath) }
+                .size(Dp.dp140)
+                .padding(Dp.dp6)
+                .background(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(Dp.dp6)
+                ), contentAlignment = Alignment.TopEnd
+        ) {
+            imageByteArray.toImageBitmap()?.let {
+                Image(
+                    modifier = Modifier
+                        .size(Dp.dp140)
+                        .clip(RoundedCornerShape(Dp.dp6))
+                        .clickable { onImageClick() },
+                    bitmap = it,
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null
                 )
-        )
+                Image(
+                    painter = painterResource(id = R.drawable.remove),
+                    contentDescription = "Delete",
+                    modifier = Modifier
+                        .size(Dp.dp24)
+                        .clickable(onClick = { onDelete(imageByteArray) }
+                        )
+                )
+            }
+        }
     }
 }
+
 
 @Preview
 @Composable
 private fun ImageCardPrev() {
     PreviewTheme {
         ImageCard(
-            absolutePath = "/storage/emulated/0/Android/data/com.debugdesk.mono/files/Pictures/MONO_20240528_103742_2037037548647594284.jpg"
+            imageByteArray = byteArrayOf(),
         )
     }
 }

@@ -25,7 +25,7 @@ import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 fun PermissionLauncherHandler(
     permissionHandler: PermissionHandler,
     onGranted: () -> Unit,
-    onPermissionDenial: () -> Unit
+    onPermissionDenial: () -> Unit = {}
 ) {
     var requestPermission by remember {
         mutableStateOf(true)

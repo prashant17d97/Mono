@@ -83,7 +83,7 @@ class IntroViewModel(
         }
         .onEach { delay(1000) }
 
-    fun setIntroFinished(isIntroCompleted: Boolean) {
-        dataStoreUtil.saveKey(INTRO_FINISHED, isIntroCompleted)
+    fun setIntroFinished() {
+        dataStoreUtil.saveKey(INTRO_FINISHED, true)
     }
 }

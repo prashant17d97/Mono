@@ -3,12 +3,12 @@ package com.debugdesk.mono.domain.data.local.localdatabase.model
 import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.takeWord
 import com.debugdesk.mono.utils.enums.ExpenseType
+import com.debugdesk.mono.utils.enums.ImageSource
 import java.util.Date
 
 
 data class DailyTransaction(
     val transactionId: Int = 0,
-    val transactionUniqueId: String = "",
     val date: Long = Date().time,
     val type: String,
     val note: String,
@@ -16,15 +16,29 @@ data class DailyTransaction(
     val categoryIcon: Int,
     val categoryId: Int,
     val amount: Double,
-    val transactionImage: List<TransactionImage> = emptyList(),
     val currentMonthId: Int = 0,
+    val imagePath: ByteArray = byteArrayOf(),
+    val imageSource: ImageSource = ImageSource.NONE,
+    val createdOn: Long = System.currentTimeMillis(),
     val year: Int? = null
 ) {
 
     val notes: String
         get() = if (note.isNotEmpty()) "$category (${note.takeWord(2)})" else category
 
-    val absolutePaths: List<String> get() = transactionImage.map { it.absolutePath }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DailyTransaction
+
+        return imagePath.contentEquals(other.imagePath)
+    }
+
+    override fun hashCode(): Int {
+        return imagePath.contentHashCode()
+    }
+
 }
 
 val emptyTransaction: DailyTransaction
@@ -35,6 +49,8 @@ val emptyTransaction: DailyTransaction
         categoryIcon = 0,
         categoryId = 0,
         amount = 0.0,
+        imagePath = byteArrayOf(),
+        imageSource = ImageSource.NONE
     )
 val previewTransaction: DailyTransaction
     get() = DailyTransaction(
@@ -45,6 +61,8 @@ val previewTransaction: DailyTransaction
         categoryId = 0,
         amount = 500.0,
         currentMonthId = 5,
+        imagePath = byteArrayOf(),
+        imageSource = ImageSource.NONE,
         year = 2024
     )
 
@@ -57,10 +75,12 @@ val previewIncomeTransaction: DailyTransaction
         categoryId = 0,
         amount = 500.0,
         currentMonthId = 5,
+        imagePath = byteArrayOf(),
+        imageSource = ImageSource.NONE,
         year = 2024
     )
 
-val listOfPreviewTransaction =listOf(
+val listOfPreviewTransaction = listOf(
     previewTransaction,
     previewTransaction,
     previewTransaction,

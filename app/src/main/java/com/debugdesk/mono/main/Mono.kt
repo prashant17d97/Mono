@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -26,7 +25,9 @@ import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
 import com.debugdesk.mono.ui.theme.MonoTheme
 import com.debugdesk.mono.utils.Dp
+import com.debugdesk.mono.utils.Dp.dp0
 import com.debugdesk.mono.utils.Dp.dp50
+import com.debugdesk.mono.utils.Dp.dp56
 import com.debugdesk.mono.utils.Dp.dp60
 import com.debugdesk.mono.utils.states.AlertState
 
@@ -47,7 +48,7 @@ fun Mono(
             },
         ) {
             it.calculateTopPadding()
-            Column(modifier = Modifier.padding(bottom = if (showBnm) 56.dp else 0.dp)) {
+            Column(modifier = Modifier.padding(bottom = if (showBnm) dp56 else dp0)) {
                 NavigationGraph(navHostController)
             }
         }

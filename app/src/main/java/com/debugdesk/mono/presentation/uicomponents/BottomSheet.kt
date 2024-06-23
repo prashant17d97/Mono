@@ -1,6 +1,8 @@
 package com.debugdesk.mono.presentation.uicomponents
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,11 +15,14 @@ import androidx.compose.runtime.Composable
 @Composable
 fun BottomSheet(
     modelBottomSheet: SheetState = rememberModalBottomSheetState(),
-    onDismiss: () -> Unit,
     show: Boolean = false,
+    onDismiss: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    AnimatedVisibility(visible = show) {
+    AnimatedVisibility(
+        visible = show,
+        enter = slideInVertically { it },
+        exit = slideOutVertically { it }) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = modelBottomSheet,

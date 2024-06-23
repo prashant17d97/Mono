@@ -524,6 +524,7 @@
     <string name="month_report">Month Report</string>
     <string name="category_report">Category Report</string>
     <string name="calender_report">Calendar Report</string>
+    <string name="share">Share</string>
 
 
 </resources>

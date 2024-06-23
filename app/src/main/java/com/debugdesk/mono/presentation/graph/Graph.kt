@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.BottomSheet
@@ -50,8 +49,10 @@ import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp.dp0
+import com.debugdesk.mono.utils.Dp.dp1
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp100
+import com.debugdesk.mono.utils.Dp.dp25
 import com.debugdesk.mono.utils.Dp.dp3
 import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp8
@@ -147,7 +148,6 @@ fun GraphAnimateContainer(
     BottomSheet(
         show = graphState.promptFilter,
         onDismiss = { onIntentChanges(GraphIntent.HideFilter) }) {
-
     }
 }
 
@@ -204,9 +204,9 @@ private fun GraphTab(
         modifier = Modifier
             .background(
                 color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(25.dp)
+                shape = RoundedCornerShape(dp25)
             )
-            .border(1.dp, disableButton, RoundedCornerShape(25.dp))
+            .border(dp1, disableButton, RoundedCornerShape(dp25))
             .height(dp40)
             .width(dp100 * tabs.size)
             .padding(dp3),
@@ -217,7 +217,7 @@ private fun GraphTab(
                 .offset(x = offsetX)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(25.dp)
+                    shape = RoundedCornerShape(dp25)
                 )
                 .fillMaxHeight()
                 .width(dp95)

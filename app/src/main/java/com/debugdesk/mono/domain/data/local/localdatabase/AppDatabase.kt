@@ -6,11 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 
 @Database(
-    entities = [Transaction::class, CategoryModel::class, TransactionImage::class],
-    version = 2,
+    entities = [Transaction::class, CategoryModel::class],
+    version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

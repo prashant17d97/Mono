@@ -3,37 +3,34 @@ package com.debugdesk.mono.utils
 import android.Manifest
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.content.Context
-import android.database.Cursor
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.BuildConfig
 import com.debugdesk.mono.R
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
-import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransactionImageDetail
-import com.debugdesk.mono.model.ImageDetails
-import com.debugdesk.mono.model.emptyImageDetails
 import com.debugdesk.mono.presentation.uicomponents.media.PermissionHandler
 import com.debugdesk.mono.presentation.uicomponents.media.RequestCode
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.Dp.dp0
-import com.debugdesk.mono.utils.enums.ImageFrom
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Objects
+
 
 object CameraFunction {
 
@@ -41,15 +38,21 @@ object CameraFunction {
     fun Context.createImageFile(): File {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "${getString(R.string.app_name)}_${timestamp}_", ".jpg", storageDir
-        ).apply {
-            // Ensure the file is created
-            if (!exists()) {
-                createNewFile()
-            }
-        }
+        return File(
+            storageDir,
+            "${getString(R.string.app_name)}_${timestamp}.jpg"
+        )
     }
+
+
+    fun getUriFromFile(context: Context, file: File): Uri {
+        return FileProvider.getUriForFile(
+            context,
+            "${BuildConfig.APPLICATION_ID}.provider",
+            file
+        )
+    }
+
 
     fun clearPicturesFolder(context: Context) {
         try {
@@ -62,7 +65,7 @@ object CameraFunction {
 
     private fun deleteDir(dir: File?): Boolean {
         if (dir != null && dir.isDirectory) {
-            val children = dir.list()
+            val children = dir.list() ?: emptyArray()
             for (child in children) {
                 val success = deleteDir(File(dir, child))
                 if (!success) {
@@ -71,140 +74,6 @@ object CameraFunction {
             }
         }
         return dir?.delete() ?: false
-    }
-
-
-    @Composable
-    fun rememberAbsolutePathPainter(path: String): AsyncImagePainter {
-        val context = LocalContext.current
-        return rememberAsyncImagePainter(model = getUriFromFilePath(context, path))
-    }
-
-    private fun getUriFromFilePath(context: Context, filePath: String): Uri {
-        val file = File(filePath)
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file
-        )
-
-    }
-
-    fun getUriFromFile(context: Context, file: File): Uri {
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context), BuildConfig.APPLICATION_ID + ".provider", file
-        )
-
-    }
-
-    fun String.getImageDetails(): ImageDetails {
-        return try {
-            val file = File(this)
-
-            // Check if the file exists
-            if (!file.exists() || !file.isFile) {
-                return emptyImageDetails
-            }
-
-            // Get file name
-            val fileName = file.name
-
-            // Get file size in bytes
-            val fileSize = file.length()
-
-            // Get last modified date
-            val lastModified = SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
-            ).format(Date(file.lastModified()))
-
-            // Decode the image file to get its dimensions
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
-            BitmapFactory.decodeFile(this, options)
-
-            // Retrieve the image width and height
-            val width = options.outWidth
-            val height = options.outHeight
-
-            // Determine the image orientation
-            val orientation = when {
-                width > height -> "Landscape"
-                width < height -> "Portrait"
-                else -> "Square"
-            }
-
-            ImageDetails(
-                absolutePath = this,
-                fileName = fileName,
-                fileSize = fileSize,
-                lastModified = lastModified,
-                width = width,
-                height = height,
-                orientation = orientation,
-                isEmpty = false
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyImageDetails // Error occurred while getting image details, return null
-        }
-    }
-
-    fun String.getTransactionImage(
-        transactionId: Int, imageId: Int = 0, from: ImageFrom
-    ): TransactionImage {
-        return try {
-            val file = File(this)
-
-            // Check if the file exists
-            if (!file.exists() || !file.isFile) {
-                return emptyTransactionImageDetail
-            }
-
-            // Get file name
-            val fileName = file.name
-
-            // Get file size in bytes
-            val fileSize = file.length()
-
-            // Get last modified date
-            val lastModified = SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
-            ).format(Date(file.lastModified()))
-
-            // Decode the image file to get its dimensions
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
-            BitmapFactory.decodeFile(this, options)
-
-            // Retrieve the image width and height
-            val width = options.outWidth
-            val height = options.outHeight
-
-            // Determine the image orientation
-            val orientation = when {
-                width > height -> "Landscape"
-                width < height -> "Portrait"
-                else -> "Square"
-            }
-
-            TransactionImage(
-                imageId = imageId,
-                transactionId = transactionId,
-                transactionUniqueId = ObjectIdGenerator.generate(),
-                absolutePath = this,
-                fileName = fileName,
-                fileSize = fileSize,
-                lastModified = lastModified,
-                width = width,
-                height = height,
-                orientation = orientation,
-                isEmpty = width <= 0 && height <= 0,
-                from = from.name
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyTransactionImageDetail // Error occurred while getting image details, return null
-        }
     }
 
 
@@ -241,6 +110,33 @@ object CameraFunction {
         }
     }
 
+    fun getByteArrayFromUri(context: Context, uri: Uri?): ByteArray {
+        var bitmap: Bitmap? = null
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri!!)
+            bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+        return (bitmap ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)).toByteArray()
+    }
+
+    private fun Bitmap.toByteArray(): ByteArray {
+        val stream = ByteArrayOutputStream()
+        this.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
+    }
+
+    fun ByteArray.toImageBitmap(): ImageBitmap? {
+        try {
+            val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
+            return bitmap.asImageBitmap()
+        } catch (exc: NullPointerException) {
+            Log.d(TAG, "toImageBitmap: ${exc.localizedMessage}")
+            return null
+        }
+    }
 
     fun getGalleryPermissionHandler(
         appStateManager: AppStateManager
@@ -274,116 +170,54 @@ object CameraFunction {
         )
     }
 
-
-    fun deleteFile(
-        absolutePath: String, onResult: (success: Boolean, notFound: Boolean) -> Unit = { _, _ -> }
-    ) {
-        val file = File(absolutePath)
-        val exists = file.exists()
-        if (exists) {
-            val success = file.delete()
-            onResult(success, false)
-            Log.e(TAG, "deleteFile: true")
-        } else {
-            onResult(false, true)
-            Log.e(TAG, "deleteFile: false")
-        }
-    }
-
-    fun deleteNonExistingFiles(context: Context) {
-        val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        picturesDir?.takeIf { it.isDirectory }?.list()?.let { children ->
-            for (child in children) {
-                val file = File(picturesDir, child)
-                val fileImage = file.absolutePath.getTransactionImage(
-                    transactionId = 0,
-                    from = ImageFrom.CAMERA
-                )
-                if (file.exists() && fileImage.fileSize == 0L) {
-                    if (file.delete()) {
-                        Log.e(TAG, "Deleted non-existing camera file: $child")
-                    } else {
-                        Log.e(TAG, "Failed to delete file: $child")
+    fun clearExternalFilesDirPictures(context: Context) {
+        val directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        if (directory != null && directory.isDirectory) {
+            val files = directory.listFiles()
+            if (files != null) {
+                for (file in files) {
+                    if (file.isFile) {
+                        file.delete()
                     }
                 }
             }
-        } ?: run {
-            Log.e(TAG, "Pictures directory is not accessible or not a directory")
         }
     }
 
 
-    fun TransactionImage.deleteImageFile(
-        onResult: (success: Boolean, notFound: Boolean) -> Unit = { _, _ -> },
-        deleteFromDB: (TransactionImage) -> Unit = {}
-    ) {
-        when (from) {
-            ImageFrom.CAMERA.name -> {
-                if (absolutePath.isNotEmpty()) {
-                    deleteFile(this.absolutePath, onResult = onResult)
-                }
-            }
-
-            ImageFrom.GALLERY.name -> deleteFromDB(this)
-        }
-
-    }
-
-    fun List<TransactionImage>.deleteAllFile(onResult: (success: Boolean, notFound: Boolean) -> Unit = { _, _ -> }) {
-        forEach {
-            if (it.absolutePath.isNotEmpty() && it.from == ImageFrom.CAMERA.name) {
-                deleteFile(absolutePath = it.absolutePath, onResult = onResult)
-            }
-        }
-    }
-
-
-    fun getAbsolutePathFromUri(context: Context, uri: Uri): String? {
-        when {
-            // DocumentProvider
-            DocumentsContract.isDocumentUri(context, uri) -> {
-                val documentId = DocumentsContract.getDocumentId(uri)
-                val split = documentId.split(":")
-                val type = split[0]
-
-                return if ("primary".equals(type, ignoreCase = true)) {
-                    "${context.getExternalFilesDir(null)}/${split[1]}"
-                } else {
-                    null
-                }
-            }
-            // MediaStore (and general)
-            "content".equals(uri.scheme, ignoreCase = true) -> {
-                return getDataColumn(context, uri, null, null)
-            }
-            // File
-            "file".equals(uri.scheme, ignoreCase = true) -> {
-                return uri.path
-            }
-
-            else -> {
-                return null
-            }
-        }
-    }
-
-    private fun getDataColumn(
-        context: Context, uri: Uri, selection: String?, selectionArgs: Array<String>?
-    ): String? {
-        var cursor: Cursor? = null
-        val column = "_data"
-        val projection = arrayOf(column)
-
+    fun openImageInGallery(context: Context, imageByteArray: ByteArray) {
         try {
-            cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(index)
-            }
-        } finally {
-            cursor?.close()
-        }
-        return null
-    }
+            // Create a temporary file to store the image
+            val imageFile = File(context.cacheDir, "temp_image.jpg")
 
+            // Write the ByteArray to the temporary file
+            val fos = FileOutputStream(imageFile)
+            fos.write(imageByteArray)
+            fos.flush()
+            fos.close()
+
+            // Get the URI for the file using FileProvider
+            val imageUri: Uri = FileProvider.getUriForFile(
+                context, "${BuildConfig.APPLICATION_ID}.provider", imageFile
+            )
+
+            // Create an Intent to view the image
+            val intent = Intent().apply {
+                action = Intent.ACTION_VIEW
+                setDataAndType(imageUri, "image/*")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            // Check if there is an app that can handle the Intent
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+            } else {
+                // Handle the case where no app can handle the Intent
+                // For example, show a toast message
+                Log.e(TAG, "No app found to open the image.")
+            }
+        } catch (exception: IOException) {
+            Log.e(TAG, "openImageInGallery: ${exception.localizedMessage}")
+        }
+    }
 }

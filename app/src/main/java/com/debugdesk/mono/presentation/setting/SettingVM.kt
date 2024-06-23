@@ -26,12 +26,12 @@ class SettingVM(
 
     val allDataCount = repository.allItemSize
 
-    val settings = { currency: Int ->
+    val settings = { currencyIconDrawable: Int ->
         listOf(
             SettingModel(icon = R.drawable.ic_category, name = SettingNameEnum.Category),
             SettingModel(icon = R.drawable.ic_wrench, name = SettingNameEnum.Appearance),
             SettingModel(
-                icon = currency,
+                icon = currencyIconDrawable,
                 name = SettingNameEnum.Currency
             ),
             SettingModel(icon = R.drawable.ic_reminder, name = SettingNameEnum.Reminder),

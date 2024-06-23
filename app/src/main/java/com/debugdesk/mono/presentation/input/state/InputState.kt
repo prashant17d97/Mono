@@ -16,7 +16,6 @@ data class InputState(
     val categoryList: List<CategoryModel> = emptyList(),
     val showCalendarDialog: Boolean = false,
     val showCameraAndGallery: Boolean = false,
-    val showImageGallery: Boolean = false,
     val changesFound: Boolean = false,
     val clickedIndex: Int = 0,
     val appStateManager: AppStateManager = AppStateManagerImpl(),

@@ -42,7 +42,7 @@ class CalendarPageVM(
                     yearRange = currentState.yearRange,
                     showCategoryList = currentState.showCategoryList,
                     transaction = transaction,
-                    currencyIcon = appConfig.currencyIconString
+                    currencyStringIcon = appConfig.selectedCurrencyIconString
                 )
             }.collect { transactions ->
                 _calendarState.tryEmit(transactions)

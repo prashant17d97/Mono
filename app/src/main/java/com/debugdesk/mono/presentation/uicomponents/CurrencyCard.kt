@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,13 +61,13 @@ fun CurrencyCard(
                     .size(35.dp)
             ) {
                 Text(
-                    text = radioModel.currencyIcon,
+                    text = stringResource(id = radioModel.currencyStringIcon),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     textAlign = TextAlign.Center
                 )
             }
             Text(
-                text = "${radioModel.currencyIcon}${radioModel.defaultCurrencyValue}",
+                text = "${stringResource(id = radioModel.currencyStringIcon)} ${radioModel.defaultCurrencyValue}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -76,7 +77,7 @@ fun CurrencyCard(
         }
 
         Text(
-            text = radioModel.currencyCode,
+            text = stringResource(id = radioModel.currencyCode),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.End

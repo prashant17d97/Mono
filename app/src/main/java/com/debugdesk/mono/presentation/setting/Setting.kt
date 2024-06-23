@@ -22,19 +22,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.navigation.Screens
-import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
+import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingModel
 import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingNameEnum
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
+import com.debugdesk.mono.utils.Dp.dp1
+import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp24
+import com.debugdesk.mono.utils.Dp.dp34
+import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp5
+import com.debugdesk.mono.utils.Dp.dp8
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -50,7 +55,7 @@ fun Setting(
     MonoColumn(
         heading = stringResource(id = R.string.setting),
         onBackClick = { navHostController.popBackStack() }) {
-        settingVM.settings(appConfigProperties.currencyIcon)
+        settingVM.settings(appConfigProperties.selectedCurrencyIconDrawable)
             .forEach { settingModel ->
                 SettingItem(settingModel = settingModel, navHostController = navHostController)
             }
@@ -78,10 +83,10 @@ private fun SettingItem(
                 )
             }
             .fillMaxWidth()
-            .padding(bottom = 5.dp)
+            .padding(bottom = dp5)
             .border(
-                width = 1.dp,
-                shape = RoundedCornerShape(8.dp),
+                width = dp1,
+                shape = RoundedCornerShape(dp8),
                 color = disableButton
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,7 +94,7 @@ private fun SettingItem(
     ) {
         Row(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(dp10)
                 .weight(1f),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
@@ -97,7 +102,7 @@ private fun SettingItem(
             Image(
                 painter = painterResource(id = settingModel.icon),
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(dp24),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
             SpacerWidth(value = dp5)
@@ -111,8 +116,8 @@ private fun SettingItem(
             contentDescription = "ic_caret_right",
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary), // Adjust tint as needed
             modifier = Modifier
-                .size(width = 34.dp, height = 24.dp)
-                .padding(end = 10.dp)
+                .size(width = dp34, height = dp24)
+                .padding(end = dp10)
         )
     }
 }
@@ -126,10 +131,10 @@ private fun DeleteAllRow(
         modifier = Modifier
             .clickable(enabled = isDataAvailable) { onDeleted() } // Click only if enabled
             .fillMaxWidth()
-            .padding(bottom = 5.dp)
+            .padding(bottom = dp5)
             .border(
-                width = 1.dp,
-                shape = RoundedCornerShape(8.dp),
+                width = dp1,
+                shape = RoundedCornerShape(dp8),
                 color = disableButton
             ), // Update border color based on boolean
         horizontalArrangement = Arrangement.Start,
@@ -139,8 +144,8 @@ private fun DeleteAllRow(
             painter = painterResource(id = R.drawable.ic_trash),
             contentDescription = null,
             modifier = Modifier
-                .size(height = 40.dp, width = 40.dp)
-                .padding(start = 10.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                .size(dp40)
+                .padding(start = dp10, end = dp5, top = dp10, bottom = dp10),
             colorFilter = ColorFilter.tint(
                 if (isDataAvailable) inActiveButton else inActiveButton.copy(
                     alpha = 0.5f

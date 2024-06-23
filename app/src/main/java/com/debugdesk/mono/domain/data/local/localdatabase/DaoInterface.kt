@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 
 @Dao
 interface DaoInterface {
@@ -50,28 +49,5 @@ interface DaoInterface {
     suspend fun deleteAllTransactions()
 
     @Query("SELECT * FROM transactionEntry WHERE categoryId = :categoryId")
-    suspend fun fetchAllTransactionFromCategoryID(categoryId:Int): List<Transaction>
-
-    @Query("SELECT * FROM transaction_images WHERE transactionUniqueId = :transactionUniqueId")
-    suspend fun getImage(transactionUniqueId: String): List<TransactionImage>
-
-    @Query("SELECT * FROM transaction_images")
-    suspend fun getAllImage(): List<TransactionImage>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertImage(image: TransactionImage)
-
-    @Update
-    suspend fun updateImage(image: TransactionImage)
-
-    @Query("DELETE FROM transaction_images WHERE transactionUniqueId = :transactionUniqueId")
-    suspend fun deleteImagesForTransaction(transactionUniqueId: String)
-
-    @Delete(TransactionImage::class)
-    suspend fun deleteImage(transactionImage: TransactionImage)
-
-    @Query("DELETE FROM transaction_images")
-    suspend fun deleteAllImage()
-
-
+    suspend fun fetchAllTransactionFromCategoryID(categoryId: Int): List<Transaction>
 }

@@ -2,7 +2,6 @@ package com.debugdesk.mono.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,12 +9,13 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
-import com.debugdesk.mono.ui.appconfig.defaultconfig.ThemeMode
 import com.debugdesk.mono.ui.appconfig.defaultconfig.Typographies
 
 
@@ -90,11 +90,8 @@ fun MonoTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val isDarkThemeMode = when (appConfigProperties.isDarkTheme) {
-        ThemeMode.Default -> isSystemInDarkTheme()
-        ThemeMode.Dark -> true
-        ThemeMode.Light -> false
-    }
+    val isDarkThemeMode by rememberUpdatedState(newValue = appConfigProperties.isNightTheme)
+
     val colorScheme = when {
         appConfigProperties.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 
@@ -103,10 +100,9 @@ fun MonoTheme(
             } else {
                 dynamicLightColorScheme(context)
             }
-
         }
 
-        isDarkThemeMode -> {
+        appConfigProperties.isNightTheme -> {
             DarkColorScheme
         }
 

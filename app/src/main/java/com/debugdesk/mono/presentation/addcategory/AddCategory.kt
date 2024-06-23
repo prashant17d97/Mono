@@ -27,6 +27,8 @@ import com.debugdesk.mono.presentation.uicomponents.CategoryCard
 import com.debugdesk.mono.presentation.uicomponents.CustomOutlineTextField
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
+import com.debugdesk.mono.utils.Dp.dp2
+import com.debugdesk.mono.utils.Dp.dp5
 import com.debugdesk.mono.utils.Dp.dp90
 import com.debugdesk.mono.utils.Icons.categoryIcons
 import org.koin.androidx.compose.koinViewModel
@@ -100,12 +102,12 @@ fun AddCategoryContainer(
                     )
                 )
             },
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+            modifier = Modifier.padding(horizontal = dp2, vertical = dp5)
         )
         Text(
             text = stringResource(id = R.string.icon),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+            modifier = Modifier.padding(horizontal = dp2, vertical = dp5)
         )
         LazyVerticalGrid(
             columns = GridCells.Adaptive(dp90),

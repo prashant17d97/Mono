@@ -2,13 +2,12 @@ package com.debugdesk.mono.utils
 
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
+import com.debugdesk.mono.utils.enums.ImageSource
 
 object DBUtils {
 
-    fun DailyTransaction.toTransactionWithId() = Transaction(
+    fun DailyTransaction.toTransaction() = Transaction(
         transactionId = this.transactionId,
-        transactionUniqueId = this.transactionUniqueId,
         date = this.date,
         type = this.type,
         note = this.note,
@@ -17,12 +16,14 @@ object DBUtils {
         categoryId = this.categoryId,
         amount = this.amount,
         currentMonthId = this.currentMonthId,
+        imagePath = this.imagePath,
+        imageSource = this.imageSource.name,
+        createdOn = this.createdOn,
         year = this.year
     )
 
-    fun Transaction.toDailyTransactionWithId(image: List<TransactionImage>) = DailyTransaction(
+    fun Transaction.toDailyTransaction() = DailyTransaction(
         transactionId = this.transactionId,
-        transactionUniqueId = this.transactionUniqueId,
         date = this.date,
         type = this.type,
         note = this.note,
@@ -30,24 +31,21 @@ object DBUtils {
         categoryIcon = this.categoryIcon,
         categoryId = this.categoryId,
         amount = this.amount,
-        transactionImage = image,
         currentMonthId = this.currentMonthId,
-        year = this.year
+        imagePath = this.imagePath,
+        imageSource = this.imageSource.toImageSource(),
+        createdOn = this.createdOn,
+        year = this.year,
     )
 
-    fun DailyTransaction.toTransactionWithoutId() = Transaction(
-        date = this.date,
-        type = this.type,
-        transactionUniqueId = ObjectIdGenerator.generate(),
-        note = this.note,
-        category = this.category,
-        categoryIcon = this.categoryIcon,
-        categoryId = this.categoryId,
-        amount = this.amount,
-        currentMonthId = this.currentMonthId,
-        year = this.year
-    )
+    fun <T> List<T>.orIfEmpty(): List<T> = this.ifEmpty { emptyList() }
 
-    inline fun <T> List<T>.orIfEmpty(): List<T> = this.ifEmpty { emptyList() }
+    private fun String.toImageSource(): ImageSource {
+        return when (this) {
+            ImageSource.CAMERA.name -> ImageSource.CAMERA
+            ImageSource.GALLERY.name -> ImageSource.GALLERY
+            else -> ImageSource.NONE
+        }
+    }
 
 }

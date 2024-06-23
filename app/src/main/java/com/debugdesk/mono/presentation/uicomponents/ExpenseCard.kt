@@ -100,7 +100,7 @@ fun ExpenseCard(
 
                     Text(
                         text = incomeExpenseModel.notes,
-                        modifier = Modifier.padding(start = 5.dp, end = 3.dp)
+                        modifier = Modifier.padding(horizontal = dp5)
                     )
 
 

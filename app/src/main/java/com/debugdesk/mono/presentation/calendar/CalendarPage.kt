@@ -41,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.listOfPreviewTransaction
@@ -119,7 +118,7 @@ private fun CalendarPageContainer(
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
                     modifier = Modifier
                         .clickable { onSelected(CalendarIntent.NavigateBack) }
-                        .padding(horizontal = 2.dp))
+                        .padding(horizontal = dp2))
                 YearDropdown(
                     modifier = Modifier.weight(1f),
                     calendarState = calendar,
@@ -383,7 +382,7 @@ private fun CalendarGrid(
             content = {
                 Column(modifier = Modifier.padding(top = dp16)) {
                     calendarState.sortedTransaction.forEach { (_, dailyTransaction) ->
-                        ExpenseCard(currency = stringResource(calendarState.currencyIcon),
+                        ExpenseCard(currency = stringResource(calendarState.currencyStringIcon),
                             dailyTransaction = dailyTransaction,
                             onTap = { onTransactionClick(it.transactionId) })
                     }

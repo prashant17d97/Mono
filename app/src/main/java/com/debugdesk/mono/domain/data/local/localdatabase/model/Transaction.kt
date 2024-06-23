@@ -9,7 +9,6 @@ import androidx.room.PrimaryKey
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val transactionId: Int = 0,
-    val transactionUniqueId: String,
     val date: Long,
     val type: String,
     val note: String,
@@ -18,5 +17,8 @@ data class Transaction(
     val categoryId: Int,
     val amount: Double,
     val currentMonthId: Int = 0,
+    val imagePath: ByteArray,
+    val imageSource: String,
+    val createdOn: Long,
     val year: Int? = null
 )

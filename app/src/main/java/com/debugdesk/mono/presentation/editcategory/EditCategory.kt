@@ -28,6 +28,8 @@ import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp2
+import com.debugdesk.mono.utils.Dp.dp5
 import com.debugdesk.mono.utils.Dp.dp70
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.filterExpenseType
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.filterIncomeType
@@ -73,7 +75,7 @@ fun EditCategory(
         Text(
             text = stringResource(id = R.string.expense),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+            modifier = Modifier.padding(horizontal = dp2, vertical = dp5)
         )
 
         LazyVerticalGrid(columns = GridCells.Adaptive(dp70)) {

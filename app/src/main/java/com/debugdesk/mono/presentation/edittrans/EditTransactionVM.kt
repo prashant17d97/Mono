@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.TransactionImage
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTfState
@@ -15,12 +14,12 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteState
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
-import com.debugdesk.mono.utils.CameraFunction.deleteImageFile
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 import com.debugdesk.mono.utils.enums.ExpenseType
+import com.debugdesk.mono.utils.enums.ImageSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,10 +58,12 @@ class EditTransactionVM(
                 initialTransaction = transaction
                 TransactionState(
                     transaction = transaction, amountTfState = AmountTfState(
-                        currencyIcon = appConfigProperties.currencyIcon,
+                        currencyIcon = appConfigProperties.selectedCurrencyIconDrawable,
                         amountValue = transaction.amount.toString(),
                     ), noteState = NoteState(
-                        transactionImages = transaction.transactionImage,
+                        imagePath = transaction.imagePath,
+                        imageSource = transaction.imageSource,
+                        createdOn = transaction.createdOn,
                         noteValue = transaction.note
                     ), categoryList = categoryModels.map { categoryModel ->
                         categoryModel.copy(
@@ -121,18 +122,7 @@ class EditTransactionVM(
             TransactionIntent.DismissCameraAndGalleryWindow -> closeCameraAndGalleryWindow()
             is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
 
-            is TransactionIntent.SaveImagesFilePath -> saveImages(
-                transactionIntent.transactionImages
-            )
-
-            is TransactionIntent.DeleteImage -> deleteImage(transactionIntent.transactionImages)
-            TransactionIntent.CloseImageGallery -> _editTransactionState.tryEmit(
-                editTransactionState.value.copy(
-                    showImageGallery = false
-                )
-            )
-
-            is TransactionIntent.DeleteFromDB -> deleteDBImage(transactionIntent.transactionImage)
+            is TransactionIntent.SaveImage -> saveImages(transactionIntent)
         }
     }
 
@@ -142,23 +132,20 @@ class EditTransactionVM(
         }
     }
 
-    private fun saveImages(images: List<TransactionImage>) {
-        val editData = editTransactionState.value
-        val transactionId = editData.transaction.transactionId
-        val existingImages = editData.transaction.transactionImage.associateBy { it.absolutePath }
-
-        val updatedImages = images.map { transactionImage ->
-            val imageId = existingImages[transactionImage.absolutePath]?.imageId ?: 0
-            transactionImage.copy(transactionId = transactionId, imageId = imageId)
-        }
-
-        val updatedTransaction = editData.transaction.copy(transactionImage = updatedImages)
-        val updatedNoteState = editData.noteState.copy(transactionImages = images)
-
+    private fun saveImages(intent: TransactionIntent.SaveImage) {
         _editTransactionState.tryEmit(
-            editData.copy(
-                transaction = updatedTransaction,
-                noteState = updatedNoteState
+            editTransactionState.value.copy(
+                transaction = editTransactionState.value.transaction.copy(
+                    imagePath = intent.imagePath,
+                    imageSource = intent.imageSource,
+                    createdOn = intent.createdOn
+                ),
+                noteState = editTransactionState.value.noteState.copy(
+                    imagePath = intent.imagePath,
+                    imageSource = intent.imageSource,
+                    createdOn = intent.createdOn
+                )
+
             )
         )
         closeCameraAndGalleryWindow()
@@ -234,19 +221,12 @@ class EditTransactionVM(
                 )
             }
 
-            is NoteIntent.DeleteImages -> deleteImage(noteIntent.transactionImage)
+            is NoteIntent.DeleteImage -> deleteImage(
+                noteIntent.imagePath,
+                imageSource = noteIntent.imageSource
+            )
 
-            is NoteIntent.ShowGallery -> {
-                _editTransactionState.tryEmit(
-                    editTransactionState.value.copy(
-                        showImageGallery = true, clickedIndex = noteIntent.selectedIndex
-                    )
-                )
-            }
 
-            is NoteIntent.DeleteFromDB -> {
-                deleteDBImage(noteIntent.transactionImage)
-            }
         }
 
     }
@@ -326,23 +306,35 @@ class EditTransactionVM(
         )
     }
 
-    private fun deleteImage(images: List<TransactionImage>) {
+    private fun deleteImage(imagePath: ByteArray, imageSource: ImageSource) {
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
-                    transactionImage = images
-                ), noteState = editTransactionState.value.noteState.copy(
-                    transactionImages = images
+                    imagePath = byteArrayOf(),
+                    imageSource = ImageSource.NONE
+                ),
+                noteState = editTransactionState.value.noteState.copy(
+                    imagePath = byteArrayOf(),
+                    imageSource = ImageSource.NONE
                 )
             )
         )
-        images.forEach {
-            it.deleteImageFile(
-                deleteFromDB = { transactionImage ->
-                    deleteDBImage(transactionImage)
-                }
-            )
-        }
+//        imagePath.deleteImageFile(
+//            imageSource = imageSource,
+//            deleteFromDB = {
+//                appStateManager.showToastState(toastMsg = R.string.image_deleted)
+//            },
+//            onResult = { success, notFound ->
+//                val message = if (notFound) {
+//                    R.string.image_deleted
+//                } else if (success) {
+//                    R.string.image_deleted
+//                } else {
+//                    R.string.image_deleted_failed
+//                }
+//                appStateManager.showToastState(toastMsg = message)
+//            }
+//        )
     }
 
 
@@ -359,13 +351,5 @@ class EditTransactionVM(
         _editTransactionState.tryEmit(
             editTransactionState.value.copy(showCameraAndGallery = true)
         )
-    }
-
-    private fun deleteDBImage(transactionImage: TransactionImage) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteTransactionImage(transactionImage, onSuccess = {
-                appStateManager.showToastState(toastMsg = R.string.image_deleted)
-            })
-        }
     }
 }

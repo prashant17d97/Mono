@@ -20,6 +20,10 @@ class MainViewModel(
 
     init {
         appConfigManager.restorePreviousAppConfig()
+        dataStoreUtil.retrieveKey(DataStoreObjects.INTRO_FINISHED) {
+            Log.e("IntroVM", "introFinished: $it,  ${isIntroCompleted.value}")
+            appConfigManager.introCompleted(it ?: false)
+        }
     }
 
     fun showToast() {
@@ -28,11 +32,4 @@ class MainViewModel(
 
     val isIntroCompleted = appConfigManager.isIntroCompleted
 
-    init {
-        appConfigManager.restorePreviousAppConfig()
-        dataStoreUtil.retrieveKey(DataStoreObjects.INTRO_FINISHED) {
-            Log.e("IntroVM", "introFinished: $it,  ${isIntroCompleted.value}")
-            appConfigManager.introCompleted(it ?: false)
-        }
-    }
 }

@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.debugdesk.mono.R
@@ -22,6 +21,8 @@ import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
 import com.debugdesk.mono.utils.CommonColor.disableButton
+import com.debugdesk.mono.utils.Dp.dp1
+import com.debugdesk.mono.utils.Dp.dp32
 import com.debugdesk.mono.utils.Dp.dp5
 import org.koin.androidx.compose.koinViewModel
 
@@ -57,6 +58,8 @@ fun Currency(
                     currencyVM.changeCurrency(
                         appConfigProperties = appConfigProperties.copy(
                             selectedCurrencyCode = it.currencyCode,
+                            selectedCurrencyIconDrawable = it.currencyIconDrawable,
+                            selectedCurrencyIconString = it.currencyStringIcon,
                         )
                     )
                 })
@@ -64,8 +67,8 @@ fun Currency(
             if (index != getCurrencies(appConfigProperties).lastIndex) {
                 HorizontalDivider(
                     modifier = Modifier
-                        .height(1.dp)
-                        .padding(start = 32.dp)
+                        .height(dp1)
+                        .padding(start = dp32)
                         .fillMaxWidth()
                         .background(color = disableButton)
                 )
@@ -85,13 +88,29 @@ fun CurrencyPreview() = Currency(
 private fun getCurrencies(appConfigProperties: AppConfigProperties): List<RadioModel> {
     val context = LocalContext.current
     val currenciesCode = context.resources.getStringArray(R.array.currenciesCode)
-    val currenciesIcon = context.resources.getStringArray(R.array.currenciesIcon)
+    val selectedCurrencyCode = stringResource(id = appConfigProperties.selectedCurrencyCode)
 
-    return currenciesCode.mapIndexed { index, code ->
+    return currenciesCode.map { code ->
         RadioModel(
-            currencyIcon = currenciesIcon[index],
-            currencyCode = code,
-            isSelected = appConfigProperties.selectedCurrencyCode == code
+            currencyStringIcon = when (code) {
+                "INR" -> R.string.inrIcon
+                "USD" -> R.string.usdIcon
+                "EUR" -> R.string.eurIcon
+                else -> R.string.inrIcon
+            },
+            currencyCode = when (code) {
+                "INR" -> R.string.inr
+                "USD" -> R.string.usd
+                "EUR" -> R.string.eur
+                else -> R.string.inr
+            },
+            currencyIconDrawable = when (code) {
+                "INR" -> R.drawable.ic_rupee
+                "USD" -> R.drawable.ic_dollar
+                "EUR" -> R.drawable.ic_euro
+                else -> R.drawable.ic_rupee
+            },
+            isSelected = selectedCurrencyCode == code
         )
 
     }

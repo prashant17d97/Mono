@@ -1,11 +1,5 @@
 package com.debugdesk.mono.presentation.input
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,28 +15,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.presentation.edittrans.TransactionIntent
+import com.debugdesk.mono.presentation.imgpreview.ImagePreview
+import com.debugdesk.mono.presentation.imgpreview.PreviewIntent
 import com.debugdesk.mono.presentation.input.state.InputState
 import com.debugdesk.mono.presentation.uicomponents.CalendarCard
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
 import com.debugdesk.mono.presentation.uicomponents.CustomTabs
-import com.debugdesk.mono.presentation.uicomponents.ImageGallery
-import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
+import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
-import com.debugdesk.mono.presentation.uicomponents.media.CameraAndGallery
+import com.debugdesk.mono.presentation.uicomponents.media.MediaBottomSheet
+import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
+import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Tabs.tabs
@@ -99,6 +98,9 @@ fun InputContainer(
     onTabClick: (Int) -> Unit,
     onInputIntent: (TransactionIntent) -> Unit
 ) {
+    var showPreview by remember {
+        mutableStateOf(false)
+    }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = modifier.fillMaxSize(),
@@ -121,36 +123,43 @@ fun InputContainer(
                             )
                         )
                     },
+                    onImageClick = { showPreview = true },
                     onInputIntent = onInputIntent
                 )
 
             }
         }
 
-        AnimatedVisibility(visible = inputState.showCameraAndGallery,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it }) {
-            CameraAndGallery(
-                appStateManager = inputState.appStateManager,
-                images = inputState.transaction.transactionImage,
-                onProcess = onInputIntent
-            )
-        }
 
+        MediaBottomSheet(
+            visible = inputState.showCameraAndGallery,
+            appStateManager = inputState.appStateManager,
+            onProcess = onInputIntent
+        )
+    }
+    inputState.noteState.imagePath.toImageBitmap()?.let {
+        ImagePreview(
+            showPreview = showPreview,
+            createdOn = inputState.noteState.createdOn,
+            imageBitmap = it,
+        ) { previewIntent ->
+            when (previewIntent) {
+                PreviewIntent.Delete -> {
+                    showPreview = false
+                    onInputIntent(
+                        TransactionIntent.UpdateNote(
+                            NoteIntent.DeleteImage(
+                                inputState.noteState.imagePath,
+                                inputState.noteState.imageSource,
+                            )
+                        )
+                    )
+                }
 
-        AnimatedVisibility(
-            visible = inputState.showImageGallery, enter = scaleIn(
-                initialScale = 0.5f, animationSpec = tween(durationMillis = 500)
-            ), exit = scaleOut(
-                targetScale = 0.5f, animationSpec = tween(durationMillis = 500)
-            )
-        ) {
-            ImageGallery(images = inputState.transaction.transactionImage,
-                clickedIndex = inputState.clickedIndex,
-                onDelete = { transactionImage ->
-                    onInputIntent(TransactionIntent.DeleteImage(inputState.noteState.transactionImages.filter { it != transactionImage }))
-                },
-                close = { onInputIntent(TransactionIntent.CloseImageGallery) })
+                PreviewIntent.Navigate -> {
+                    showPreview = false
+                }
+            }
         }
     }
 }
@@ -162,6 +171,7 @@ private fun InputPage(
     inputState: InputState,
     text: Int = R.string.expense,
     onSave: () -> Unit = {},
+    onImageClick: () -> Unit = {},
     onInputIntent: (TransactionIntent) -> Unit
 ) {
 
@@ -204,9 +214,9 @@ private fun InputPage(
                 })
 
             NoteTextField(
-                appStateManager = inputState.appStateManager,
                 noteState = inputState.noteState,
-                onNoteChange = onInputIntent
+                onNoteChange = onInputIntent,
+                onImageClick = onImageClick
             )
 
             EditCategoryCard(
@@ -216,7 +226,7 @@ private fun InputPage(
 
         CustomButton(modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(dp10),
             status = Buttons.Active.takeIf { inputState.changesFound } ?: Buttons.Disable,
             text = stringResource(id = R.string.save),
             onClick = { onSave() })

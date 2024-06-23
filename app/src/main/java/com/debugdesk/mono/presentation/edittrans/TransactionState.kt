@@ -15,8 +15,6 @@ data class TransactionState(
     val noteState: NoteState = NoteState(),
     val categoryList: List<CategoryModel> = emptyList(),
     val showCameraAndGallery: Boolean = false,
-    val showImageGallery: Boolean = false,
-    val clickedIndex: Int = 0,
     val changesFound: Boolean = false,
     val appStateManager: AppStateManager = AppStateManagerImpl()
 )

@@ -25,7 +25,7 @@ data class CalendarState(
     val showCategoryList: Boolean = true,
     val transaction: List<DailyTransaction> = emptyList(),
     @StringRes
-    val currencyIcon: Int = R.string.inrIcon
+    val currencyStringIcon: Int = R.string.inrIcon
 ) {
 
 

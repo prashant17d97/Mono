@@ -48,9 +48,6 @@ fun Intro(
         pagerState.animateScrollToPage(currentIndex)
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.saveSomeCategory(context)
-    }
     MonoColumn {
         val introModel = viewModel.getIntroModel(context = context)
 
@@ -58,7 +55,8 @@ fun Intro(
             IntroCard(
                 modifier = Modifier.fillMaxSize(),
                 skip = {
-                    viewModel.setIntroFinished(true)
+                    viewModel.saveSomeCategory(context)
+                    viewModel.setIntroFinished()
                     navController.navigate(Screens.Report.route) {
                         popUpTo(Screens.Intro.route) {
                             inclusive = true
@@ -68,7 +66,8 @@ fun Intro(
                 },
                 onContinue = {
                     if (index >= introModel.size - 1) {
-                        viewModel.setIntroFinished(true)
+                        viewModel.saveSomeCategory(context)
+                        viewModel.setIntroFinished()
                         navController.navigate(Screens.Report.route) {
                             popUpTo(Screens.Intro.route) {
                                 inclusive = true
