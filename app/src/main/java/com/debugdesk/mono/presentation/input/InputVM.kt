@@ -212,10 +212,7 @@ class InputVM(
                 )
             )
 
-            is NoteIntent.DeleteImage -> deleteImage(
-                noteIntent.imagePath,
-                imageSource = noteIntent.imageSource
-            )
+            is NoteIntent.DeleteImage -> deleteImage()
 
         }
     }
@@ -288,7 +285,7 @@ class InputVM(
     }
 
 
-    private fun deleteImage(imagePath: ByteArray, imageSource: ImageSource) {
+    private fun deleteImage() {
         stateFlow.tryEmit(
             state.copy(
                 transaction = state.transaction.copy(
@@ -301,22 +298,7 @@ class InputVM(
                 )
             )
         )
-//        imagePath.deleteImageFile(
-//            imageSource = imageSource,
-//            deleteFromDB = {
-//                appStateManager.showToastState(toastMsg = R.string.image_deleted)
-//            },
-//            onResult = { success, notFound ->
-//                val message = if (notFound) {
-//                    R.string.image_deleted
-//                } else if (success) {
-//                    R.string.image_deleted
-//                } else {
-//                    R.string.image_deleted_failed
-//                }
-//                appStateManager.showToastState(toastMsg = message)
-//            }
-//        )
+        appStateManager.showToastState(toastMsg = R.string.image_deleted)
     }
 
     private fun closeCameraAndGalleryWindow() {

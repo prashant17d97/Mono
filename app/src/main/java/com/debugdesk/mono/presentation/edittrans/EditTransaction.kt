@@ -155,10 +155,7 @@ fun EditTransactionContainer(
                     showPreview = false
                     onEditTransactionIntent(
                         TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage(
-                                transactionState.noteState.imagePath,
-                                transactionState.noteState.imageSource,
-                            )
+                            NoteIntent.DeleteImage
                         )
                     )
                 }

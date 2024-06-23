@@ -87,10 +87,7 @@ fun NoteTextField(
                 onDelete = {
                     onNoteChange(
                         TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage(
-                                noteState.imagePath,
-                                noteState.imageSource
-                            )
+                            NoteIntent.DeleteImage
                         )
                     )
                 },

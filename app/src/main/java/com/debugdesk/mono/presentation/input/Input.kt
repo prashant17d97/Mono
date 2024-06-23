@@ -148,10 +148,7 @@ fun InputContainer(
                     showPreview = false
                     onInputIntent(
                         TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage(
-                                inputState.noteState.imagePath,
-                                inputState.noteState.imageSource,
-                            )
+                            NoteIntent.DeleteImage
                         )
                     )
                 }

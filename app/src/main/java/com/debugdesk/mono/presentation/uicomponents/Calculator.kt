@@ -37,6 +37,7 @@ import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp120
 import com.debugdesk.mono.utils.Dp.dp130
 import com.debugdesk.mono.utils.Dp.dp150
+import com.debugdesk.mono.utils.Dp.dp2
 import com.debugdesk.mono.utils.Dp.dp20
 import com.debugdesk.mono.utils.enums.CellCounts
 
@@ -108,13 +109,13 @@ fun Calculator(
             VerticalDivider(
                 modifier = Modifier
                     .height(dp130)
-                    .width(dp1)
-                    .background(color = MaterialTheme.colorScheme.primary)
+                    .width(dp2)
+                    .background(color = MaterialTheme.colorScheme.onPrimaryContainer)
             )
 
             Icon(painter = painterResource(id = R.drawable.ic_backspace),
                 contentDescription = "Backspace",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier
                     .weight(1f)
                     .clickable {
@@ -230,7 +231,7 @@ fun Calculator(
         ) {
             Text(text = stringResource(id = R.string.cancel),
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.clickable { onValueReturn(CalculatorEnum.Cancel, "") })
+                modifier = Modifier.clickable { onValueReturn(CalculatorEnum.Cancel, priorValue) })
             Text(text = stringResource(id = R.string.clear),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.clickable {
