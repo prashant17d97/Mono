@@ -26,7 +26,6 @@ import com.debugdesk.mono.presentation.uicomponents.CalendarCard
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
 import com.debugdesk.mono.presentation.uicomponents.media.MediaBottomSheet
@@ -35,6 +34,7 @@ import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
 import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
+import com.debugdesk.mono.utils.Dp.dp8
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDateWeek
 import com.debugdesk.mono.utils.enums.Buttons
 import org.koin.androidx.compose.koinViewModel
@@ -87,9 +87,8 @@ fun EditTransactionContainer(
             },
             trailing = stringResource(id = R.string.delete),
             trailingColor = CommonColor.inActiveButton,
-            verticalArrangement = Arrangement.spacedBy(dp10, alignment = Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(dp8, alignment = Alignment.Top),
         ) {
-            SpacerHeight(value = dp10)
 
             CalendarCard(
                 date = transactionState.transaction.date,
