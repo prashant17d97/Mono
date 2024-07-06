@@ -1,10 +1,10 @@
 package com.debugdesk.mono.presentation.edittrans
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
+import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTfState
@@ -13,7 +13,6 @@ import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryInt
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
-import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 import com.debugdesk.mono.utils.enums.ExpenseType
@@ -22,24 +21,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class EditTransactionVM(
-    val appStateManager: AppStateManager,
+    private val appStateManager: AppStateManager,
     appConfigManager: AppConfigManager,
     private val repository: Repository,
 ) : ViewModel() {
 
     private val _editTransactionState = MutableStateFlow(TransactionState())
-    val editTransactionState: StateFlow<TransactionState>
-        get() = _editTransactionState
+    val editTransactionState: StateFlow<TransactionState> = _editTransactionState
+
     private val appConfigProperties = appConfigManager.appConfigProperties
     private val categoryModels = repository.categoryModelList
 
     private var initialTransactionState: TransactionState? = null
+
+    init {
+        viewModelScope.launch {
+            combine(appConfigProperties, categoryModels) { _, _ ->
+                initial()
+            }
+        }
+    }
 
     fun getDailyTransaction(transactionId: Int) {
         initial()
@@ -48,138 +52,110 @@ class EditTransactionVM(
         }
     }
 
-    init {
-        viewModelScope.launch {
-            combine(appConfigProperties, categoryModels) { a, b ->
-                initial()
-            }
-        }
-    }
-
     private fun initial() {
         viewModelScope.launch {
             repository.fetchCategories()
+            listenTransactionFetch()
+            listenChanges()
         }
-        listenTransactionFetch()
-        listenChanges()
     }
 
     private fun listenTransactionFetch() {
         viewModelScope.launch {
             repository.editTransaction.collect { transaction ->
                 transaction?.let {
-                    val transactionState = TransactionState(
-                        transaction = transaction,
-                        categoryList = categoryModels.value.map { categoryModel ->
-                            categoryModel.copy(
-                                isSelected = categoryModel.categoryId == transaction.categoryId,
-                                enable = categoryModel.categoryType == transaction.type
-                            )
-                        },
-                        date = transaction.date,
-                        amountTfState = AmountTfState(
-                            currencyIcon = appConfigProperties.value.selectedCurrencyIconDrawable,
-                            amountValue = transaction.amount.toString(),
-                        ),
-                        note = transaction.note,
-                        image = transaction.imagePath,
-                        imageSource = transaction.imageSource,
-                        createdOn = transaction.createdOn,
-                        appStateManager = appStateManager
-
-                    )
+                    val transactionState = createTransactionState(transaction)
                     initialTransactionState = transactionState
-                    _editTransactionState.tryEmit(
-                        transactionState
-                    )
+                    _editTransactionState.emit(transactionState)
                 }
-                Log.d("EditVM", "combine: $transaction")
-
             }
         }
     }
 
     private fun listenChanges() {
-        editTransactionState.onEach { transaction ->
-            _editTransactionState.tryEmit(
-                transaction.copy(
-                    changesFound = transaction isEqualTo initialTransactionState
+        viewModelScope.launch {
+            editTransactionState.collect { transaction ->
+                _editTransactionState.emit(
+                    transaction.copy(changesFound = transaction isEqualTo initialTransactionState)
                 )
-            )
-        }.launchIn(viewModelScope)
+            }
+        }
     }
 
     fun handleTransactionIntent(
         transactionIntent: TransactionIntent,
         navHostController: NavHostController,
     ) {
-        when (transactionIntent) {
-            TransactionIntent.OnBackClick -> {
-                if (!editTransactionState.value.changesFound) {
-                    navHostController.popBackStack()
-                } else {
-                    appStateManager.showAlertDialog(
-                        message = R.string.discard_changes,
-                        positiveButtonText = R.string.discard,
-                        onPositiveClick = {
-                            navHostController.popBackStack()
-                        },
-                    )
-                }
+        viewModelScope.launch {
+            when (transactionIntent) {
+                TransactionIntent.OnBackClick -> handleBackClick(navHostController)
+                TransactionIntent.OnDeleteClick -> deleteTransactionWithAlert(navHostController)
+                TransactionIntent.OnUpdateClick -> updateTransaction(navHostController)
+                is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(
+                    transactionIntent.type
+                )
+
+                is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
+                is TransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
+                is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
+                    transactionIntent.editCategoryIntent,
+                    navHostController
+                )
+
+                is TransactionIntent.UpdateDate -> updateDate(transactionIntent.date)
+                TransactionIntent.DismissCameraAndGalleryWindow,
+                is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
+
+                is TransactionIntent.SaveImage -> saveImages(transactionIntent)
+                TransactionIntent.DeleteImage -> deleteImage()
+                TransactionIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
+                is TransactionIntent.OnValueChange -> updateNote(transactionIntent.value)
+                is TransactionIntent.UpdateTransactionType -> updateTransactionType(
+                    transactionIntent.expenseType
+                )
             }
-
-            TransactionIntent.OnDeleteClick -> deleteTransactionWithAlert(navHostController)
-            TransactionIntent.OnUpdateClick -> updateTransaction(navHostController)
-            is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(
-                transactionIntent.type
-            )
-
-            is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
-            is TransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
-            is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
-                transactionIntent.editCategoryIntent, navHostController
-            )
-
-            is TransactionIntent.UpdateDate -> updateDate(transactionIntent.date)
-            TransactionIntent.DismissCameraAndGalleryWindow -> closeCameraAndGalleryWindow()
-            is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
-
-            is TransactionIntent.SaveImage -> saveImages(transactionIntent)
-            TransactionIntent.DeleteImage -> deleteImage()
-            TransactionIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
-            is TransactionIntent.OnValueChange -> updateNote(transactionIntent.value)
-            is TransactionIntent.UpdateTransactionType -> updateTransactionType(transactionIntent.expenseType)
-
         }
     }
 
-    private fun updateTransactionType(value: String) {
+    private fun handleBackClick(navHostController: NavHostController) {
+        if (!editTransactionState.value.changesFound) {
+            navHostController.popBackStack()
+        } else {
+            appStateManager.showAlertDialog(
+                message = R.string.discard_changes,
+                positiveButtonText = R.string.discard,
+                onPositiveClick = {
+                    navHostController.popBackStack()
+                },
+            )
+        }
+    }
+
+    private suspend fun updateTransactionType(value: String) {
         val transaction = editTransactionState.value.transaction
-        _editTransactionState.tryEmit(
+        val newCategoryList = if (initialTransactionState?.transaction?.type == value) {
+            initialTransactionState?.categoryList ?: emptyList()
+        } else {
+            categoryModels.value.mapIndexed { index, categoryModel ->
+                categoryModel.copy(
+                    isSelected = index == 0,
+                    enable = categoryModel.categoryType == value
+                )
+            }
+        }
+
+        _editTransactionState.emit(
             editTransactionState.value.copy(
-                transaction = transaction.copy(
-                    type = value
-                ),
-                categoryList = if (initialTransactionState?.transaction?.type == value) {
-                    initialTransactionState?.categoryList ?: emptyList()
-                } else {
-                    categoryModels.value.mapIndexed { index, categoryModel ->
-                        categoryModel.copy(
-                            isSelected = index == 0,
-                            enable = categoryModel.categoryType == value
-                        )
-                    }
-                }
+                transaction = transaction.copy(type = value),
+                categoryList = newCategoryList
             )
         )
     }
 
-    private fun updateNote(value: String) {
-        _editTransactionState.tryEmit(
+    private suspend fun updateNote(value: String) {
+        _editTransactionState.emit(
             editTransactionState.value.copy(
-                transaction = editTransactionState.value.transaction.copy(
-                    note = value
-                ),
+                transaction = editTransactionState.value.transaction.copy(note = value),
                 note = value
             )
         )
@@ -191,8 +167,8 @@ class EditTransactionVM(
         }
     }
 
-    private fun saveImages(intent: TransactionIntent.SaveImage) {
-        _editTransactionState.tryEmit(
+    private suspend fun saveImages(intent: TransactionIntent.SaveImage) {
+        _editTransactionState.emit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
                     imagePath = intent.imagePath,
@@ -202,111 +178,84 @@ class EditTransactionVM(
                 image = intent.imagePath,
                 imageSource = intent.imageSource,
                 createdOn = intent.createdOn
-
             )
         )
         closeCameraAndGalleryWindow()
     }
 
-
     private fun deleteTransactionWithAlert(navHostController: NavHostController) {
-        appStateManager.showAlertDialog(message = R.string.transaction_deleted_alert,
+        appStateManager.showAlertDialog(
+            message = R.string.transaction_deleted_alert,
             onPositiveClick = {
-                deleteTransaction(
-                    navHostController
-                )
-            })
-    }
-
-    private fun updateCalendarDialog(showDialog: Boolean) {
-        _editTransactionState.tryEmit(
-            editTransactionState.value.copy(
-                showCalendarDialog = showDialog
-            )
+                deleteTransaction()
+                navHostController.navigateUp()
+            }
         )
     }
 
-    private fun updateTransaction(
-        navHostController: NavHostController
-    ) {
+    private suspend fun updateCalendarDialog(showDialog: Boolean) {
+        _editTransactionState.emit(
+            editTransactionState.value.copy(showCalendarDialog = showDialog)
+        )
+    }
+
+    private fun updateTransaction(navHostController: NavHostController) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTransaction(
-                editTransactionState.value.transaction
-            )
+            repository.updateTransaction(editTransactionState.value.transaction)
             repository.getAllTransactionByMonth(
-                getCurrentMonthYear().first, getCurrentMonthYear().second
+                getCurrentMonthYear().first,
+                getCurrentMonthYear().second
             )
         }.invokeOnCompletion {
             viewModelScope.launch {
-                withContext(Dispatchers.Main) {
-                    appStateManager.showToastState(toastMsg = R.string.transaction_updated)
-                    navHostController.popBackStack()
-                }
+                appStateManager.showToastState(toastMsg = R.string.transaction_updated)
+                navHostController.popBackStack()
             }
         }
     }
 
-    private fun deleteTransaction(
-        navHostController: NavHostController
-    ) {
+    private fun deleteTransaction() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteTransaction(
-                editTransactionState.value.transaction
-            )
+            repository.deleteTransaction(editTransactionState.value.transaction)
             repository.getAllTransactionByMonth(
-                getCurrentMonthYear().first, getCurrentMonthYear().second
+                getCurrentMonthYear().first,
+                getCurrentMonthYear().second
             )
         }.invokeOnCompletion {
             appStateManager.showToastState(toastMsg = R.string.transaction_deleted)
+
         }
-        navHostController.popBackStack()
     }
 
-    private fun updateAmount(amountIntent: TextFieldCalculatorIntent) {
-        when (amountIntent) {
-            is TextFieldCalculatorIntent.OnHeightChange -> {
-                _editTransactionState.tryEmit(
-                    editTransactionState.value.copy(
-                        amountTfState = editTransactionState.value.amountTfState.copy(
-                            height = amountIntent.height,
-                        )
-                    )
-                )
-            }
+    private suspend fun updateAmount(amountIntent: TextFieldCalculatorIntent) {
+        val updatedState = when (amountIntent) {
+            is TextFieldCalculatorIntent.OnHeightChange -> editTransactionState.value.amountTfState.copy(
+                height = amountIntent.height
+            )
 
-            is TextFieldCalculatorIntent.OnValueChange -> {
-                _editTransactionState.tryEmit(
-                    editTransactionState.value.copy(
-                        transaction = editTransactionState.value.transaction.copy(
-                            amount = amountIntent.value.double()
-                        ), amountTfState = editTransactionState.value.amountTfState.copy(
-                            amountValue = amountIntent.value
-                        )
-                    )
-                )
-            }
+            is TextFieldCalculatorIntent.OnValueChange -> editTransactionState.value.amountTfState.copy(
+                amountValue = amountIntent.value
+            )
 
-            is TextFieldCalculatorIntent.OpenDialog -> {
-                _editTransactionState.tryEmit(
-                    editTransactionState.value.copy(
-                        amountTfState = editTransactionState.value.amountTfState.copy(
-                            openDialog = amountIntent.openDialog
-                        )
-                    )
-                )
-            }
+            is TextFieldCalculatorIntent.OpenDialog -> editTransactionState.value.amountTfState.copy(
+                openDialog = amountIntent.openDialog
+            )
         }
 
+        _editTransactionState.emit(
+            editTransactionState.value.copy(amountTfState = updatedState)
+        )
     }
 
-    private fun updateCategoryIntent(
-        categoryIntent: EditCategoryIntent, navHostController: NavHostController
+    private suspend fun updateCategoryIntent(
+        categoryIntent: EditCategoryIntent,
+        navHostController: NavHostController
     ) {
         when (categoryIntent) {
             is EditCategoryIntent.OnCategoryListChange -> {
                 val selectedCategory = categoryIntent.list.first { it.isSelected }
                 if (selectedCategory.categoryId != editTransactionState.value.transaction.categoryId) {
-                    _editTransactionState.tryEmit(
+                    _editTransactionState.emit(
                         editTransactionState.value.copy(
                             categoryList = categoryIntent.list,
                             transaction = editTransactionState.value.transaction.copy(
@@ -319,16 +268,13 @@ class EditTransactionVM(
                 }
             }
 
-            EditCategoryIntent.OnEditCategoryClicked -> {
-                navHostController.navigate(Screens.EditCategory.route)
-            }
+            EditCategoryIntent.OnEditCategoryClicked -> navHostController.navigate(Screens.EditCategory.route)
         }
     }
 
-    private fun updateDate(date: Long) {
+    private suspend fun updateDate(date: Long) {
         val (month, year) = CommonFunctions.getMonthAndYearFromLong(date)
-
-        _editTransactionState.tryEmit(
+        _editTransactionState.emit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
                     date = date,
@@ -340,8 +286,8 @@ class EditTransactionVM(
         )
     }
 
-    private fun deleteImage() {
-        _editTransactionState.tryEmit(
+    private suspend fun deleteImage() {
+        _editTransactionState.emit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
                     imagePath = byteArrayOf(),
@@ -356,19 +302,41 @@ class EditTransactionVM(
         appStateManager.showToastState(toastMsg = R.string.image_deleted)
     }
 
-
-    private fun closeCameraAndGalleryWindow() {
-        if (editTransactionState.value.showCameraAndGallery) {
-            _editTransactionState.tryEmit(
-                editTransactionState.value.copy(showCameraAndGallery = false)
-            )
+    private suspend fun closeCameraAndGalleryWindow() {
+        viewModelScope.launch {
+            if (editTransactionState.value.showCameraAndGallery) {
+                _editTransactionState.emit(
+                    editTransactionState.value.copy(showCameraAndGallery = false)
+                )
+            }
         }
     }
 
-
-    private fun openCameraAndGalleryWindow() {
-        _editTransactionState.tryEmit(
+    private suspend fun openCameraAndGalleryWindow() {
+        _editTransactionState.emit(
             editTransactionState.value.copy(showCameraAndGallery = true)
+        )
+    }
+
+    private fun createTransactionState(transaction: DailyTransaction): TransactionState {
+        return TransactionState(
+            transaction = transaction,
+            categoryList = categoryModels.value.map { categoryModel ->
+                categoryModel.copy(
+                    isSelected = categoryModel.categoryId == transaction.categoryId,
+                    enable = categoryModel.categoryType == transaction.type
+                )
+            },
+            date = transaction.date,
+            amountTfState = AmountTfState(
+                currencyIcon = appConfigProperties.value.selectedCurrencyIconDrawable,
+                amountValue = transaction.amount.toString(),
+            ),
+            note = transaction.note,
+            image = transaction.imagePath,
+            imageSource = transaction.imageSource,
+            createdOn = transaction.createdOn,
+            appStateManager = appStateManager
         )
     }
 
@@ -380,6 +348,4 @@ class EditTransactionVM(
                 !image.contentEquals(transactionState.image) ||
                 categoryList != transactionState.categoryList
     }
-
-
 }

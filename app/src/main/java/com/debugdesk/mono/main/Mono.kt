@@ -1,8 +1,19 @@
 package com.debugdesk.mono.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -46,6 +57,47 @@ fun Mono(
                     BottomNavigationView(navController = navHostController)
                 }
             },
+            floatingActionButton = {
+                AnimatedVisibility(
+                    visible = currentRoute(navHostController) == Screens.Report.route,
+                    enter = slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessVeryLow
+                        )
+                    ) + scaleIn(
+                        initialScale = 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessVeryLow
+                        )
+                    ),
+                    exit = slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessVeryLow
+                        )
+                    ) + scaleOut(
+                        targetScale = 0f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessVeryLow
+                        )
+                    )
+                ) {
+                    FloatingActionButton(
+                        shape = CircleShape,
+                        onClick = { navHostController.navigate(Screens.Input.route) }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Add,
+                            contentDescription = "FAB"
+                        )
+                    }
+                }
+
+            }
         ) {
             it.calculateTopPadding()
             Column(modifier = Modifier.padding(bottom = if (showBnm) dp56 else dp0)) {
