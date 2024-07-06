@@ -109,17 +109,24 @@ fun CalendarBar(
                             )
                             .padding(dp8)
                             .clickable {
-                                if (filter.filterRange != FilterRange.CUSTOM_RANGE) {
-                                    onIntentChange(
-                                        ReportIntent.UpdateFilter(
-                                            filter = filter,
-                                            filterRange = filter.filterRange,
-                                            dateRange = null
+                                when (filter.filterRange) {
+                                    FilterRange.CUSTOM_RANGE -> {
+                                        showCustomRangeDialog = true
+                                    }
+                                    FilterRange.THIS_MONTH -> {
+                                        onIntentChange(ReportIntent.ResetClick)
+                                    }
+                                    else -> {
+                                        onIntentChange(
+                                            ReportIntent.UpdateFilter(
+                                                filter = filter,
+                                                filterRange = filter.filterRange,
+                                                dateRange = null
+                                            )
                                         )
-                                    )
-                                } else {
-                                    showCustomRangeDialog = true
+                                    }
                                 }
+
                                 onIntentChange(ReportIntent.ExpandCalendar(isCalendarExpanded = false))
                             }
                     )

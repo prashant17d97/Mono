@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +38,13 @@ import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
 import com.debugdesk.mono.presentation.uicomponents.media.MediaBottomSheet
-import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
 import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Tabs.tabs
 import com.debugdesk.mono.utils.enums.Buttons
+import com.debugdesk.mono.utils.enums.ExpenseType
 import com.debugdesk.mono.utils.enums.expenseType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -67,9 +66,10 @@ fun Input(
         viewModel.fetchInitialData()
     }
 
-    InputContainer(modifier = Modifier,
-        inputState = rememberUpdatedState(newValue = expenseState.takeIf { pagerState.currentPage == 0 }
-            ?: incomeState).value,
+    InputContainer(
+        modifier = Modifier,
+        expenseState = expenseState,
+        incomeState = incomeState,
         state = pagerState,
         tabs = tabs,
         onTabClick = {
@@ -92,15 +92,13 @@ fun Input(
 @Composable
 fun InputContainer(
     modifier: Modifier = Modifier,
-    inputState: InputState,
+    expenseState: InputState,
+    incomeState: InputState,
     state: PagerState,
     tabs: List<Int>,
     onTabClick: (Int) -> Unit,
     onInputIntent: (TransactionIntent) -> Unit
 ) {
-    var showPreview by remember {
-        mutableStateOf(false)
-    }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = modifier.fillMaxSize(),
@@ -112,52 +110,40 @@ fun InputContainer(
             HorizontalPager(
                 state = state,
             ) { pageIndex ->
-                InputPage(
-                    categories = inputState.inputCategories(pageIndex),
-                    inputState = inputState,
-                    text = R.string.expense.takeIf { pageIndex == 0 } ?: R.string.income,
-                    onSave = {
-                        onInputIntent(
-                            TransactionIntent.OnNewTransactionSaveClick(
-                                expenseType(pageIndex)
+                when (pageIndex) {
+                    0 -> InputPage(
+                        categories = expenseState.categoryList,
+                        inputState = expenseState,
+                        text = R.string.expense,
+                        onSave = {
+                            onInputIntent(
+                                TransactionIntent.OnNewTransactionSaveClick(
+                                    ExpenseType.Expense
+                                )
                             )
-                        )
-                    },
-                    onImageClick = { showPreview = true },
-                    onInputIntent = onInputIntent
-                )
+                        },
+                        onInputIntent = onInputIntent
+                    )
 
-            }
-        }
-
-
-        MediaBottomSheet(
-            visible = inputState.showCameraAndGallery,
-            appStateManager = inputState.appStateManager,
-            onProcess = onInputIntent
-        )
-    }
-    inputState.noteState.imagePath.toImageBitmap()?.let {
-        ImagePreview(
-            showPreview = showPreview,
-            createdOn = inputState.noteState.createdOn,
-            imageBitmap = it,
-        ) { previewIntent ->
-            when (previewIntent) {
-                PreviewIntent.Delete -> {
-                    showPreview = false
-                    onInputIntent(
-                        TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage
-                        )
+                    1 -> InputPage(
+                        categories = incomeState.categoryList,
+                        inputState = incomeState,
+                        text = R.string.income,
+                        onSave = {
+                            onInputIntent(
+                                TransactionIntent.OnNewTransactionSaveClick(
+                                    ExpenseType.Income
+                                )
+                            )
+                        },
+                        onInputIntent = onInputIntent
                     )
                 }
 
-                PreviewIntent.Navigate -> {
-                    showPreview = false
-                }
             }
         }
+
+
     }
 }
 
@@ -168,10 +154,11 @@ private fun InputPage(
     inputState: InputState,
     text: Int = R.string.expense,
     onSave: () -> Unit = {},
-    onImageClick: () -> Unit = {},
     onInputIntent: (TransactionIntent) -> Unit
 ) {
-
+    var showPreview by remember {
+        mutableStateOf(false)
+    }
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -188,7 +175,8 @@ private fun InputPage(
             verticalArrangement = Arrangement.spacedBy(dp10, alignment = Alignment.Top),
         ) {
 
-            CalendarCard(date = inputState.transaction.date,
+            CalendarCard(
+                date = inputState.date,
                 showDialog = inputState.showCalendarDialog,
                 onShowCalendarDialog = {
                     onInputIntent(
@@ -211,13 +199,26 @@ private fun InputPage(
                 })
 
             NoteTextField(
-                noteState = inputState.noteState,
-                onNoteChange = onInputIntent,
-                onImageClick = onImageClick
+                note = inputState.note,
+                image = inputState.image,
+                onNoteChange = {
+                    onInputIntent(TransactionIntent.OnValueChange(it))
+                },
+                onImageClick = {
+                    showPreview = true
+                },
+                onDelete = {
+                    onInputIntent(TransactionIntent.DeleteImage)
+                },
+                onTrailClick = {
+                    onInputIntent(TransactionIntent.OnTrailIconClick)
+                }
+
             )
 
             EditCategoryCard(
-                list = categories, onCategoryEdit = onInputIntent
+                list = categories,
+                onCategoryEdit = onInputIntent
             )
         }
 
@@ -229,6 +230,33 @@ private fun InputPage(
             onClick = { onSave() })
     }
 
+    MediaBottomSheet(
+        visible = inputState.showCameraAndGallery,
+        appStateManager = inputState.appStateManager,
+        onProcess = onInputIntent
+    )
+    inputState.image.toImageBitmap()?.let {
+        ImagePreview(
+            showPreview = showPreview,
+            createdOn = inputState.createdOn,
+            imageBitmap = it,
+        ) { previewIntent ->
+            when (previewIntent) {
+                PreviewIntent.Delete -> {
+                    showPreview = false
+                    onInputIntent(
+                        TransactionIntent.DeleteImage
+                    )
+                }
+
+                PreviewIntent.Navigate -> {
+                    showPreview = false
+                }
+
+            }
+        }
+    }
+
 }
 
 
@@ -238,7 +266,8 @@ private fun InputPage(
 private fun InputPagePrev() {
     PreviewTheme {
         InputContainer(modifier = Modifier,
-            inputState = InputState(),
+            expenseState = InputState(),
+            incomeState = InputState(),
             state = rememberPagerState {
                 2
             },

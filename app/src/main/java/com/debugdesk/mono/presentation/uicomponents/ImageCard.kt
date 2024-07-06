@@ -22,7 +22,7 @@ import com.debugdesk.mono.utils.Dp
 @Composable
 fun ImageCard(
     imageByteArray: ByteArray,
-    onDelete: (imageByteArray: ByteArray) -> Unit = {},
+    onDelete: () -> Unit = {},
     onImageClick: () -> Unit = {}
 ) {
     if (imageByteArray.isNotEmpty() && imageByteArray.toImageBitmap() != null) {
@@ -50,8 +50,7 @@ fun ImageCard(
                     contentDescription = "Delete",
                     modifier = Modifier
                         .size(Dp.dp24)
-                        .clickable(onClick = { onDelete(imageByteArray) }
-                        )
+                        .clickable(onClick = onDelete)
                 )
             }
         }

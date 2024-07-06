@@ -34,14 +34,18 @@ fun TransactionDropDown(
     modifier: Modifier = Modifier,
     isExpended: Boolean = false,
     selectedTransaction: String = ExpenseType.Income.name,
-    onDropDownClick: (String) -> Unit = {}
+    onDropDownClick: (String) -> Unit = {},
+    dismiss: () -> Unit = {},
 ) {
     val strings = stringArrayResource(id = R.array.expenses)
     Column {
         DropDownItem(
             modifier = modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.onPrimary),
+                .background(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    shape = MaterialTheme.shapes.large
+                ),
             text = selectedTransaction,
             icon = Icons.Default.KeyboardArrowDown,
             onDropDownClick = onDropDownClick
@@ -51,7 +55,8 @@ fun TransactionDropDown(
             expanded = isExpended,
             properties = PopupProperties(
                 dismissOnBackPress = true, dismissOnClickOutside = true
-            ), onDismissRequest = { onDropDownClick(selectedTransaction) }) {
+            ), onDismissRequest = dismiss
+        ) {
             strings.forEachIndexed { index, transactionType ->
                 DropDownItem(
                     modifier = Modifier.fillMaxWidth(),

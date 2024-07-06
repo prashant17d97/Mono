@@ -1,6 +1,7 @@
 package com.debugdesk.mono.presentation.uicomponents
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,16 +40,18 @@ fun CategoryCard(
 
     val color by animateColorAsState(targetValue = selectedColor.takeIf { model.isSelected }
         ?: unSelectedColor, label = "")
+
+    val alpha by animateFloatAsState(targetValue = if (model.enable) 1f else 0.5f, label = "Alpha")
     Column(modifier = Modifier
         .clickable {
-            onClick(model.copy(isSelected = !model.isSelected))
+            if (model.enable) {
+                onClick(model.copy(isSelected = !model.isSelected))
+            }
         }
         .size(dp80)
         .padding(dp4)
         .border(
-            width = 1.dp,
-            color = color,
-            shape = RoundedCornerShape(7.dp)
+            width = 1.dp, color = color.copy(alpha = alpha), shape = RoundedCornerShape(7.dp)
         ),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -58,12 +61,12 @@ fun CategoryCard(
                 contentDescription = "categoryIcon",
                 contentScale = ContentScale.Inside,
                 modifier = Modifier.size(dp40),
-                colorFilter = ColorFilter.tint(color),
+                colorFilter = ColorFilter.tint(color.copy(alpha = alpha)),
             )
         }
         Text(
             text = model.category,
-            style = MaterialTheme.typography.titleSmall.copy(color = color)
+            style = MaterialTheme.typography.titleSmall.copy(color = color.copy(alpha = alpha))
         )
     }
 }

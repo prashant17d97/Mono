@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.input
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -13,7 +14,6 @@ import com.debugdesk.mono.presentation.input.state.InputState
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTfState
 import com.debugdesk.mono.presentation.uicomponents.amounttf.TextFieldCalculatorIntent
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryIntent
-import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class InputVM(
     private val repository: Repository,
@@ -68,6 +69,7 @@ class InputVM(
                 appConfigManager.appConfigProperties,
                 repository.categoryModelList
             ) { appConfigProperties, categoryModels ->
+
                 InputState(
                     amountTfState = AmountTfState(
                         currencyIcon = appConfigProperties.selectedCurrencyIconDrawable
@@ -82,8 +84,20 @@ class InputVM(
     }
 
     private fun updateState(state: InputState) {
-        _incomeState.tryEmit(state)
-        _expenseState.tryEmit(state)
+        _incomeState.tryEmit(
+            InputState(
+                amountTfState = state.amountTfState,
+                categoryList = state.categoryList.filter { it.categoryType == ExpenseType.Income.name },
+                appStateManager = state.appStateManager
+            )
+        )
+        _expenseState.tryEmit(
+            InputState(
+                amountTfState = state.amountTfState,
+                categoryList = state.categoryList.filter { it.categoryType == ExpenseType.Expense.name },
+                appStateManager = state.appStateManager
+            )
+        )
     }
 
     private fun listenChanges() {
@@ -95,8 +109,7 @@ class InputVM(
 
     private fun emitChanges(state: InputState) {
         val updatedState = state.copy(
-            changesFound = state.transaction != emptyTransaction
-                    && state.transaction.amount != 0.0
+            changesFound = state.transaction.amount != 0.0
                     && state.transaction.categoryIcon != emptyTransaction.categoryIcon
         )
         if (state == _incomeState.value) {
@@ -122,7 +135,6 @@ class InputVM(
             is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(inputIntent.showDialog)
             is TransactionIntent.UpdateAmount -> updateAmount(inputIntent.amountTFIntent)
             is TransactionIntent.UpdateDate -> updateDate(inputIntent.date)
-            is TransactionIntent.UpdateNote -> updateNoteIntent(inputIntent.noteIntent)
             TransactionIntent.DismissCameraAndGalleryWindow, is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
             is TransactionIntent.SaveImage -> saveImages(
                 inputIntent
@@ -131,6 +143,16 @@ class InputVM(
             is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
                 inputIntent.editCategoryIntent,
                 navHostController
+            )
+
+
+            TransactionIntent.DeleteImage -> deleteImage()
+            TransactionIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
+            is TransactionIntent.OnValueChange -> stateFlow.tryEmit(
+                state.copy(
+                    transaction = state.transaction.copy(note = inputIntent.value),
+                    note = inputIntent.value
+                )
             )
 
             else -> {}
@@ -186,11 +208,10 @@ class InputVM(
                     imageSource = intent.imageSource,
                     createdOn = intent.createdOn
                 ),
-                noteState = state.noteState.copy(
-                    imagePath = intent.imagePath,
-                    imageSource = intent.imageSource,
-                    createdOn = intent.createdOn
-                )
+                image = intent.imagePath,
+                createdOn = intent.createdOn,
+                imageSource = intent.imageSource
+
             )
         )
         closeCameraAndGalleryWindow()
@@ -198,23 +219,6 @@ class InputVM(
 
     private fun updateCalendarDialog(showDialog: Boolean) {
         stateFlow.tryEmit(state.copy(showCalendarDialog = showDialog))
-    }
-
-    private fun updateNoteIntent(
-        noteIntent: NoteIntent,
-    ) {
-        when (noteIntent) {
-            NoteIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
-            is NoteIntent.OnValueChange -> stateFlow.tryEmit(
-                state.copy(
-                    transaction = state.transaction.copy(note = noteIntent.value),
-                    noteState = state.noteState.copy(noteValue = noteIntent.value)
-                )
-            )
-
-            is NoteIntent.DeleteImage -> deleteImage()
-
-        }
     }
 
     private fun updateAmount(amountIntent: TextFieldCalculatorIntent) {
@@ -273,13 +277,15 @@ class InputVM(
 
     private fun updateDate(date: Long) {
         val (month, year) = CommonFunctions.getMonthAndYearFromLong(date)
+        Log.d(TAG, "updateDate: $month, $year, ${Date(date)}")
         stateFlow.tryEmit(
             state.copy(
                 transaction = state.transaction.copy(
                     date = date,
                     currentMonthId = month,
                     year = year
-                )
+                ),
+                date = date,
             )
         )
     }
@@ -292,10 +298,9 @@ class InputVM(
                     imagePath = byteArrayOf(),
                     imageSource = ImageSource.NONE
                 ),
-                noteState = state.noteState.copy(
-                    imagePath = byteArrayOf(),
-                    imageSource = ImageSource.NONE
-                )
+                image = byteArrayOf(),
+                imageSource = ImageSource.NONE,
+                createdOn = 0L
             )
         )
         appStateManager.showToastState(toastMsg = R.string.image_deleted)

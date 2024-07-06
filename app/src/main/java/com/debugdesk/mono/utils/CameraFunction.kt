@@ -3,7 +3,6 @@ package com.debugdesk.mono.utils
 import android.Manifest
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -25,8 +24,6 @@ import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.Dp.dp0
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -124,7 +121,7 @@ object CameraFunction {
 
     private fun Bitmap.toByteArray(): ByteArray {
         val stream = ByteArrayOutputStream()
-        this.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        this.compress(Bitmap.CompressFormat.PNG, 50, stream)
         return stream.toByteArray()
     }
 
@@ -181,43 +178,6 @@ object CameraFunction {
                     }
                 }
             }
-        }
-    }
-
-
-    fun openImageInGallery(context: Context, imageByteArray: ByteArray) {
-        try {
-            // Create a temporary file to store the image
-            val imageFile = File(context.cacheDir, "temp_image.jpg")
-
-            // Write the ByteArray to the temporary file
-            val fos = FileOutputStream(imageFile)
-            fos.write(imageByteArray)
-            fos.flush()
-            fos.close()
-
-            // Get the URI for the file using FileProvider
-            val imageUri: Uri = FileProvider.getUriForFile(
-                context, "${BuildConfig.APPLICATION_ID}.provider", imageFile
-            )
-
-            // Create an Intent to view the image
-            val intent = Intent().apply {
-                action = Intent.ACTION_VIEW
-                setDataAndType(imageUri, "image/*")
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-
-            // Check if there is an app that can handle the Intent
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
-            } else {
-                // Handle the case where no app can handle the Intent
-                // For example, show a toast message
-                Log.e(TAG, "No app found to open the image.")
-            }
-        } catch (exception: IOException) {
-            Log.e(TAG, "openImageInGallery: ${exception.localizedMessage}")
         }
     }
 }

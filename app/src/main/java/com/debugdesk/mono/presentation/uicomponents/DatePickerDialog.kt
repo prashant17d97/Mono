@@ -14,22 +14,17 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun DatePickerDialog(
     openDialog: Boolean,
-    initial: Long = System.currentTimeMillis(),
+    initial: Long,
     openDialogChange: (Boolean) -> Unit,
     value: (Long) -> Unit
 ) {
-
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initial,
+        yearRange = IntRange(2000, 2200),
+    )
     if (openDialog) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initial,
-            yearRange = IntRange(2000, 2200),
-        )
-
         DatePickerDialog(
             onDismissRequest = {
-                // Dismiss the dialog when the user clicks outside the dialog or on the back
-                // button. If you want to disable that functionality, simply use an empty
-                // onDismissRequest.
                 openDialogChange(false)
             },
             properties = DialogProperties(),
@@ -52,7 +47,6 @@ fun DatePickerDialog(
                 ) {
                     Text("Cancel")
                 }
-                value(datePickerState.selectedDateMillis ?: 0L)
             }
         ) {
             DatePicker(state = datePickerState, showModeToggle = false)

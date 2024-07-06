@@ -145,6 +145,11 @@ class ReportVM(
     ) {
         when (reportIntent) {
             is ReportIntent.ResetClick -> {
+                updateFilter(
+                    context,
+                    ReportIntent.UpdateFilter(filterRange = FilterRange.THIS_MONTH)
+                )
+
                 val (month, year) = getCurrentMonthYear()
                 _reportState.tryEmit(
                     reportState.value.copy(
@@ -176,16 +181,7 @@ class ReportVM(
             is ReportIntent.UpdateTab -> updateTab(reportIntent.currentIndex)
             is ReportIntent.UpdateSelectedDate -> updateSelectedDate(reportIntent.timeStamp)
             is ReportIntent.UpdateFilter -> {
-                _reportState.tryEmit(
-                    reportState.value.copy(
-                        filters = reportState.value.filters.map { filter ->
-                            filter.copy(isSelected = filter == reportIntent.filter)
-                        },
-                        filterString = context.getString(reportIntent.filter.title),
-                        showRest = true
-
-                    )
-                )
+                updateFilter(context, reportIntent)
                 viewModelScope.launch(Dispatchers.IO) {
                     when (reportIntent.filterRange) {
                         FilterRange.THIS_MONTH -> getMonthTransaction()
@@ -270,6 +266,18 @@ class ReportVM(
                 )
             )
         }
+    }
+
+    private fun updateFilter(context: Context, reportIntent: ReportIntent.UpdateFilter) {
+        _reportState.tryEmit(
+            reportState.value.copy(
+                filters = reportState.value.filters.map { filter ->
+                    filter.copy(isSelected = filter == reportIntent.filter)
+                },
+                filterString = context.getString(reportIntent.filter.title),
+                showRest = true
+            )
+        )
     }
 
     fun updateView(navHostController: NavHostController, reportView: ReportView) {

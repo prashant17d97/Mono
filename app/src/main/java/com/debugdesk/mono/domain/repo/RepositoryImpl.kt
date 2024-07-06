@@ -1,10 +1,10 @@
 package com.debugdesk.mono.domain.repo
 
+import android.util.Log
 import com.debugdesk.mono.domain.data.local.localdatabase.AppDatabase
 import com.debugdesk.mono.domain.data.local.localdatabase.DaoInterface
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
-import com.debugdesk.mono.domain.data.local.localdatabase.model.emptyTransaction
 import com.debugdesk.mono.utils.DBUtils.orIfEmpty
 import com.debugdesk.mono.utils.DBUtils.toDailyTransaction
 import com.debugdesk.mono.utils.DBUtils.toTransaction
@@ -53,9 +53,9 @@ class RepositoryImpl(
         MutableStateFlow(emptyList())
     override val categoryModelList: StateFlow<List<CategoryModel>> = _categoryModelList
 
-    private val _transaction: MutableStateFlow<DailyTransaction> =
-        MutableStateFlow(emptyTransaction)
-    override val transaction: StateFlow<DailyTransaction> = _transaction
+    private val _editTransaction: MutableStateFlow<DailyTransaction?> =
+        MutableStateFlow(null)
+    override val editTransaction: StateFlow<DailyTransaction?> = _editTransaction
 
     override suspend fun getYearRange(): IntRange {
         val year = daoInterface.getAllTransaction().sortedBy { it.year }
@@ -162,11 +162,20 @@ class RepositoryImpl(
     }
 
     override suspend fun fetchTransactionFromId(transactionId: Int) {
-        val transaction = daoInterface.fetchTransactionFromId(transactionId)
-        _transaction.tryEmit(
-            transaction.toDailyTransaction()
-        )
+        // Fetch the transaction and store it in a variable
+        val transaction = daoInterface.fetchTransactionFromId(transactionId).toDailyTransaction()
+
+        // Log the fetched transaction
+        Log.d(TAG, "fetchTransactionFromId: $transaction")
+
+        // Emit the fetched transaction
+        val emitted = _editTransaction.tryEmit(transaction)
+
+        // Log whether the emission was successful
+        Log.d(TAG, "Emission successful: $emitted")
+
+        // Log the current value of _editTransaction
+        Log.d(TAG, "fetchTransactionFromIdPost: ${_editTransaction.value}")
 
     }
-
 }

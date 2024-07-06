@@ -12,7 +12,7 @@ interface Repository {
     val categoryTransactionAll: StateFlow<List<DailyTransaction>>
     val allDailyMonthTransaction: StateFlow<List<DailyTransaction>>
     val allDailyYearTransaction: StateFlow<List<DailyTransaction>>
-    val transaction: StateFlow<DailyTransaction>
+    val editTransaction: StateFlow<DailyTransaction?>
     val allItemSize: StateFlow<Int>
     val categoryModelList: StateFlow<List<CategoryModel>>
 

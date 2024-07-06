@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import com.debugdesk.mono.R
-import com.debugdesk.mono.presentation.edittrans.TransactionIntent
 import com.debugdesk.mono.presentation.uicomponents.ImageCard
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.tf.MonoOutlineTextField
@@ -31,9 +30,12 @@ import com.debugdesk.mono.utils.Dp.dp10
 
 @Composable
 fun NoteTextField(
-    noteState: NoteState,
-    onNoteChange: (TransactionIntent) -> Unit = {},
-    onImageClick: () -> Unit = {}
+    note: String,
+    image: ByteArray = byteArrayOf(),
+    onNoteChange: (String) -> Unit = {},
+    onImageClick: () -> Unit = {},
+    onDelete: () -> Unit = {},
+    onTrailClick: () -> Unit = {}
 ) {
     val interaction = remember { MutableInteractionSource() }
     val inFocus by interaction.collectIsFocusedAsState()
@@ -64,27 +66,19 @@ fun NoteTextField(
                 focusManager = focusManager,
                 borderWidth = dp0,
                 cornerShape = dp10,
-                textOutlineEnabled = noteState.imagePath.isEmpty(),
+                textOutlineEnabled = image.isEmpty(),
                 imeAction = ImeAction.Done,
-                value = noteState.noteValue,
-                onValueChange = {
-                    onNoteChange(TransactionIntent.UpdateNote(NoteIntent.OnValueChange(it)))
-                },
+                value = note,
+                onValueChange = onNoteChange,
                 trailingClick = {
                     focusManager.clearFocus()
-                    onNoteChange(TransactionIntent.UpdateNote(NoteIntent.OnTrailIconClick))
+                    onTrailClick()
                 },
             )
 
             ImageCard(
-                imageByteArray = noteState.imagePath,
-                onDelete = {
-                    onNoteChange(
-                        TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage
-                        )
-                    )
-                },
+                imageByteArray = image,
+                onDelete = onDelete,
                 onImageClick = onImageClick
             )
         }
@@ -96,8 +90,6 @@ fun NoteTextField(
 @Composable
 fun NoteTextFieldPrev() {
     PreviewTheme {
-        NoteTextField(
-            noteState = NoteState()
-        )
+        NoteTextField(note = "")
     }
 }

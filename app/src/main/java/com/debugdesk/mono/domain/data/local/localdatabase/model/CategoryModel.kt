@@ -17,6 +17,7 @@ data class CategoryModel(
     val categoryIcon: Int? = null,
     val categoryType: String? = null,
     var isSelected: Boolean = false,
+    var enable: Boolean = true,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),

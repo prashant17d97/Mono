@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,10 +25,10 @@ import com.debugdesk.mono.presentation.uicomponents.CalendarCard
 import com.debugdesk.mono.presentation.uicomponents.CustomButton
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
+import com.debugdesk.mono.presentation.uicomponents.TransactionDropDown
 import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
 import com.debugdesk.mono.presentation.uicomponents.media.MediaBottomSheet
-import com.debugdesk.mono.presentation.uicomponents.notetf.NoteIntent
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
 import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
 import com.debugdesk.mono.utils.CommonColor
@@ -46,8 +45,8 @@ fun EditTransaction(
     transactionId: Int?,
     editTransactionViewModel: EditTransactionVM = koinViewModel(),
 ) {
-    LocalContext.current
     val editTransactionState by editTransactionViewModel.editTransactionState.collectAsState()
+
     LaunchedEffect(transactionId) {
         transactionId?.let { editTransactionViewModel.getDailyTransaction(it) }
     }
@@ -66,6 +65,10 @@ fun EditTransactionContainer(
     onEditTransactionIntent: (TransactionIntent) -> Unit = {},
 ) {
     var showPreview by remember {
+        mutableStateOf(false)
+    }
+
+    var showTransactionType by remember {
         mutableStateOf(false)
     }
 
@@ -91,7 +94,7 @@ fun EditTransactionContainer(
         ) {
 
             CalendarCard(
-                date = transactionState.transaction.date,
+                date = transactionState.date,
                 showDialog = transactionState.showCalendarDialog,
                 onShowCalendarDialog = {
                     onEditTransactionIntent(
@@ -114,10 +117,32 @@ fun EditTransactionContainer(
                 }
             )
 
+            TransactionDropDown(
+                isExpended = showTransactionType,
+                selectedTransaction = transactionState.transaction.type,
+                onDropDownClick = {
+                    showTransactionType = !showTransactionType
+                    onEditTransactionIntent(TransactionIntent.UpdateTransactionType(it))
+                },
+                dismiss = { showPreview = false }
+            )
+
             NoteTextField(
-                noteState = transactionState.noteState,
-                onNoteChange = onEditTransactionIntent,
-                onImageClick = { showPreview = true }
+                note = transactionState.note,
+                image = transactionState.image,
+                onNoteChange = {
+                    onEditTransactionIntent(TransactionIntent.OnValueChange(it))
+                },
+                onImageClick = {
+                    showPreview = true
+                },
+                onDelete = {
+                    onEditTransactionIntent(TransactionIntent.DeleteImage)
+                },
+                onTrailClick = {
+                    onEditTransactionIntent(TransactionIntent.OnTrailIconClick)
+                }
+
             )
 
             EditCategoryCard(
@@ -143,19 +168,17 @@ fun EditTransactionContainer(
         onProcess = onEditTransactionIntent
     )
 
-    transactionState.noteState.imagePath.toImageBitmap()?.let {
+    transactionState.image.toImageBitmap()?.let {
         ImagePreview(
             showPreview = showPreview,
-            createdOn = transactionState.noteState.createdOn,
+            createdOn = transactionState.createdOn,
             imageBitmap = it,
         ) { previewIntent ->
             when (previewIntent) {
                 PreviewIntent.Delete -> {
                     showPreview = false
                     onEditTransactionIntent(
-                        TransactionIntent.UpdateNote(
-                            NoteIntent.DeleteImage
-                        )
+                        TransactionIntent.DeleteImage
                     )
                 }
 
