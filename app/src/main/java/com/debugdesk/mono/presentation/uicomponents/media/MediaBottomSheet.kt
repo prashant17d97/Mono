@@ -118,6 +118,7 @@ fun MediaBottomSheet(
                 when (it.requestCode) {
                     RequestCode.CAMERA -> cameraLauncher.launch(uri)
                     RequestCode.GALLERY -> galleryLauncher.launch("image/*")
+                    else -> {}
                 }
             },
         )

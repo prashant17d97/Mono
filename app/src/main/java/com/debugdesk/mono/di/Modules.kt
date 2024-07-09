@@ -1,5 +1,6 @@
 package com.debugdesk.mono.di
 
+import android.app.NotificationManager
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreUtil
@@ -7,6 +8,8 @@ import com.debugdesk.mono.domain.data.local.localdatabase.AppDatabase
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.domain.repo.RepositoryImpl
 import com.debugdesk.mono.main.MainViewModel
+import com.debugdesk.mono.notification.NotificationHelper
+import com.debugdesk.mono.notification.NotificationScheduler
 import com.debugdesk.mono.presentation.addcategory.AddCategoryVM
 import com.debugdesk.mono.presentation.calendar.CalendarPageVM
 import com.debugdesk.mono.presentation.editcategory.EditCategoryVM
@@ -42,6 +45,25 @@ object Modules {
         single<AppStateManager> { AppStateManagerImpl() }
         single<AppConfigManager> { AppConfigurationManagerImpl(dataStoreUtil = get()) }
 
+
+        single<NotificationManager> {
+            androidApplication().applicationContext.getSystemService(
+                Context.NOTIFICATION_SERVICE
+            ) as NotificationManager
+        }
+        single<NotificationHelper> {
+            NotificationHelper(
+                context = androidApplication().applicationContext,
+                notificationManager = get()
+            )
+        }
+        single<NotificationScheduler> {
+            NotificationScheduler(
+                context = androidApplication().applicationContext
+            )
+        }
+
+
         viewModel {
             AddCategoryVM(repository = get())
         }
@@ -62,12 +84,12 @@ object Modules {
         }
         viewModel {
             IntroViewModel(
-                dataStoreUtil = get(), repository = get()
+                appConfigManager = get(), repository = get()
             )
         }
         viewModel {
             ReportVM(
-                appConfigManager = get(), repository = get()
+                appConfigManager = get(), repository = get(), appStateManager = get()
             )
         }
 
@@ -94,13 +116,15 @@ object Modules {
 
         viewModel {
             ReminderVM(
-                appStateManager = get()
+                appStateManager = get(),
+                notificationScheduler = get(),
+                appConfigManager = get()
             )
         }
 
         viewModel {
             MainViewModel(
-                appStateManager = get(), appConfigManager = get(), dataStoreUtil = get()
+                appStateManager = get(), appConfigManager = get()
             )
         }
 

@@ -4,11 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.debugdesk.mono.R
-import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects.INTRO_FINISHED
-import com.debugdesk.mono.domain.data.local.datastore.DataStoreUtil
 import com.debugdesk.mono.domain.data.local.localdatabase.model.CategoryModel
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.model.IntroModel
+import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.utils.enums.ExpenseType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class IntroViewModel(
-    private val dataStoreUtil: DataStoreUtil,
+    private val appConfigManager: AppConfigManager,
     private val repository: Repository
 ) : ViewModel() {
 
@@ -84,6 +83,6 @@ class IntroViewModel(
         .onEach { delay(1000) }
 
     fun setIntroFinished() {
-        dataStoreUtil.saveKey(INTRO_FINISHED, true)
+        appConfigManager.introCompleted(true)
     }
 }

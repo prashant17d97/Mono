@@ -24,7 +24,7 @@ import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
 @Composable
 fun PermissionLauncherHandler(
     permissionHandler: PermissionHandler,
-    onGranted: () -> Unit,
+    onGranted: () -> Unit = {},
     onPermissionDenial: () -> Unit = {}
 ) {
     var requestPermission by remember {

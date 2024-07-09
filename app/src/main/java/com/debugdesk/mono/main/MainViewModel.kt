@@ -1,16 +1,12 @@
 package com.debugdesk.mono.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects
-import com.debugdesk.mono.domain.data.local.datastore.DataStoreUtil
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 
 class MainViewModel(
     private val appStateManager: AppStateManager,
-    private val appConfigManager: AppConfigManager,
-    dataStoreUtil: DataStoreUtil
+    private val appConfigManager: AppConfigManager
 ) : ViewModel() {
 
     val toastMsg = appStateManager.toastState
@@ -19,11 +15,7 @@ class MainViewModel(
     val appConfigProperties = appConfigManager.appConfigProperties
 
     init {
-        appConfigManager.restorePreviousAppConfig()
-        dataStoreUtil.retrieveKey(DataStoreObjects.INTRO_FINISHED) {
-            Log.e("IntroVM", "introFinished: $it,  ${isIntroCompleted.value}")
-            appConfigManager.introCompleted(it ?: false)
-        }
+        appConfigManager.fetchAppInitialData()
     }
 
     fun showToast() {

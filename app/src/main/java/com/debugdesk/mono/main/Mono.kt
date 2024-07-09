@@ -1,5 +1,6 @@
 package com.debugdesk.mono.main
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -22,6 +23,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -45,9 +47,17 @@ import com.debugdesk.mono.utils.states.AlertState
 @Composable
 fun Mono(
     appConfigProperties: AppConfigProperties,
-    alertState: AlertState
+    alertState: AlertState,
+    targetScreen: String?
 ) {
     val navHostController = rememberNavController()
+
+    LaunchedEffect(key1 = targetScreen) {
+        Log.d("MainActivity", "Mono: $targetScreen")
+        targetScreen?.let {
+            navHostController.navigate(it)
+        }
+    }
 
     MonoTheme(appConfigProperties = appConfigProperties) {
         val showBnm = showBnm(navHostController)

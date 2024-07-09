@@ -1,6 +1,7 @@
 package com.debugdesk.mono.presentation.report
 
 import android.app.Activity
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -57,8 +58,10 @@ import com.debugdesk.mono.presentation.uicomponents.DropDown
 import com.debugdesk.mono.presentation.uicomponents.ExpenseCard
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
 import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
+import com.debugdesk.mono.presentation.uicomponents.PermissionLauncherHandler
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
+import com.debugdesk.mono.utils.CameraFunction.getNotificationPermissionHandler
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp
 import com.debugdesk.mono.utils.Dp.dp0
@@ -81,6 +84,12 @@ fun Report(
         (context as Activity).finishAffinity()
     }
 
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+        PermissionLauncherHandler(
+            permissionHandler = getNotificationPermissionHandler(viewModel.appState),
+        )
+    }
+    
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchTransaction()
         viewModel.updateView(
@@ -104,7 +113,7 @@ fun Report(
 private fun ReportContainer(
     scrollState: ScrollState = rememberScrollState(),
     reportState: ReportState,
-    currency: String = stringResource(id =R.string.inrIcon),
+    currency: String = stringResource(id = R.string.inrIcon),
     onIntentChange: (ReportIntent) -> Unit
 ) {
     MonoColumn(
@@ -146,6 +155,7 @@ private fun ReportContainer(
                     reportState = reportState,
                     onIntentChange = onIntentChange
                 )
+
                 else -> {}
             }
 

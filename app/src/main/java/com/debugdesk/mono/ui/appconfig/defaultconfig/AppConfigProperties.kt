@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontStyle.Companion.Normal
 import com.debugdesk.mono.R
 
 data class AppConfigProperties(
-    val isDarkTheme: ThemeMode = ThemeMode.Default,
+    val themeMode: ThemeMode = ThemeMode.Default,
     val fontFamily: String = "Poppins",
     val fontStyle: FontStyle = Normal,
     val textDarkColor: Color = Color.White,
@@ -23,7 +23,7 @@ data class AppConfigProperties(
 
     val isNightTheme: Boolean
         @Composable
-        get() = when (isDarkTheme) {
+        get() = when (themeMode) {
             ThemeMode.Dark -> true
             ThemeMode.Light -> false
             else -> isSystemInDarkTheme()
@@ -31,7 +31,7 @@ data class AppConfigProperties(
 }
 
 val DefaultConfigProperties = AppConfigProperties(
-    isDarkTheme = ThemeMode.Default,
+    themeMode = ThemeMode.Default,
     fontFamily = "Poppins",
     fontStyle = Normal,
     textDarkColor = Color.White,

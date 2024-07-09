@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -164,6 +165,18 @@ object CameraFunction {
             errorMsg = R.string.camera_permission,
             openSettingMsg = R.string.gallery_camera_denied,
             requestCode = RequestCode.CAMERA
+        )
+    }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun getNotificationPermissionHandler(
+        appStateManager: AppStateManager
+    ): PermissionHandler {
+        return PermissionHandler(
+            permissionStrings = arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            appStateManager = appStateManager,
+            errorMsg = R.string.notification_permission,
+            openSettingMsg = R.string.notification_denied,
+            requestCode = RequestCode.NOTIFICATION
         )
     }
 

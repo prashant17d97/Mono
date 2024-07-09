@@ -11,7 +11,7 @@ import com.debugdesk.mono.ui.theme.MonoTheme
 fun PreviewTheme(
     isDarkTheme: Boolean = true,
     appConfigProperties: AppConfigProperties = AppConfigProperties(
-        isDarkTheme = isDarkTheme(
+        themeMode = isDarkTheme(
             isDarkTheme
         )
     ),

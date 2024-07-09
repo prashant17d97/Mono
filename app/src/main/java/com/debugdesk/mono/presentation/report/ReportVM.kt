@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
+import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getExpenseAmount
@@ -28,12 +29,14 @@ import kotlinx.coroutines.launch
 class ReportVM(
     private val appConfigManager: AppConfigManager,
     private val repository: Repository,
+    private val appStateManager: AppStateManager
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "ReportVM"
     }
 
+    val appState = appStateManager
     init {
         listenStateChanges()
         viewModelScope.launch(Dispatchers.IO) {

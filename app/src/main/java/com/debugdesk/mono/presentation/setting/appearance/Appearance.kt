@@ -28,9 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -70,98 +67,112 @@ fun Appearance(
     appearanceVM: AppearanceVM = koinViewModel()
 ) {
     val context = LocalContext.current
-    val appConfigProperties by appearanceVM.appConfigProperties.collectAsState()
+    val appearanceState by appearanceVM.appearanceState.collectAsState()
 
-    LaunchedEffect(appConfigProperties) {
-        Log.e(TAG, "Appearance: ${appConfigProperties.dynamicColor}")
+    LaunchedEffect(Unit) {
+        appearanceVM.initial()
     }
 
-    var appearanceState by remember { mutableStateOf(AppearanceState()) }
-
     BackHandler {
-        appearanceVM.revertTheAppConfigPropertiesChange()
-        navHostController.popBackStack()
+        appearanceVM.handleAppearanceIntent(AppearanceIntent.Back, navHostController)
     }
 
     AppearanceContainer(
-        onBack = {
-            appearanceVM.revertTheAppConfigPropertiesChange()
-            navHostController.popBackStack()
-        },
-        onSave = {
-            appearanceVM.saveNewAppConfigPropertiesChanges()
-            appearanceVM.showToastState(toastMsg = R.string.app_config_saved)
-        },
-        appConfigProperties = appConfigProperties,
+        appConfigProperties = appearanceState.appConfigProperties,
         appearanceState = appearanceState,
-        fontItems = context.getFontFamilies(appConfigProperties.fontFamily),
-        languageModel = context.getLanguages(appConfigProperties.language),
-        onAppConfigPropertiesChange = {
-            appearanceVM.requestAppConfigChanges(it)
-        },
-        onAppearanceStateChanges = { appearanceState = it },
-        requestDynamicColors = {
-            appearanceVM
-                .requestAppConfigChanges(
-                    appConfigProperties = appConfigProperties.copy(
-                        dynamicColor = !appConfigProperties.dynamicColor
-                    )
-                )
-        })
+        fontItems = context.getFontFamilies(appearanceState.appConfigProperties.fontFamily),
+        languageModel = context.getLanguages(appearanceState.appConfigProperties.language),
+        onIntentChange = { appearanceIntent ->
+            appearanceVM.handleAppearanceIntent(appearanceIntent, navHostController)
+        }
+    )
 
 
 }
 
 @Composable
 private fun AppearanceContainer(
-    onBack: () -> Unit,
-    onSave: () -> Unit,
     fontItems: List<FontModel>,
     languageModel: List<LanguageModel>,
     appConfigProperties: AppConfigProperties,
-    onAppConfigPropertiesChange: (AppConfigProperties) -> Unit,
     appearanceState: AppearanceState,
-    onAppearanceStateChanges: (AppearanceState) -> Unit,
-    requestDynamicColors: (Boolean) -> Unit = {}
+    onIntentChange: (AppearanceIntent) -> Unit = {},
 ) {
     MonoColumn(
         heading = stringResource(id = R.string.appearance),
         showBack = true,
         isScrollEnabled = false,
         trailing = stringResource(id = R.string.save),
-        onBackClick = onBack,
-        onTrailClick = onSave
+        onBackClick = { onIntentChange(AppearanceIntent.Back) },
+        onTrailClick = { onIntentChange(AppearanceIntent.Save) }
     ) {
         FontItems(
             title = stringResource(id = R.string.font),
             value = appConfigProperties.fontFamily,
-            isExpanded = appearanceState.font,
-            onToggleExpand = { onAppearanceStateChanges(appearanceState.copy(font = it)) },
-            onItemClick = { onAppConfigPropertiesChange(appConfigProperties.copy(fontFamily = it)) },
+            isExpanded = appearanceState.isFontExpended,
+            onToggleExpand = {
+                onIntentChange(
+                    AppearanceIntent.ChangeFont(
+                        appConfigProperties.fontFamily,
+                        !appearanceState.isFontExpended
+                    )
+                )
+            },
+            onItemClick = {
+                onIntentChange(
+                    AppearanceIntent.ChangeFont(
+                        it,
+                        !appearanceState.isFontExpended
+                    )
+                )
+            },
             items = fontItems
         )
 
         LanguageItems(
             title = stringResource(id = R.string.language),
             value = appConfigProperties.language,
-            isExpanded = appearanceState.language,
-            onToggleExpand = { onAppearanceStateChanges(appearanceState.copy(language = it)) },
-            onItemClick = { onAppConfigPropertiesChange(appConfigProperties.copy(language = it)) },
+            isExpanded = appearanceState.isLanguageExpended,
+            onToggleExpand = {
+                onIntentChange(
+                    AppearanceIntent.ChangeLanguage(
+                        appConfigProperties.language,
+                        !appearanceState.isLanguageExpended
+                    )
+                )
+            },
+            onItemClick = {
+                onIntentChange(
+                    AppearanceIntent.ChangeLanguage(
+                        it,
+                        !appearanceState.isLanguageExpended
+                    )
+                )
+            },
             items = languageModel
         )
         DropDownThemeMenu(
-            isDropDownExpanded = appearanceState.theme,
+            isDropDownExpanded = appearanceState.isThemeExpended,
             onDropDownClick = {
-                onAppearanceStateChanges(appearanceState.copy(theme = !appearanceState.theme))
+                onIntentChange(
+                    AppearanceIntent.ChangeTheme(
+                        it,
+                        !appearanceState.isThemeExpended
+                    )
+                )
             },
-            appConfigProperties = appConfigProperties,
-            onAppConfigPropertiesChange = onAppConfigPropertiesChange
+            themeMode = appConfigProperties.themeMode,
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             DynamicColorSetting(
                 value = appConfigProperties.dynamicColor,
-                onValueChange = requestDynamicColors
+                onValueChange = {
+                    Log.d(TAG, "AppearanceContainer: $it")
+                    onIntentChange(
+                        AppearanceIntent.UpdateDynamicColor
+                    )
+                }
             )
         }
     }
@@ -348,14 +359,13 @@ private fun DynamicColorSetting(
 @Composable
 private fun DropDownThemeMenu(
     isDropDownExpanded: Boolean,
-    onDropDownClick: () -> Unit,
-    appConfigProperties: AppConfigProperties,
-    onAppConfigPropertiesChange: (AppConfigProperties) -> Unit = {}
+    themeMode: ThemeMode,
+    onDropDownClick: (ThemeMode) -> Unit = {},
 ) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(bottom = 5.dp)
-        .clickable { onDropDownClick() }
+        .clickable { onDropDownClick(themeMode) }
         .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
@@ -366,7 +376,7 @@ private fun DropDownThemeMenu(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(id = R.drawable.ic_dark_mode.takeIf { appConfigProperties.isDarkTheme.isDarkTheme() }
+            Image(painter = painterResource(id = R.drawable.ic_dark_mode.takeIf { themeMode.isDarkTheme() }
                 ?: R.drawable.ic_mode_light),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
@@ -389,11 +399,10 @@ private fun DropDownThemeMenu(
         x = 0.dp, y = (-60).dp
     ), properties = PopupProperties(
         dismissOnBackPress = true, dismissOnClickOutside = true
-    ), onDismissRequest = { onDropDownClick() }) {
+    ), onDismissRequest = { onDropDownClick(themeMode) }) {
         ThemeMode.entries.forEach { menu ->
             DropdownMenuItem(onClick = {
-                onAppConfigPropertiesChange(appConfigProperties.copy(isDarkTheme = menu))
-                onDropDownClick()
+                onDropDownClick(menu)
             }, text = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -402,7 +411,7 @@ private fun DropDownThemeMenu(
                     Text(text = stringResource(id = menu.stringRes))
                     SpacerWidth(value = Dp.dp6)
                     AnimatedVisibility(
-                        visible = menu.stringRes == appConfigProperties.isDarkTheme.stringRes
+                        visible = menu.stringRes == themeMode.stringRes
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -420,12 +429,11 @@ private fun DropDownThemeMenu(
 @Composable
 fun AppearancePre() {
     val context = LocalContext.current
-    AppearanceContainer(onBack = { },
-        onSave = { },
+    AppearanceContainer(
         appConfigProperties = AppConfigProperties(),
         appearanceState = AppearanceState(),
         fontItems = context.getFontFamilies("Poppins"),
         languageModel = context.getLanguages("English"),
-        onAppConfigPropertiesChange = { },
-        onAppearanceStateChanges = { })
+        onIntentChange = { },
+    )
 }

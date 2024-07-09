@@ -1,13 +1,5 @@
 <resources>
     <string name="app_name">Mono</string>
-    <string name="login">Login</string>
-    <string name="username">Username</string>
-    <string name="enter_username">Enter Username</string>
-    <string name="password">Password</string>
-    <string name="enter_password">Enter Password</string>
-    <string name="remember_me">Remember Me!</string>
-    <string name="invalid_username">Username field must not be empty!</string>
-    <string name="invalid_password">Password field must not be empty!</string>
 
     <string name="someError">Some error occurred!</string>
     <string name="your_device_offline">You\'re offline</string>
@@ -33,7 +25,6 @@
     <string name="clear">Clear</string>
     <string name="equal">=</string>
     <string name="okay">Okay</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="back">Back</string>
     <string name="add">Add</string>
     <string name="icon">Icon</string>
@@ -43,9 +34,9 @@
     <string name="save">Save</string>
     <string name="appearance">Appearance</string>
     <string name="font">Font Family</string>
-    <string name="introHeading1">Easy to add new dailyTransaction</string>
+    <string name="introHeading1">Easy to add new daily transaction</string>
     <string name="introHeading2">Track income and expenses</string>
-    <string name="introHeading3">Easy to add new dailyTransaction</string>
+    <string name="introHeading3">Easy to add new daily transaction</string>
     <string name="introDescription1">We always try to bring the best experience to users. Your transactions are recorded as quickly as possible. You will not have any difficulties when you first use MoNo.</string>
     <string name="introDescription2">Details tracking transactions visually with the adding images features bills</string>
     <string name="introDescription3">Supports viewing your balance for monthly, income and expenses, debts, loans as well as reports with category.</string>
@@ -57,9 +48,11 @@
     <string name="characterWarning">You can not add more character!</string>
 
 
-    <string name="reminderCaption">Mono will reminder to note dailyTransaction on this time everyday.</string>
+    <string name="reminderCaption">Mono will reminder to note daily transaction on this time everyday.</string>
     <string name="setReminder">Set Reminder</string>
     <string name="removeReminder">Remove Reminder</string>
+    <string name="reminderRemoved">Reminder Removed</string>
+
 
     <string name="dark">Dark</string>
     <string name="light">Light</string>
@@ -145,8 +138,8 @@
         <item>@string/Nov</item>
         <item>@string/Dec</item>
     </string-array>
-    <!--Transaction Type-->
 
+    <!--Transaction Type-->
     <string name="expense">Expense</string>
     <string name="income">Income</string>
 
@@ -155,9 +148,7 @@
         <item>@string/income</item>
     </string-array>
 
-
     <string name="language">Language</string>
-
     <!--Language Array-->
     <string name="hindi">Hindi</string>
     <string name="english">English</string>
@@ -407,7 +398,7 @@
     <string name="grant_permission">Grant Permission</string>
     <string name="select_image">Select Image</string>
     <string name="capture_image">Capture Image</string>
-    <string name="app_config_saved">New config applied!</string>
+    <string name="app_config_saved">New Appearance applied!</string>
     <string name="alert">Alert</string>
 
     <!--Alert Dialog-->
@@ -505,11 +496,12 @@
     <string name="edit">Edit</string>
     <string name="update">Update</string>
     <string name="transaction_deleted_alert">Are you sure? you want to delete this transaction!</string>
-    <string name="discard_changes">Are you sure you want to dicard the changes?</string>
+    <string name="discard_changes">Are you sure you want to discard the changes?</string>
     <string name="discard">Discard</string>
     <string name="permission_access">Permission Access Denied</string>
     <string name="permission_denied_setting">Permission denied. Please grant permission from app settings.</string>
     <string name="camera_permission">In order to access camera, please grant the permission.</string>
+    <string name="notification_permission">In order to provide notification, please grant the permission.</string>
     <string name="gallery_permission">In order to access gallery images, please grant the permission.</string>
     <string name="image_deleted">Image deleted!</string>
     <string name="image_deleted_failed">Failed to delete image.</string>
@@ -517,14 +509,15 @@
     <string name="groceries">Groceries</string>
     <string name="preview">Preview</string>
     <string name="image_not_found">Image not found!</string>
-    <string name="gallery_permission_denied">We couldn\'t access the gallery because the required permissions were not granted. Please enable the permissions in the app settings to access your gallery images.</string>
-    <string name="gallery_camera_denied">We couldn\'t obtain camera permission in previous attempts. Please grant the permission from the app settings to access the camera.</string>
+    <string name="gallery_permission_denied">We could not access the gallery because the required permissions were not granted. Please enable the permissions in the app settings to access your gallery images.</string>
+    <string name="gallery_camera_denied">We could not obtain camera permission in previous attempts. Please grant the permission from the app settings to access the camera.</string>
+    <string name="notification_denied">We could not obtain notification permission in previous attempts. Please grant the permission from the app settings.</string>
     <string name="no_data_found">No data found!</string>
     <string name="transaction_added">New Transaction Added.</string>
     <string name="month_report">Month Report</string>
     <string name="category_report">Category Report</string>
     <string name="calender_report">Calendar Report</string>
     <string name="share">Share</string>
-
+    <string name="reminder_content">It\'s time to add today\'s expenses.</string>
 
 </resources>

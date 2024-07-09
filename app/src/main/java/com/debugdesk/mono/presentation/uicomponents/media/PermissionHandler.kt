@@ -17,5 +17,6 @@ data class PermissionHandler(
 
 enum class RequestCode {
     CAMERA,
-    GALLERY
+    GALLERY,
+    NOTIFICATION
 }
