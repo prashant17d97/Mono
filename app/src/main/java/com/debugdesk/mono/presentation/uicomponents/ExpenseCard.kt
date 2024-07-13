@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp24
+import com.debugdesk.mono.utils.Dp.dp40
 import com.debugdesk.mono.utils.Dp.dp5
 import com.debugdesk.mono.utils.Dp.dp6
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getExpenseAmount
@@ -80,7 +82,7 @@ fun ExpenseCard(
         dailyTransaction.forEachIndexed { _, incomeExpenseModel ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().height(dp40)
                     .padding(horizontal = dp10, vertical = dp6)
                     .clickable { onTap(incomeExpenseModel) },
                 horizontalArrangement = Arrangement.SpaceBetween,

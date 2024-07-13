@@ -1,6 +1,11 @@
 package com.debugdesk.mono.domain.data.local.localdatabase.model
 
+import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.R
+import com.debugdesk.mono.utils.CameraFunction.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.takeWord
 import com.debugdesk.mono.utils.enums.ExpenseType
 import com.debugdesk.mono.utils.enums.ImageSource
@@ -23,10 +28,19 @@ data class DailyTransaction(
     val createdOn: Long = System.currentTimeMillis(),
     val year: Int? = null
 ) {
+    private val bit: Bitmap = imagePath.toBitmap()
+    val painter: Painter
+        @Composable
+        get() {
+            return rememberAsyncImagePainter(model = bit)
+        }
+
+    val showImage: Boolean get() = imagePath.isNotEmpty()
 
     val notes: String
         get() = if (note.isNotEmpty()) "$category (${note.takeWord(2)})" else category
 }
+
 
 val emptyTransaction = DailyTransaction(
     type = "",

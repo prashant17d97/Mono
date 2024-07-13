@@ -1,11 +1,15 @@
 package com.debugdesk.mono.presentation.report
 
+import android.Manifest
 import android.content.Context
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.navigation.Screens
+import com.debugdesk.mono.presentation.uicomponents.hasPermission
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
@@ -19,6 +23,8 @@ import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getNextMonth
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getPreviousMonth
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getTotalAmount
 import com.debugdesk.mono.utils.enums.ExpenseType
+import com.debugdesk.mono.utils.states.AlertState
+import com.debugdesk.mono.utils.states.Drawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +42,35 @@ class ReportVM(
         private const val TAG = "ReportVM"
     }
 
+    private val _requestNotificationPermission = MutableStateFlow(false)
+    val requestNotificationPermission: StateFlow<Boolean>
+        get() = _requestNotificationPermission
+
     val appState = appStateManager
+
+    fun requestNotificationPermissionDialog(context: Context) {
+        if (!requestNotificationPermission.value && Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU && !context.hasPermission(
+                arrayOf(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            )
+        ) {
+            appStateManager.updateAlertState(
+                AlertState(
+                    show = true,
+                    title = R.string.notfication_title,
+                    message = R.string.notfication_message,
+                    negativeButtonText = R.string.empty,
+                    drawable = Drawable.Animated(),
+                    onPositiveClick = {
+                        _requestNotificationPermission.value = true
+                    }
+                )
+            )
+
+        }
+    }
+
     init {
         listenStateChanges()
         viewModelScope.launch(Dispatchers.IO) {

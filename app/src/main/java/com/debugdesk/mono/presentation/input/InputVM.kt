@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.input
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,7 @@ import com.debugdesk.mono.presentation.uicomponents.amounttf.TextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryIntent
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
+import com.debugdesk.mono.utils.CameraFunction
 import com.debugdesk.mono.utils.NavigationFunctions.navigateTo
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.double
@@ -123,13 +125,14 @@ class InputVM(
         inputIntent: TransactionIntent,
         transactionType: ExpenseType,
         navHostController: NavHostController,
+        context: Context
     ) {
         this.transactionType = transactionType
         when (inputIntent) {
             TransactionIntent.OnBackClick -> handleBackClick(navHostController)
             is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(
                 inputIntent.type,
-                navHostController
+                navHostController, context
             )
 
             is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(inputIntent.showDialog)
@@ -174,7 +177,11 @@ class InputVM(
         }
     }
 
-    private fun saveNewTransaction(type: ExpenseType, navHostController: NavHostController) {
+    private fun saveNewTransaction(
+        type: ExpenseType,
+        navHostController: NavHostController,
+        context: Context
+    ) {
         val (month, year) = CommonFunctions.getMonthAndYearFromLong(state.transaction.date)
 
         viewModelScope.launch {
@@ -185,17 +192,18 @@ class InputVM(
             )
             repository.insert(transaction)
         }.invokeOnCompletion {
-            resetState(navHostController)
+            resetState(navHostController, context)
         }
     }
 
-    private fun resetState(navHostController: NavHostController) {
+    private fun resetState(navHostController: NavHostController, context: Context) {
         viewModelScope.launch {
             updateState(InputState())
             repository.getTransactionAll()
             withContext(Dispatchers.Main) {
                 appStateManager.showToastState(toastMsg = R.string.transaction_added)
                 navHostController.popBackStack()
+                CameraFunction.clearPicturesFolder(context)
             }
         }
     }

@@ -55,7 +55,6 @@ import com.debugdesk.mono.utils.Dp.dp0
 import com.debugdesk.mono.utils.Dp.dp1
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp12
-import com.debugdesk.mono.utils.Dp.dp120
 import com.debugdesk.mono.utils.Dp.dp16
 import com.debugdesk.mono.utils.Dp.dp2
 import com.debugdesk.mono.utils.Dp.dp4
@@ -377,7 +376,6 @@ private fun CalendarGrid(
         NoDataFoundLayout(
             show = calendarState.isTransactionEmpty,
             text = R.string.noTransactionFound,
-            imageSize = dp120,
             modifier = Modifier.padding(top = dp80),
             content = {
                 Column(modifier = Modifier.padding(top = dp16)) {

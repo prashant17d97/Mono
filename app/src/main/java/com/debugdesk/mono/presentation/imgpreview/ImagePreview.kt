@@ -56,10 +56,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
-import com.debugdesk.mono.utils.CameraFunction.toBitmap
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDate
 
 @Composable
@@ -67,10 +65,9 @@ fun ImagePreview(
     showPreview: Boolean = false,
     createdOn: Long = System.currentTimeMillis(),
     size: String = "",
-    imageBitmap: String,
+    painter: Painter,
     onClick: (PreviewIntent) -> Unit
 ) {
-
     AnimatedContent(
         targetState = showPreview, transitionSpec = {
             if (targetState > initialState) {
@@ -92,9 +89,7 @@ fun ImagePreview(
                 },
                 content = { padding ->
                     ViewContainer(
-                        modifier = Modifier.padding(padding), imagePath = rememberAsyncImagePainter(
-                            model = imageBitmap.toBitmap()
-                        )
+                        modifier = Modifier.padding(padding), painter = painter
                     )
                 },
                 modifier = Modifier.fillMaxSize(),
@@ -155,7 +150,7 @@ private fun AppBar(
 }
 
 @Composable
-private fun ViewContainer(modifier: Modifier = Modifier, imagePath: Painter) {
+private fun ViewContainer(modifier: Modifier = Modifier, painter: Painter) {
     var scale by remember { mutableFloatStateOf(1f) }
     val animatedScale by animateFloatAsState(targetValue = scale, label = "")
 
@@ -182,9 +177,10 @@ private fun ViewContainer(modifier: Modifier = Modifier, imagePath: Painter) {
 
     ) {
 
-        Image(painter = imagePath,
+        Image(painter = painter,
             contentDescription = null,
             modifier = Modifier
+                .fillMaxSize()
                 .align(Alignment.Center)
                 .pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { tapOffSet ->
@@ -246,7 +242,9 @@ private fun BottomBarItem(icon: ImageVector, label: String) {
 fun DefaultPreview() {
     PreviewTheme {
         AppBar(imageSize = "2MB") {}
-        ViewContainer(imagePath = painterResource(id = R.drawable.intro_img_two))
+        ViewContainer(
+            painter = painterResource(id = R.drawable.intro_img_two)
+        )
     }
 }
 

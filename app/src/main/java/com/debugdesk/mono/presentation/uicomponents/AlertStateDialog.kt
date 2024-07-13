@@ -1,34 +1,24 @@
 package com.debugdesk.mono.presentation.uicomponents
 
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.debugdesk.mono.utils.Dp
+import com.debugdesk.mono.R
 import com.debugdesk.mono.utils.states.AlertState
+import com.debugdesk.mono.utils.states.Drawable
 
 @Composable
 fun AlertStateDialog(alertState: AlertState) {
     if (alertState.show) {
         AlertDialog(
             properties = alertState.properties,
-            icon = alertState.iconDrawable?.let {
-                {
-                    Icon(
-                        painter = painterResource(id = it),
-                        contentDescription = "Icon",
-                        modifier = Modifier.size(Dp.dp48),
-                        tint = alertState.iconColor
-                    )
-                }
-            },
+            icon = alertState.iconCompose,
             title = {
                 Text(
                     text = stringResource(id = alertState.title),
@@ -37,17 +27,23 @@ fun AlertStateDialog(alertState: AlertState) {
             text = {
                 Text(
                     text = stringResource(id = alertState.message),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = if (alertState.showIcon) TextAlign.Center else TextAlign.Start
                 )
             },
             onDismissRequest = alertState.onNegativeClick,
             confirmButton = {
-                Button(onClick = alertState.onPositiveClick) {
-                    Text(text = stringResource(id = alertState.positiveButtonText))
+                if (alertState.positiveText.isNotEmpty()) {
+                    Button(onClick = alertState.onPositiveClick) {
+                        Text(text = alertState.positiveText)
+                    }
                 }
             },
             dismissButton = {
-                Button(onClick = alertState.onNegativeClick) {
-                    Text(text = stringResource(id = alertState.negativeButtonText))
+                if (alertState.negativeText.isNotEmpty()) {
+                    Button(onClick = alertState.onNegativeClick) {
+                        Text(text = alertState.negativeText)
+                    }
                 }
             }
         )
@@ -57,9 +53,14 @@ fun AlertStateDialog(alertState: AlertState) {
 @Preview(showBackground = true, showSystemUi = false, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun AlertStatePre() {
-    MaterialTheme {
+    PreviewTheme {
         AlertStateDialog(
-            alertState = AlertState(show = true)
+            alertState = AlertState(
+                show = true,
+                drawable = Drawable.Animated(R.drawable.ringer_bell),
+                showIcon = false,
+                negativeButtonText = R.string.empty
+            )
         )
     }
 }

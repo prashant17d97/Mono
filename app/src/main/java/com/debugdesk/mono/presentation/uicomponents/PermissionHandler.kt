@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.media.PermissionHandler
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
+import com.debugdesk.mono.utils.states.Drawable
 
 @Composable
 fun PermissionLauncherHandler(
@@ -46,7 +47,7 @@ fun PermissionLauncherHandler(
                 permissionHandler.appStateManager.showAlertDialog(
                     title = R.string.permission_access,
                     message = permissionHandler.message(isRational),
-                    iconDrawable = null,
+                    drawable = Drawable.Static(null),
                     onPositiveClick = {
                         if (isRational) {
                             requestPermission = true

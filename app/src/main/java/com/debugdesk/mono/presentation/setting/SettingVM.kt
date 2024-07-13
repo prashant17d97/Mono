@@ -12,6 +12,7 @@ import com.debugdesk.mono.ui.appconfig.defaultconfig.SettingNameEnum
 import com.debugdesk.mono.utils.CameraFunction.clearPicturesFolder
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
+import com.debugdesk.mono.utils.states.Drawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -42,8 +43,7 @@ class SettingVM(
 
     fun deleteAllData(context: Context) {
         appStateManager.showAlertDialog(
-            iconDrawable = R.drawable.ic_trash,
-            iconColor = inActiveButton,
+            drawable = Drawable.Static(R.drawable.ic_trash, inActiveButton),
             onPositiveClick = {
                 viewModelScope.launch(Dispatchers.IO) {
                     if (repository.allDailyTransaction.value.isNotEmpty()) {

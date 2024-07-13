@@ -83,13 +83,16 @@ fun Report(
     BackHandler {
         (context as Activity).finishAffinity()
     }
+    viewModel.requestNotificationPermissionDialog(context)
 
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+    val promptNotificationPermission by viewModel.requestNotificationPermission.collectAsState()
+
+    if (promptNotificationPermission && Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
         PermissionLauncherHandler(
             permissionHandler = getNotificationPermissionHandler(viewModel.appState),
         )
     }
-    
+
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchTransaction()
         viewModel.updateView(
@@ -202,7 +205,6 @@ private fun MonthReport(
         NoDataFoundLayout(
             show = reportState.isTransactionEmpty,
             text = R.string.noTransactionFound,
-            imageSize = Dp.dp120,
             modifier = Modifier.padding(top = Dp.dp80),
             content = {
                 Column {

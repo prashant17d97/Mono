@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.debugdesk.mono.BuildConfig
@@ -28,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -77,10 +77,16 @@ object CameraFunction {
     }
 
     fun String.toBitmap(): Bitmap {
+        if (this.isEmpty()) {
+            return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
+        }
         try {
+            Log.d(TAG, "toBitmap: try")
             val decodedString = Base64.decode(this, Base64.DEFAULT)
-            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        } catch (ex: FileNotFoundException) {
+            val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            return bitmap
+        } catch (ex: Exception) {
+            Log.d(TAG, "toBitmap: ${ex.localizedMessage}")
             return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
         }
     }

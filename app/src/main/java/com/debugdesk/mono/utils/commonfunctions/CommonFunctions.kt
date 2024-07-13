@@ -3,12 +3,10 @@ package com.debugdesk.mono.utils.commonfunctions
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.DialogProperties
 import com.debugdesk.mono.R
 import com.debugdesk.mono.domain.data.local.localdatabase.model.DailyTransaction
@@ -19,6 +17,7 @@ import com.debugdesk.mono.ui.appconfig.defaultconfig.ThemeMode
 import com.debugdesk.mono.utils.CommonColor.inActiveButton
 import com.debugdesk.mono.utils.enums.ExpenseType
 import com.debugdesk.mono.utils.states.AlertState
+import com.debugdesk.mono.utils.states.Drawable
 import kotlinx.coroutines.delay
 import java.text.DateFormat
 import java.text.DateFormatSymbols
@@ -27,7 +26,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Calendar
-import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
@@ -220,29 +218,27 @@ object CommonFunctions {
         }
     }
 
-    fun String.toCurrencyIcon(): String {
-        return Currency.getInstance(this).getSymbol(Locale.getDefault())
-    }
-
     fun AppStateManager.showAlertDialog(
         @StringRes title: Int = R.string.alert,
         @StringRes message: Int = R.string.delete_all_transactions,
         @StringRes positiveButtonText: Int = R.string.okay,
         @StringRes negativeButtonText: Int = R.string.cancel,
-        @DrawableRes iconDrawable: Int? = R.drawable.ic_warning,
-        iconColor: Color = inActiveButton,
+        drawable: Drawable = Drawable.Static(
+            icon = R.drawable.ic_warning,
+            tintColor = inActiveButton
+        ),
         dismissOnBackPress: Boolean = true,
         dismissOnClickOutside: Boolean = true,
         onNegativeClick: () -> Unit = {},
         onPositiveClick: () -> Unit = {}
     ) {
-        updateAlertState(AlertState(title = title,
+        updateAlertState(AlertState(
+            title = title,
             message = message,
             positiveButtonText = positiveButtonText,
             negativeButtonText = negativeButtonText,
-            iconDrawable = iconDrawable,
+            drawable = drawable,
             show = true,
-            iconColor = iconColor,
             properties = DialogProperties(
                 dismissOnBackPress = dismissOnBackPress,
                 dismissOnClickOutside = dismissOnClickOutside

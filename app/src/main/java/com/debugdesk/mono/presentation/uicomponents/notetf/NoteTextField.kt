@@ -15,7 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +33,8 @@ import com.debugdesk.mono.utils.Dp.dp10
 @Composable
 fun NoteTextField(
     note: String,
-    image: String = "",
+    image: Painter,
+    textOutlineEnabled: Boolean = true,
     onNoteChange: (String) -> Unit = {},
     onImageClick: () -> Unit = {},
     onDelete: () -> Unit = {},
@@ -66,7 +69,7 @@ fun NoteTextField(
                 focusManager = focusManager,
                 borderWidth = dp0,
                 cornerShape = dp10,
-                textOutlineEnabled = image.isEmpty(),
+                textOutlineEnabled = textOutlineEnabled,
                 imeAction = ImeAction.Done,
                 value = note,
                 onValueChange = onNoteChange,
@@ -76,11 +79,13 @@ fun NoteTextField(
                 },
             )
 
-            ImageCard(
-                imagePath = image,
-                onDelete = onDelete,
-                onImageClick = onImageClick
-            )
+            if (textOutlineEnabled){
+                ImageCard(
+                    painter = image,
+                    onDelete = onDelete,
+                    onImageClick = onImageClick
+                )
+            }
         }
     }
 }
@@ -90,6 +95,6 @@ fun NoteTextField(
 @Composable
 fun NoteTextFieldPrev() {
     PreviewTheme {
-        NoteTextField(note = "")
+        NoteTextField(note = "", painterResource(id = R.drawable.mono))
     }
 }

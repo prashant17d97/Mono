@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,14 +46,14 @@ fun EditTransaction(
     editTransactionViewModel: EditTransactionVM = koinViewModel(),
 ) {
     val editTransactionState by editTransactionViewModel.editTransactionState.collectAsState()
-
+    val context = LocalContext.current
     LaunchedEffect(transactionId) {
         transactionId?.let { editTransactionViewModel.getDailyTransaction(it) }
     }
     EditTransactionContainer(
         transactionState = editTransactionState,
         onEditTransactionIntent = {
-            editTransactionViewModel.handleTransactionIntent(it, navHostController)
+            editTransactionViewModel.handleTransactionIntent(it, navHostController, context)
         }
     )
 
@@ -128,7 +129,8 @@ fun EditTransactionContainer(
 
             NoteTextField(
                 note = transactionState.note,
-                image = transactionState.image,
+                image = transactionState.transaction.painter,
+                textOutlineEnabled = transactionState.transaction.showImage,
                 onNoteChange = {
                     onEditTransactionIntent(TransactionIntent.OnValueChange(it))
                 },
@@ -170,7 +172,7 @@ fun EditTransactionContainer(
     ImagePreview(
         showPreview = showPreview,
         createdOn = transactionState.createdOn,
-        imageBitmap = transactionState.image,
+        painter = transactionState.transaction.painter,
         size = transactionState.transaction.imageSize
     ) { previewIntent ->
         when (previewIntent) {

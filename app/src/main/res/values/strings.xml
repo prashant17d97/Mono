@@ -519,5 +519,8 @@
     <string name="calender_report">Calendar Report</string>
     <string name="share">Share</string>
     <string name="reminder_content">It\'s time to add today\'s expenses.</string>
+    <string name="empty" />
+    <string name="notfication_message">Allow notifications to receive all transaction updates and alerts.</string>
+    <string name="notfication_title">Notification Alert</string>
 
 </resources>

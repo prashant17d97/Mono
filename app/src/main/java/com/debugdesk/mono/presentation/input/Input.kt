@@ -18,9 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
@@ -59,6 +61,10 @@ fun Input(
     val pagerState = rememberPagerState {
         tabs.size
     }
+    val context = LocalContext.current
+    var showPreview by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.closeAllDialogs(expenseType(pagerState.currentPage))
@@ -77,14 +83,50 @@ fun Input(
                 viewModel.closeAllDialogs(expenseType(pagerState.currentPage))
             }
         },
+        onImageClick = {
+            showPreview = true
+        },
         onInputIntent = { inputIntent ->
             viewModel.handleTransactionIntent(
                 inputIntent = inputIntent,
                 transactionType = expenseType(pagerState.currentPage),
-                navHostController = navHostController
+                navHostController = navHostController,
+                context = context
             )
-        })
+        }
+    )
 
+    val state by rememberUpdatedState(
+        newValue = if (pagerState.currentPage == 0) {
+            expenseState
+        } else {
+            incomeState
+        }
+    )
+
+    ImagePreview(
+        showPreview = showPreview,
+        createdOn = state.createdOn,
+        painter = state.transaction.painter,
+        size = state.transaction.imageSize
+    ) { previewIntent ->
+        when (previewIntent) {
+            PreviewIntent.Delete -> {
+                viewModel.handleTransactionIntent(
+                    inputIntent = TransactionIntent.DeleteImage,
+                    transactionType = expenseType(pagerState.currentPage),
+                    navHostController = navHostController,
+                    context = context
+                )
+                showPreview = false
+            }
+
+            PreviewIntent.Navigate -> {
+                showPreview = false
+            }
+
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -96,6 +138,7 @@ fun InputContainer(
     state: PagerState,
     tabs: List<Int>,
     onTabClick: (Int) -> Unit,
+    onImageClick: () -> Unit = {},
     onInputIntent: (TransactionIntent) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -121,6 +164,7 @@ fun InputContainer(
                                 )
                             )
                         },
+                        onImageClick = onImageClick,
                         onInputIntent = onInputIntent
                     )
 
@@ -135,14 +179,13 @@ fun InputContainer(
                                 )
                             )
                         },
+                        onImageClick = onImageClick,
                         onInputIntent = onInputIntent
                     )
-                }
 
+                }
             }
         }
-
-
     }
 }
 
@@ -153,11 +196,10 @@ private fun InputPage(
     inputState: InputState,
     text: Int = R.string.expense,
     onSave: () -> Unit = {},
+    onImageClick: () -> Unit = {},
     onInputIntent: (TransactionIntent) -> Unit
 ) {
-    var showPreview by remember {
-        mutableStateOf(false)
-    }
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -199,13 +241,12 @@ private fun InputPage(
 
             NoteTextField(
                 note = inputState.note,
-                image = inputState.image,
+                textOutlineEnabled = inputState.image.isNotEmpty(),
+                image = inputState.transaction.painter,
                 onNoteChange = {
                     onInputIntent(TransactionIntent.OnValueChange(it))
                 },
-                onImageClick = {
-                    showPreview = true
-                },
+                onImageClick = onImageClick,
                 onDelete = {
                     onInputIntent(TransactionIntent.DeleteImage)
                 },
@@ -234,27 +275,6 @@ private fun InputPage(
         appStateManager = inputState.appStateManager,
         onProcess = onInputIntent
     )
-    ImagePreview(
-        showPreview = showPreview,
-        createdOn = inputState.createdOn,
-        imageBitmap = inputState.image,
-        size = inputState.transaction.imageSize
-    ) { previewIntent ->
-        when (previewIntent) {
-            PreviewIntent.Delete -> {
-                showPreview = false
-                onInputIntent(
-                    TransactionIntent.DeleteImage
-                )
-            }
-
-            PreviewIntent.Navigate -> {
-                showPreview = false
-            }
-
-        }
-    }
-
 }
 
 

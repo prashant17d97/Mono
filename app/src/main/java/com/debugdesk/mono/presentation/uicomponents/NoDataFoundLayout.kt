@@ -15,26 +15,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.debugdesk.mono.R
-import com.debugdesk.mono.utils.Dp.dp180
+import com.debugdesk.mono.utils.Dp.dp160
 import com.debugdesk.mono.utils.Dp.dp20
 
 @Composable
 fun NoDataFoundLayout(
     modifier: Modifier = Modifier,
     @DrawableRes
-    image: Int = R.drawable.empty,
-    imageSize: Dp = dp180,
+    image: Int = R.drawable.intro_img_two,
+    imageSize: Dp = dp160,
     @StringRes
     text: Int = R.string.noTransactionFound,
     show: Boolean = false,
@@ -70,7 +68,6 @@ fun NoDataFoundLayout(
                         painter = painterResource(id = image),
                         contentDescription = "No Data Found",
                         modifier = Modifier.size(imageSize),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                     )
                     if (text != 0) {
                         Text(text = stringResource(id = text))

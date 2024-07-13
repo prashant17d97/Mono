@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.edittrans
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -12,10 +13,10 @@ import com.debugdesk.mono.presentation.uicomponents.amounttf.TextFieldCalculator
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryIntent
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import com.debugdesk.mono.ui.appconfig.AppStateManager
+import com.debugdesk.mono.utils.CameraFunction
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.getCurrentMonthYear
 import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.showAlertDialog
-import com.debugdesk.mono.utils.enums.ExpenseType
 import com.debugdesk.mono.utils.enums.ImageSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,15 +86,14 @@ class EditTransactionVM(
     fun handleTransactionIntent(
         transactionIntent: TransactionIntent,
         navHostController: NavHostController,
+        context: Context,
     ) {
         viewModelScope.launch {
             when (transactionIntent) {
                 TransactionIntent.OnBackClick -> handleBackClick(navHostController)
                 TransactionIntent.OnDeleteClick -> deleteTransactionWithAlert(navHostController)
-                TransactionIntent.OnUpdateClick -> updateTransaction(navHostController)
-                is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(
-                    transactionIntent.type
-                )
+                TransactionIntent.OnUpdateClick -> updateTransaction(navHostController, context)
+
 
                 is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(transactionIntent.showDialog)
                 is TransactionIntent.UpdateAmount -> updateAmount(transactionIntent.amountTFIntent)
@@ -113,6 +113,8 @@ class EditTransactionVM(
                 is TransactionIntent.UpdateTransactionType -> updateTransactionType(
                     transactionIntent.expenseType
                 )
+
+                else -> {}
             }
         }
     }
@@ -136,17 +138,26 @@ class EditTransactionVM(
         val newCategoryList = if (initialTransactionState?.transaction?.type == value) {
             initialTransactionState?.categoryList ?: emptyList()
         } else {
-            categoryModels.value.mapIndexed { index, categoryModel ->
+            val changeModel = categoryModels.value.first { it.categoryType == value }.categoryId
+            categoryModels.value.map { categoryModel ->
                 categoryModel.copy(
-                    isSelected = index == 0,
+                    isSelected = categoryModel.categoryId == changeModel,
                     enable = categoryModel.categoryType == value
                 )
             }
         }
 
+        val selectedCategory = newCategoryList.first {
+            it.isSelected
+        }
         _editTransactionState.emit(
             editTransactionState.value.copy(
-                transaction = transaction.copy(type = value),
+                transaction = transaction.copy(
+                    type = value,
+                    category = selectedCategory.category,
+                    categoryId = selectedCategory.categoryId,
+                    categoryIcon = selectedCategory.categoryIcon ?: R.drawable.mono
+                ),
                 categoryList = newCategoryList
             )
         )
@@ -159,12 +170,6 @@ class EditTransactionVM(
                 note = value
             )
         )
-    }
-
-    private fun saveNewTransaction(type: ExpenseType) {
-        viewModelScope.launch {
-            repository.insert(editTransactionState.value.transaction.copy(type = type.name))
-        }
     }
 
     private suspend fun saveImages(intent: TransactionIntent.SaveImage) {
@@ -199,7 +204,7 @@ class EditTransactionVM(
         )
     }
 
-    private fun updateTransaction(navHostController: NavHostController) {
+    private fun updateTransaction(navHostController: NavHostController, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateTransaction(editTransactionState.value.transaction)
             repository.getAllTransactionByMonth(
@@ -209,6 +214,7 @@ class EditTransactionVM(
         }.invokeOnCompletion {
             viewModelScope.launch {
                 appStateManager.showToastState(toastMsg = R.string.transaction_updated)
+                CameraFunction.clearPicturesFolder(context)
                 navHostController.popBackStack()
             }
         }
