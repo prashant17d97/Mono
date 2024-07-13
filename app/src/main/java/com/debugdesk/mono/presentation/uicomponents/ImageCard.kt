@@ -15,17 +15,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import coil.compose.rememberAsyncImagePainter
 import com.debugdesk.mono.R
-import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
+import com.debugdesk.mono.utils.CameraFunction.toBitmap
 import com.debugdesk.mono.utils.Dp
 
 @Composable
 fun ImageCard(
-    imageByteArray: ByteArray,
+    imagePath: String,
     onDelete: () -> Unit = {},
     onImageClick: () -> Unit = {}
 ) {
-    if (imageByteArray.isNotEmpty() && imageByteArray.toImageBitmap() != null) {
+    if (imagePath.isNotEmpty()) {
         Box(
             modifier = Modifier
                 .size(Dp.dp140)
@@ -35,13 +36,13 @@ fun ImageCard(
                     shape = RoundedCornerShape(Dp.dp6)
                 ), contentAlignment = Alignment.TopEnd
         ) {
-            imageByteArray.toImageBitmap()?.let {
+            imagePath.let {
                 Image(
                     modifier = Modifier
                         .size(Dp.dp140)
                         .clip(RoundedCornerShape(Dp.dp6))
                         .clickable { onImageClick() },
-                    bitmap = it,
+                    painter = rememberAsyncImagePainter(model = it.toBitmap()),
                     contentScale = ContentScale.FillBounds,
                     contentDescription = null
                 )
@@ -63,7 +64,7 @@ fun ImageCard(
 private fun ImageCardPrev() {
     PreviewTheme {
         ImageCard(
-            imageByteArray = byteArrayOf(),
+            imagePath = "",
         )
     }
 }

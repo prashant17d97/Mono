@@ -15,7 +15,7 @@ data class InputState(
     val date: Long = Date().time,
     val amountTfState: AmountTfState = AmountTfState(),
     val note: String = "",
-    val image: ByteArray = byteArrayOf(),
+    val image: String = "",
     val createdOn: Long = System.currentTimeMillis(),
     val imageSource: ImageSource = ImageSource.NONE,
     val categoryList: List<CategoryModel> = emptyList(),

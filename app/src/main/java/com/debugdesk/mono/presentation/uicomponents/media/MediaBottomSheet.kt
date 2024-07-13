@@ -17,6 +17,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,10 +40,12 @@ import com.debugdesk.mono.ui.appconfig.AppStateManager
 import com.debugdesk.mono.utils.CameraFunction
 import com.debugdesk.mono.utils.CameraFunction.clearExternalFilesDirPictures
 import com.debugdesk.mono.utils.CameraFunction.createImageFile
-import com.debugdesk.mono.utils.CameraFunction.getByteArrayFromUri
 import com.debugdesk.mono.utils.CameraFunction.getUriFromFile
-import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
+import com.debugdesk.mono.utils.CameraFunction.toCompressedBase64
+import com.debugdesk.mono.utils.CameraFunction.toGalleryBase64
 import com.debugdesk.mono.utils.enums.ImageSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun MediaBottomSheet(
@@ -53,6 +56,7 @@ fun MediaBottomSheet(
     val context = LocalContext.current
     val file = context.createImageFile()
     val uri = getUriFromFile(context, file)
+    val scope = rememberCoroutineScope()
 
     var permissionHandler: PermissionHandler? by remember {
         mutableStateOf(null)
@@ -65,31 +69,33 @@ fun MediaBottomSheet(
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        val bitmap = getByteArrayFromUri(context, uri)
-        if ((bitmap.toImageBitmap()?.height ?: 0) > 1 && (bitmap.toImageBitmap()?.width ?: 0) > 1) {
-            onProcess(
-                TransactionIntent.SaveImage(
-                    imagePath = bitmap,
-                    imageSource = ImageSource.CAMERA,
-                    createdOn = System.currentTimeMillis()
+        scope.launch(Dispatchers.Main) {
+            if (file.exists()) {
+                val imageString = file.toCompressedBase64(context)
+                onProcess(
+                    TransactionIntent.SaveImage(
+                        imagePath = imageString,
+                        imageSource = ImageSource.CAMERA,
+                        createdOn = System.currentTimeMillis()
+                    )
                 )
-            )
+            }
         }
     }
 
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uriFile ->
-            val bitmap = getByteArrayFromUri(context, uriFile)
-            if ((bitmap.toImageBitmap()?.height ?: 0) > 1 && (bitmap.toImageBitmap()?.width
-                    ?: 0) > 1
-            ) {
-                onProcess(
-                    TransactionIntent.SaveImage(
-                        imagePath = bitmap,
-                        imageSource = ImageSource.GALLERY,
-                        createdOn = System.currentTimeMillis()
+            scope.launch(Dispatchers.Main) {
+                val imageString = uriFile.toGalleryBase64(context)
+                if (imageString != null) {
+                    onProcess(
+                        TransactionIntent.SaveImage(
+                            imagePath = imageString,
+                            imageSource = ImageSource.GALLERY,
+                            createdOn = System.currentTimeMillis()
+                        )
                     )
-                )
+                }
             }
         }
 

@@ -31,7 +31,7 @@ import com.debugdesk.mono.utils.Dp.dp10
 @Composable
 fun NoteTextField(
     note: String,
-    image: ByteArray = byteArrayOf(),
+    image: String = "",
     onNoteChange: (String) -> Unit = {},
     onImageClick: () -> Unit = {},
     onDelete: () -> Unit = {},
@@ -77,7 +77,7 @@ fun NoteTextField(
             )
 
             ImageCard(
-                imageByteArray = image,
+                imagePath = image,
                 onDelete = onDelete,
                 onImageClick = onImageClick
             )

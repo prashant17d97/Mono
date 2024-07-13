@@ -17,7 +17,7 @@ data class Transaction(
     val categoryId: Int,
     val amount: Double,
     val currentMonthId: Int = 0,
-    val imagePath: ByteArray,
+    val imagePath: String,
     val imageSource: String,
     val createdOn: Long,
     val year: Int? = null

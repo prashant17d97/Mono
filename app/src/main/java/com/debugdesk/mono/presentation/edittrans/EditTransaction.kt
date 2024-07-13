@@ -30,7 +30,6 @@ import com.debugdesk.mono.presentation.uicomponents.amounttf.AmountTextFieldCalc
 import com.debugdesk.mono.presentation.uicomponents.editcategory.EditCategoryCard
 import com.debugdesk.mono.presentation.uicomponents.media.MediaBottomSheet
 import com.debugdesk.mono.presentation.uicomponents.notetf.NoteTextField
-import com.debugdesk.mono.utils.CameraFunction.toImageBitmap
 import com.debugdesk.mono.utils.CommonColor
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp8
@@ -168,26 +167,25 @@ fun EditTransactionContainer(
         onProcess = onEditTransactionIntent
     )
 
-    transactionState.image.toImageBitmap()?.let {
-        ImagePreview(
-            showPreview = showPreview,
-            createdOn = transactionState.createdOn,
-            imageBitmap = it,
-        ) { previewIntent ->
-            when (previewIntent) {
-                PreviewIntent.Delete -> {
-                    showPreview = false
-                    onEditTransactionIntent(
-                        TransactionIntent.DeleteImage
-                    )
-                }
-
-                PreviewIntent.Navigate -> {
-                    showPreview = false
-                }
-
-
+    ImagePreview(
+        showPreview = showPreview,
+        createdOn = transactionState.createdOn,
+        imageBitmap = transactionState.image,
+        size = transactionState.transaction.imageSize
+    ) { previewIntent ->
+        when (previewIntent) {
+            PreviewIntent.Delete -> {
+                showPreview = false
+                onEditTransactionIntent(
+                    TransactionIntent.DeleteImage
+                )
             }
+
+            PreviewIntent.Navigate -> {
+                showPreview = false
+            }
+
+
         }
     }
 }

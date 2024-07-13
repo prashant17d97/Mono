@@ -295,10 +295,10 @@ class InputVM(
         stateFlow.tryEmit(
             state.copy(
                 transaction = state.transaction.copy(
-                    imagePath = byteArrayOf(),
+                    imagePath = "",
                     imageSource = ImageSource.NONE
                 ),
-                image = byteArrayOf(),
+                image = "",
                 imageSource = ImageSource.NONE,
                 createdOn = 0L
             )

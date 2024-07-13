@@ -18,7 +18,7 @@ sealed class TransactionIntent {
     data object OnBackClick : TransactionIntent()
     data object DismissCameraAndGalleryWindow : TransactionIntent()
     data class SaveImage(
-        val imagePath: ByteArray,
+        val imagePath: String,
         val imageSource: ImageSource,
         val createdOn: Long = System.currentTimeMillis()
     ) :

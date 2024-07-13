@@ -15,7 +15,7 @@ data class TransactionState(
     val showCalendarDialog: Boolean = false,
     val amountTfState: AmountTfState = AmountTfState(),
     val note: String = "",
-    val image: ByteArray = byteArrayOf(),
+    val image: String = "",
     val imageSource: ImageSource = ImageSource.NONE,
     val createdOn: Long = 0L,
     val categoryList: List<CategoryModel> = emptyList(),

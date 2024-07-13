@@ -290,11 +290,11 @@ class EditTransactionVM(
         _editTransactionState.emit(
             editTransactionState.value.copy(
                 transaction = editTransactionState.value.transaction.copy(
-                    imagePath = byteArrayOf(),
+                    imagePath = "",
                     imageSource = ImageSource.NONE,
                     createdOn = 0L
                 ),
-                image = byteArrayOf(),
+                image = "",
                 imageSource = ImageSource.NONE,
                 createdOn = 0L
             )

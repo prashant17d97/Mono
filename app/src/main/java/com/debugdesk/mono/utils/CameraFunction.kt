@@ -3,36 +3,40 @@ package com.debugdesk.mono.utils
 import android.Manifest
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.util.Log
+import android.provider.MediaStore
+import android.util.Base64
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.debugdesk.mono.BuildConfig
 import com.debugdesk.mono.R
 import com.debugdesk.mono.presentation.uicomponents.media.PermissionHandler
 import com.debugdesk.mono.presentation.uicomponents.media.RequestCode
 import com.debugdesk.mono.ui.appconfig.AppStateManager
-import com.debugdesk.mono.utils.Dp.dp0
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.quality
+import id.zelory.compressor.constraint.resolution
+import id.zelory.compressor.constraint.size
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
 object CameraFunction {
 
     private const val TAG = "CameraFunction"
+
     fun Context.createImageFile(): File {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -42,7 +46,6 @@ object CameraFunction {
         )
     }
 
-
     fun getUriFromFile(context: Context, file: File): Uri {
         return FileProvider.getUriForFile(
             context,
@@ -50,7 +53,6 @@ object CameraFunction {
             file
         )
     }
-
 
     fun clearPicturesFolder(context: Context) {
         try {
@@ -74,66 +76,89 @@ object CameraFunction {
         return dir?.delete() ?: false
     }
 
+    fun String.toBitmap(): Bitmap {
+        try {
+            val decodedString = Base64.decode(this, Base64.DEFAULT)
+            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+        } catch (ex: FileNotFoundException) {
+            return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
+        }
+    }
 
-    @Composable
-    fun getImageHeightInDp(absolutePath: String): Dp {
-        val screenHeight = LocalConfiguration.current.screenHeightDp * 0.8
-        val (_, height) = getImageResolution(absolutePath) ?: return dp0
-
-        return if (screenHeight > height) {
-            height
+    suspend fun Uri?.toGalleryBase64(context: Context): String? {
+        val galleryFile = this?.getRealPathFromURI(context)?.let { File(it) }
+        return if (galleryFile != null && galleryFile.exists()) {
+            galleryFile.toCompressedBase64(context)
         } else {
-            screenHeight.toInt()
-        }.dp
-
+            null
+        }
     }
 
-    private fun getImageResolution(path: String): Pair<Int, Int>? {
+    private fun Uri.getRealPathFromURI(context: Context): String? {
+        var cursor: Cursor? = null
         return try {
-            // Decode the image file to get its dimensions
-            val options = BitmapFactory.Options().apply {
-                // Set inJustDecodeBounds to true to decode only the image size,
-                // not the entire bitmap
-                inJustDecodeBounds = true
-            }
-            BitmapFactory.decodeFile(path, options)
-
-            val width = options.outWidth
-            val height = options.outHeight
-
-            Pair(width, height)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null // Error occurred while decoding the image, return null
+            val projection = arrayOf(MediaStore.Images.Media.DATA)
+            cursor = context.contentResolver.query(this, projection, null, null, null)
+            val columnIndex = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            cursor.getString(columnIndex)
+        } finally {
+            cursor?.close()
         }
     }
 
-    fun getByteArrayFromUri(context: Context, uri: Uri?): ByteArray {
-        var bitmap: Bitmap? = null
-        try {
-            val inputStream = context.contentResolver.openInputStream(uri!!)
-            bitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+    suspend fun File.toCompressedBase64(context: Context): String {
+        return withContext(Dispatchers.IO) {
+            val originalFile = File(path)
+
+            // Determine the quality based on the original file size
+            var quality = 75 // Initial quality
+            var compressedImageFile: File
+
+            // Compress loop to achieve desired size
+            do {
+                compressedImageFile = Compressor.compress(context, originalFile) {
+                    quality(quality = quality)
+                    resolution(width = 720, height = 1024)
+                    size(maxFileSize = 500 * 1020)
+                }
+                quality -= 5 // Decrease quality gradually
+            } while (compressedImageFile.length() > 500 * 1024 && quality >= 30) // Adjust conditions based on desired size
+
+            // Rotate the image based on its orientation
+            val rotatedBitmap = rotateImageIfRequired(compressedImageFile.absolutePath)
+
+            // Convert rotated bitmap to Base64 string
+            bitmapToBase64(rotatedBitmap)
         }
-        return (bitmap ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)).toByteArray()
     }
 
-    private fun Bitmap.toByteArray(): ByteArray {
-        val stream = ByteArrayOutputStream()
-        this.compress(Bitmap.CompressFormat.PNG, 50, stream)
-        return stream.toByteArray()
+    private fun rotateImageIfRequired(imagePath: String): Bitmap {
+        val exif = ExifInterface(imagePath)
+        val orientation = exif.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+
+        val rotationAngle = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
+        }
+
+        val bitmap = BitmapFactory.decodeFile(imagePath)
+        val matrix = Matrix()
+        matrix.postRotate(rotationAngle.toFloat())
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-    fun ByteArray.toImageBitmap(): ImageBitmap? {
-        try {
-            val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
-            return bitmap.asImageBitmap()
-        } catch (exc: NullPointerException) {
-            Log.d(TAG, "toImageBitmap: ${exc.localizedMessage}")
-            return null
-        }
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     fun getGalleryPermissionHandler(
@@ -167,6 +192,7 @@ object CameraFunction {
             requestCode = RequestCode.CAMERA
         )
     }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun getNotificationPermissionHandler(
         appStateManager: AppStateManager

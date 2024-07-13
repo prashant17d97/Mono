@@ -17,7 +17,8 @@ data class DailyTransaction(
     val categoryIcon: Int,
     val categoryId: Int,
     val amount: Double,
-    val imagePath: ByteArray = byteArrayOf(),
+    val imagePath: String = "",
+    val imageSize: String = "",
     val imageSource: ImageSource = ImageSource.NONE,
     val createdOn: Long = System.currentTimeMillis(),
     val year: Int? = null
@@ -25,15 +26,6 @@ data class DailyTransaction(
 
     val notes: String
         get() = if (note.isNotEmpty()) "$category (${note.takeWord(2)})" else category
-
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        return imagePath.contentHashCode()
-    }
-
 }
 
 val emptyTransaction = DailyTransaction(
@@ -43,7 +35,7 @@ val emptyTransaction = DailyTransaction(
     categoryIcon = 0,
     categoryId = 0,
     amount = 0.0,
-    imagePath = byteArrayOf(),
+    imagePath = "",
     imageSource = ImageSource.NONE
 )
 val previewTransaction = DailyTransaction(
@@ -54,7 +46,7 @@ val previewTransaction = DailyTransaction(
     categoryId = 0,
     amount = 500.0,
     currentMonthId = 5,
-    imagePath = byteArrayOf(),
+    imagePath = "",
     imageSource = ImageSource.NONE,
     year = 2024
 )
@@ -67,7 +59,7 @@ val previewIncomeTransaction = DailyTransaction(
     categoryId = 0,
     amount = 500.0,
     currentMonthId = 5,
-    imagePath = byteArrayOf(),
+    imagePath = "",
     imageSource = ImageSource.NONE,
     year = 2024
 )
