@@ -40,29 +40,33 @@ fun TransactionDropDown(
     val strings = stringArrayResource(id = R.array.expenses)
     Column {
         DropDownItem(
-            modifier = modifier
+            modifier =
+            modifier
                 .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.onPrimary,
-                    shape = MaterialTheme.shapes.large
+                    shape = MaterialTheme.shapes.large,
                 ),
             text = selectedTransaction,
             icon = Icons.Default.KeyboardArrowDown,
-            onDropDownClick = onDropDownClick
+            onDropDownClick = onDropDownClick,
         )
         DropdownMenu(
             modifier = modifier.fillMaxWidth(),
             expanded = isExpended,
-            properties = PopupProperties(
-                dismissOnBackPress = true, dismissOnClickOutside = true
-            ), onDismissRequest = dismiss
+            properties =
+            PopupProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
+            onDismissRequest = dismiss,
         ) {
             strings.forEachIndexed { index, transactionType ->
                 DropDownItem(
                     modifier = Modifier.fillMaxWidth(),
                     text = transactionType,
                     visible = transactionType == selectedTransaction,
-                    onDropDownClick = onDropDownClick
+                    onDropDownClick = onDropDownClick,
                 )
                 if (strings.lastIndex != index) {
                     HorizontalDivider()
@@ -78,29 +82,30 @@ fun DropDownItem(
     text: String,
     visible: Boolean = true,
     icon: ImageVector = Icons.Default.Check,
-    onDropDownClick: (String) -> Unit
+    onDropDownClick: (String) -> Unit,
 ) {
     DropdownMenuItem(
         modifier = modifier,
         onClick = {
             onDropDownClick(text)
-        }, text = {
+        },
+        text = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = text)
                 AnimatedVisibility(
-                    visible = visible
+                    visible = visible,
                 ) {
                     Icon(
                         imageVector = icon,
-                        contentDescription = "Selected Theme"
+                        contentDescription = "Selected Theme",
                     )
                 }
             }
-        }
+        },
     )
 }
 
@@ -115,11 +120,13 @@ private fun TransactionDropPrev() {
         mutableStateOf(ExpenseType.Income.name)
     }
     PreviewTheme {
-        TransactionDropDown(isExpended = isExpended,
+        TransactionDropDown(
+            isExpended = isExpended,
             selectedTransaction = string,
             onDropDownClick = {
                 isExpended = !isExpended
                 string = it
-            })
+            },
+        )
     }
 }

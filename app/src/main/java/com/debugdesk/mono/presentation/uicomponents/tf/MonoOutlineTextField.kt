@@ -79,24 +79,27 @@ fun MonoOutlineTextField(
 ) {
     val context = LocalContext.current
     val color by animateColorAsState(
-        targetValue = when {
+        targetValue =
+        when {
             inFocus -> MaterialTheme.colorScheme.primary
             textOutlineEnabled -> CommonColor.disableButton
             else -> Color.Transparent
-        }, label = "color"
+        },
+        label = "color",
     )
 
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .height(height)
             .border(
                 width = borderWidth,
                 color = color,
-                shape = RoundedCornerShape(cornerShape)
+                shape = RoundedCornerShape(cornerShape),
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         leadingIcon?.let {
             Image(
@@ -104,18 +107,22 @@ fun MonoOutlineTextField(
                 contentDescription = "LeadingIcon",
                 contentScale = ContentScale.Inside,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
-                modifier = Modifier
+                modifier =
+                Modifier
                     .background(
-                        MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(
-                            topStart = cornerShape, bottomStart = cornerShape
-                        )
+                        MaterialTheme.colorScheme.primary,
+                        shape =
+                        RoundedCornerShape(
+                            topStart = cornerShape, bottomStart = cornerShape,
+                        ),
                     )
-                    .size(width = TextFieldDefaults.MinHeight, height = height)
+                    .size(width = TextFieldDefaults.MinHeight, height = height),
             )
             VerticalDivider(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .size(width = 1.dp, height = height)
-                    .background(color = CommonColor.disableButton)
+                    .background(color = CommonColor.disableButton),
             )
         } ?: leadingIconCompose?.invoke(this)
 
@@ -127,7 +134,7 @@ fun MonoOutlineTextField(
                         when (imeAction) {
                             ImeAction.Next -> {
                                 focusManager.moveFocus(
-                                    focusDirection = FocusDirection.Next
+                                    focusDirection = FocusDirection.Next,
                                 )
                             }
 
@@ -148,18 +155,16 @@ fun MonoOutlineTextField(
                         errorMsg(context.getString(R.string.characterWarning))
                         when (imeAction) {
                             ImeAction.Done -> {
-
                                 keyBoardControl?.hide()
                                 focusManager.clearFocus()
                             }
 
                             ImeAction.Next -> {
                                 focusManager.moveFocus(
-                                    focusDirection = FocusDirection.Next
+                                    focusDirection = FocusDirection.Next,
                                 )
                             }
                         }
-
                     }
                 }
             },
@@ -167,7 +172,7 @@ fun MonoOutlineTextField(
             placeholder = {
                 Text(
                     text = placeHolderText,
-                    style = textStyle.copy(color = CommonColor.disableButton)
+                    style = textStyle.copy(color = CommonColor.disableButton),
                 )
             },
             enabled = enabled,
@@ -175,25 +180,28 @@ fun MonoOutlineTextField(
             shape = RoundedCornerShape(cornerShape),
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(imeAction = imeAction, keyboardType = keyboardType),
-            keyboardActions = KeyboardActions(
+            keyboardActions =
+            KeyboardActions(
                 onDone = {
                     keyBoardControl?.hide()
                     focusManager.clearFocus()
                 },
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
-                }
+                },
             ),
-            colors = TextFieldDefaults.colors(
+            colors =
+            TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.background,
                 unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 disabledContainerColor = MaterialTheme.colorScheme.background,
                 focusedIndicatorColor = Color.Transparent,
                 cursorColor = MaterialTheme.colorScheme.primary,
                 disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
             ),
-            modifier = Modifier
+            modifier =
+            Modifier
                 .weight(1f)
                 .height(height)
                 .clickable {
@@ -204,13 +212,16 @@ fun MonoOutlineTextField(
         )
 
         trailingIcon?.let {
-            Image(painter = painterResource(id = trailingIcon),
+            Image(
+                painter = painterResource(id = trailingIcon),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 contentDescription = "trailingIcon",
                 contentScale = ContentScale.Inside,
-                modifier = Modifier
+                modifier =
+                Modifier
                     .size(height)
-                    .clickable { trailingClick() })
+                    .clickable { trailingClick() },
+            )
         }
     }
 }
@@ -219,7 +230,8 @@ fun MonoOutlineTextField(
 @Composable
 fun MonoOutlineTextFieldPrev() {
     PreviewTheme {
-        MonoOutlineTextField(leadingIcon = R.drawable.ic_rupee,
+        MonoOutlineTextField(
+            leadingIcon = R.drawable.ic_rupee,
             trailingIcon = R.drawable.camera,
             placeHolderText = "Enter Amount",
             textStyle = TextStyle(),
@@ -230,6 +242,7 @@ fun MonoOutlineTextFieldPrev() {
             onValueChange = {},
             enabled = true,
             trailingClick = {},
-            fieldClickBack = {})
+            fieldClickBack = {},
+        )
     }
 }

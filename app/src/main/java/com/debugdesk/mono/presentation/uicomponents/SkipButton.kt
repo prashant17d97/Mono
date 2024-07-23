@@ -11,14 +11,16 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SkipButton(
-    modifier: Modifier = Modifier, text: String, onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit,
 ) {
     OutlinedButton(
         onClick = { onClick() },
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         modifier = modifier,
         shape = CircleShape,
-        /*colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = )*/
+        // colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = )
     ) {
         Text(text = text, style = MaterialTheme.typography.titleMedium)
     }

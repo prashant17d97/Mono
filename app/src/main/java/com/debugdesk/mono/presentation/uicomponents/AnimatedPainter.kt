@@ -16,7 +16,10 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
-fun animatedPainterResource(@DrawableRes id: Int, animate: Boolean = true): Painter {
+fun animatedPainterResource(
+    @DrawableRes id: Int,
+    animate: Boolean = true,
+): Painter {
     val image = AnimatedImageVector.animatedVectorResource(id = id)
     var atEnd by remember { mutableStateOf(true) }
 
@@ -27,5 +30,4 @@ fun animatedPainterResource(@DrawableRes id: Int, animate: Boolean = true): Pain
         }
     }
     return rememberAnimatedVectorPainter(image, atEnd)
-
 }

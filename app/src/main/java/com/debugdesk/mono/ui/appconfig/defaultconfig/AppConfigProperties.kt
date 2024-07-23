@@ -20,26 +20,27 @@ data class AppConfigProperties(
     val selectedCurrencyIconString: Int = R.string.inrIcon,
     val selectedCurrencyIconDrawable: Int = R.drawable.ic_rupee,
 ) {
-
     val isNightTheme: Boolean
         @Composable
-        get() = when (themeMode) {
-            ThemeMode.Dark -> true
-            ThemeMode.Light -> false
-            else -> isSystemInDarkTheme()
-        }
+        get() =
+            when (themeMode) {
+                ThemeMode.Dark -> true
+                ThemeMode.Light -> false
+                else -> isSystemInDarkTheme()
+            }
 }
 
-val DefaultConfigProperties = AppConfigProperties(
-    themeMode = ThemeMode.Default,
-    fontFamily = "Poppins",
-    fontStyle = Normal,
-    textDarkColor = Color.White,
-    textLightColor = Color.Black,
-    dynamicColor = false,
-    language = "English",
-    dynamicPrimaryColor = null,
-    selectedCurrencyCode = R.string.inr,
-    selectedCurrencyIconString = R.string.inrIcon,
-    selectedCurrencyIconDrawable = R.drawable.ic_rupee,
-)
+val DefaultConfigProperties =
+    AppConfigProperties(
+        themeMode = ThemeMode.Default,
+        fontFamily = "Poppins",
+        fontStyle = Normal,
+        textDarkColor = Color.White,
+        textLightColor = Color.Black,
+        dynamicColor = false,
+        language = "English",
+        dynamicPrimaryColor = null,
+        selectedCurrencyCode = R.string.inr,
+        selectedCurrencyIconString = R.string.inrIcon,
+        selectedCurrencyIconDrawable = R.drawable.ic_rupee,
+    )

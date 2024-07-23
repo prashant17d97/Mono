@@ -35,9 +35,8 @@ import kotlinx.coroutines.launch
 class ReportVM(
     private val appConfigManager: AppConfigManager,
     private val repository: Repository,
-    private val appStateManager: AppStateManager
+    private val appStateManager: AppStateManager,
 ) : ViewModel() {
-
     companion object {
         private const val TAG = "ReportVM"
     }
@@ -49,10 +48,11 @@ class ReportVM(
     val appState = appStateManager
 
     fun requestNotificationPermissionDialog(context: Context) {
-        if (!requestNotificationPermission.value && Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU && !context.hasPermission(
+        if (!requestNotificationPermission.value && Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU &&
+            !context.hasPermission(
                 arrayOf(
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ),
             )
         ) {
             appStateManager.updateAlertState(
@@ -63,11 +63,11 @@ class ReportVM(
                     negativeButtonText = R.string.empty,
                     drawable = Drawable.Animated(),
                     onPositiveClick = {
+                        dismissDialog()
                         _requestNotificationPermission.value = true
-                    }
-                )
+                    },
+                ),
             )
-
         }
     }
 
@@ -98,7 +98,7 @@ class ReportVM(
                 repository.allDailyTransaction,
                 repository.allDailyMonthTransaction,
                 repository.allDailyYearTransaction,
-                repository.categoryModelList
+                repository.categoryModelList,
             ) { appConfigProperties, allDailyTransaction, allDailyMonthTransaction, _, categories ->
                 ReportState(
                     allDailyMonthTransaction = allDailyMonthTransaction,
@@ -108,9 +108,8 @@ class ReportVM(
                     currentMonthIncome = allDailyMonthTransaction.getIncomeAmount(),
                     currentMonthAvailableBalance = allDailyMonthTransaction.getTotalAmount(),
                     currency = appConfigProperties.selectedCurrencyIconString,
-                    categories = categories
+                    categories = categories,
                 )
-
             }.collect {
                 delay(100)
                 _reportState.tryEmit(
@@ -122,8 +121,8 @@ class ReportVM(
                         currentMonthIncome = it.currentMonthIncome,
                         currentMonthAvailableBalance = it.currentMonthAvailableBalance,
                         currency = it.currency,
-                        categories = it.categories
-                    )
+                        categories = it.categories,
+                    ),
                 )
                 updateTab(0)
             }
@@ -141,21 +140,22 @@ class ReportVM(
 
     // Function to update tab content based on selected index
     private fun updateTab(currentIndex: Int) {
-        val transaction = when (currentIndex) {
-            0 -> reportState.value.allDailyMonthTransaction
-            1 -> reportState.value.allDailyMonthTransaction.filter { it.type == ExpenseType.Expense.name }
-            2 -> reportState.value.allDailyMonthTransaction.filter { it.type == ExpenseType.Income.name }
-            else -> emptyList()
-        }
+        val transaction =
+            when (currentIndex) {
+                0 -> reportState.value.allDailyMonthTransaction
+                1 -> reportState.value.allDailyMonthTransaction.filter { it.type == ExpenseType.Expense.name }
+                2 -> reportState.value.allDailyMonthTransaction.filter { it.type == ExpenseType.Income.name }
+                else -> emptyList()
+            }
         _reportState.tryEmit(
             reportState.value.copy(
                 transaction = transaction,
-                tabs = reportState.value.tabs.mapIndexed { index, tabs ->
+                tabs =
+                reportState.value.tabs.mapIndexed { index, tabs ->
                     tabs.copy(isSelected = index == currentIndex)
-                }
-            )
+                },
+            ),
         )
-
     }
 
     // Function to update selected date
@@ -170,21 +170,20 @@ class ReportVM(
                 year = getMonthAndYearFromLong.second,
                 showRest = true,
                 filterString = null,
-            )
+            ),
         )
     }
-
 
     fun updateReportState(
         context: Context,
         reportIntent: ReportIntent,
-        navHostController: NavHostController
+        navHostController: NavHostController,
     ) {
         when (reportIntent) {
             is ReportIntent.ResetClick -> {
                 updateFilter(
                     context,
-                    ReportIntent.UpdateFilter(filterRange = FilterRange.THIS_MONTH)
+                    ReportIntent.UpdateFilter(filterRange = FilterRange.THIS_MONTH),
                 )
 
                 val (month, year) = getCurrentMonthYear()
@@ -196,24 +195,26 @@ class ReportVM(
                         year = year,
                         showRest = false,
                         filterString = null,
-                    )
+                    ),
                 )
                 getMonthTransaction(getCurrentMonthYear())
             }
 
-            ReportIntent.RightClick -> updateSelectedDate(
-                getNextMonth(
-                    reportState.value.selectedDate.first,
-                    reportState.value.selectedDate.second
+            ReportIntent.RightClick ->
+                updateSelectedDate(
+                    getNextMonth(
+                        reportState.value.selectedDate.first,
+                        reportState.value.selectedDate.second,
+                    ),
                 )
-            )
 
-            ReportIntent.LeftClick -> updateSelectedDate(
-                getPreviousMonth(
-                    reportState.value.selectedDate.first,
-                    reportState.value.selectedDate.second
+            ReportIntent.LeftClick ->
+                updateSelectedDate(
+                    getPreviousMonth(
+                        reportState.value.selectedDate.first,
+                        reportState.value.selectedDate.second,
+                    ),
                 )
-            )
 
             is ReportIntent.UpdateTab -> updateTab(reportIntent.currentIndex)
             is ReportIntent.UpdateSelectedDate -> updateSelectedDate(reportIntent.timeStamp)
@@ -223,30 +224,30 @@ class ReportVM(
                     when (reportIntent.filterRange) {
                         FilterRange.THIS_MONTH -> getMonthTransaction()
                         FilterRange.LAST_MONTH,
-                        FilterRange.LAST_THREE_MONTH, FilterRange.LAST_SIX_MONTH -> {
+                        FilterRange.LAST_THREE_MONTH, FilterRange.LAST_SIX_MONTH,
+                        -> {
                             val (startDate, endDate) = getMonthRange(reportIntent.filterRange.range)
                             repository.getTransactionByDateRange(
-                                startDate = startDate, endDate = endDate
-
+                                startDate = startDate,
+                                endDate = endDate,
                             )
                         }
 
                         FilterRange.CUSTOM_RANGE -> {
                             repository.getTransactionByDateRange(
                                 reportIntent.dateRange?.first ?: 0L,
-                                reportIntent.dateRange?.second ?: 0L
+                                reportIntent.dateRange?.second ?: 0L,
                             )
                         }
                     }
                 }
-
             }
 
             is ReportIntent.ExpandCalendar -> {
                 _reportState.tryEmit(
                     reportState.value.copy(
-                        isCalendarExpanded = reportIntent.isCalendarExpanded
-                    )
+                        isCalendarExpanded = reportIntent.isCalendarExpanded,
+                    ),
                 )
             }
 
@@ -254,16 +255,16 @@ class ReportVM(
                 _reportState.tryEmit(
                     reportState.value.copy(
                         showTransactionCard = true,
-                        showClickedTransaction = reportIntent.transaction
-                    )
+                        showClickedTransaction = reportIntent.transaction,
+                    ),
                 )
             }
 
             ReportIntent.DeleteTransaction -> {
                 _reportState.tryEmit(
                     reportState.value.copy(
-                        showTransactionCard = false
-                    )
+                        showTransactionCard = false,
+                    ),
                 )
                 viewModelScope.launch(Dispatchers.IO) {
                     repository.deleteTransaction(reportState.value.showClickedTransaction)
@@ -274,58 +275,72 @@ class ReportVM(
             ReportIntent.CloseTransactionCard -> {
                 _reportState.tryEmit(
                     reportState.value.copy(
-                        showTransactionCard = false
-                    )
+                        showTransactionCard = false,
+                    ),
                 )
             }
 
             is ReportIntent.EditTransaction -> {
                 _reportState.tryEmit(
                     reportState.value.copy(
-                        showTransactionCard = false
-                    )
+                        showTransactionCard = false,
+                    ),
                 )
                 navHostController.navigate(
                     Screens.EditTransaction.passTransactionId(
-                        reportIntent.transactionId
-                    )
+                        reportIntent.transactionId,
+                    ),
                 )
             }
 
-            is ReportIntent.ChangeReportView -> updateView(
-                navHostController,
-                reportIntent.reportView
-            )
-
-            is ReportIntent.NavigateToGraph -> navHostController.navigateTo(
-                Screens.Graph.passCategoryId(
-                    reportIntent.categoryId
+            is ReportIntent.ChangeReportView ->
+                updateView(
+                    navHostController,
+                    reportIntent.reportView,
                 )
-            )
+
+            is ReportIntent.NavigateToGraph ->
+                navHostController.navigateTo(
+                    Screens.Graph.passCategoryId(
+                        reportIntent.categoryId,
+                    ),
+                )
         }
     }
 
-    private fun updateFilter(context: Context, reportIntent: ReportIntent.UpdateFilter) {
+    private fun updateFilter(
+        context: Context,
+        reportIntent: ReportIntent.UpdateFilter,
+    ) {
         _reportState.tryEmit(
             reportState.value.copy(
-                filters = reportState.value.filters.map { filter ->
+                filters =
+                reportState.value.filters.map { filter ->
                     filter.copy(isSelected = filter == reportIntent.filter)
                 },
                 filterString = context.getString(reportIntent.filter.title),
-                showRest = true
-            )
+                showRest = true,
+            ),
         )
     }
 
-    fun updateView(navHostController: NavHostController, reportView: ReportView) {
+    fun updateView(
+        navHostController: NavHostController,
+        reportView: ReportView,
+    ) {
         when (reportView) {
-            ReportView.MonthlyReport, ReportView.CategoryReport -> _reportState.tryEmit(
-                reportState.value.copy(
-                    selectedReportView = reportView.stringValue
+            ReportView.MonthlyReport /*ReportView.CategoryReport */ ->
+                _reportState.tryEmit(
+                    reportState.value.copy(
+                        selectedReportView = reportView.stringValue,
+                    ),
                 )
-            )
 
             ReportView.CalendarReport -> navHostController.navigateTo(Screens.CalendarPage)
         }
+    }
+
+    fun dismissDialog() {
+        appState.hideAlertDialog()
     }
 }

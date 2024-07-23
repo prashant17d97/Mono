@@ -17,28 +17,41 @@ import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 
 class NotificationScheduler(private val context: Context) : KoinComponent {
-
     fun scheduleNotification(
-        timeOfDayMillis: Long, title: String, content: String, targetScreen: Screens
+        timeOfDayMillis: Long,
+        title: String,
+        content: String,
+        targetScreen: Screens,
     ) {
         val initialDelay = calculateInitialDelay(timeOfDayMillis)
 
         // Create a periodic work request to repeat every day
-        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-            repeatInterval = 1, // Repeat interval in days
-            repeatIntervalTimeUnit = TimeUnit.DAYS,
-            flexTimeInterval = 10, // Flex interval ensures work is not deferred unnecessarily
-            flexTimeIntervalUnit = TimeUnit.MINUTES
-        ).setInitialDelay(initialDelay, TimeUnit.MILLISECONDS).setInputData(
+        val workRequest =
+
+
+            PeriodicWorkRequestBuilder<NotificationWorker>(
+
+
+                repeatInterval = 1, // Repeat interval in days
+
+                repeatIntervalTimeUnit = TimeUnit.DAYS,
+                flexTimeInterval = 10, // Flex interval ensures work is not deferred unnecessarily
+
+                flexTimeIntervalUnit = TimeUnit.MINUTES,
+            ).setInitialDelay(initialDelay, TimeUnit.MILLISECONDS).setInputData(
+
+
                 workDataOf(
                     NOTIFICATION_TITLE to title,
                     CONTENT to content,
-                    TARGET_SCREEN to targetScreen.route
-                )
+                    TARGET_SCREEN to targetScreen.route,
+                ),
             ).build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            MONO_DAILY_NOTIFICATION, ExistingPeriodicWorkPolicy.UPDATE, workRequest
+            MONO_DAILY_NOTIFICATION,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest,
         )
     }
 

@@ -15,9 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 class RepositoryImpl(
     private val daoInterface: DaoInterface,
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
 ) : Repository {
-
     companion object {
         private const val TAG = "RepositoryImpl"
     }
@@ -36,18 +35,15 @@ class RepositoryImpl(
     private val _allItemSize: MutableStateFlow<Int> = MutableStateFlow(0)
     override val allItemSize: StateFlow<Int> = _allItemSize
 
-
     private val _allDailyMonthTransaction: MutableStateFlow<List<DailyTransaction>> =
         MutableStateFlow(emptyList())
     override val allDailyMonthTransaction: StateFlow<List<DailyTransaction>> =
         _allDailyMonthTransaction
 
-
     private val _allDailyYearTransaction: MutableStateFlow<List<DailyTransaction>> =
         MutableStateFlow(emptyList())
     override val allDailyYearTransaction: StateFlow<List<DailyTransaction>> =
         _allDailyYearTransaction
-
 
     private val _categoryModelList: MutableStateFlow<List<CategoryModel>> =
         MutableStateFlow(emptyList())
@@ -61,7 +57,7 @@ class RepositoryImpl(
         val year = daoInterface.getAllTransaction().sortedBy { it.year }
         return IntRange(
             start = (year.firstOrNull()?.year ?: getCurrentYear) - 3,
-            endInclusive = (year.lastOrNull()?.year ?: getCurrentYear) + 3
+            endInclusive = (year.lastOrNull()?.year ?: getCurrentYear) + 3,
         )
     }
 
@@ -78,7 +74,7 @@ class RepositoryImpl(
     override suspend fun insert(dailyTransaction: DailyTransaction) {
         val transactionWithImgId = dailyTransaction.toTransaction()
         daoInterface.insert(
-            transactionWithImgId
+            transactionWithImgId,
         )
         getTransactionAll()
     }
@@ -87,7 +83,6 @@ class RepositoryImpl(
         daoInterface.updateTransaction(dailyTransaction.toTransaction())
         getTransactionAll()
     }
-
 
     override suspend fun deleteTransaction(dailyTransaction: DailyTransaction) {
         daoInterface.deleteTransaction(dailyTransaction.toTransaction())
@@ -104,13 +99,17 @@ class RepositoryImpl(
         getTransactionAll()
     }
 
-    override suspend fun getAllTransactionByMonth(month: Int, year: Int) {
+    override suspend fun getAllTransactionByMonth(
+        month: Int,
+        year: Int,
+    ) {
         _allDailyMonthTransaction.tryEmit(
             daoInterface.getAllTransactionByMonth(
-                month = month, year = year
+                month = month,
+                year = year,
             ).map { transaction ->
                 transaction.toDailyTransaction()
-            }.orIfEmpty()
+            }.orIfEmpty(),
         )
     }
 
@@ -119,7 +118,7 @@ class RepositoryImpl(
             daoInterface.getAllTransactionByYear(year = year)
                 .map { transaction ->
                     transaction.toDailyTransaction()
-                }.orIfEmpty()
+                }.orIfEmpty(),
         )
     }
 
@@ -146,19 +145,27 @@ class RepositoryImpl(
 
     override suspend fun fetchAllTransactionFromCategoryID(categoryID: Int) {
         val categoryTransaction = daoInterface.fetchAllTransactionFromCategoryID(categoryID)
-        val transaction = categoryTransaction.map { transaction ->
-            transaction.toDailyTransaction()
-        }.orIfEmpty()
+        val transaction =
+            categoryTransaction.map { transaction ->
+                transaction.toDailyTransaction()
+            }.orIfEmpty()
         _categoryTransactionAll.tryEmit(transaction)
     }
 
-    override suspend fun getTransactionByDateRange(startDate: Long, endDate: Long) {
-        val allMonthTransaction = daoInterface.findItemsInDateRange(
-            startDate = startDate, endDate = endDate
+    override suspend fun getTransactionByDateRange(
+        startDate: Long,
+        endDate: Long,
+    ) {
+        val allMonthTransaction =
+            daoInterface.findItemsInDateRange(
+                startDate = startDate,
+                endDate = endDate,
+            )
+        _allDailyMonthTransaction.tryEmit(
+            allMonthTransaction.map { transaction ->
+                transaction.toDailyTransaction()
+            }.orIfEmpty(),
         )
-        _allDailyMonthTransaction.tryEmit(allMonthTransaction.map { transaction ->
-            transaction.toDailyTransaction()
-        }.orIfEmpty())
     }
 
     override suspend fun fetchTransactionFromId(transactionId: Int) {
@@ -176,6 +183,5 @@ class RepositoryImpl(
 
         // Log the current value of _editTransaction
         Log.d(TAG, "fetchTransactionFromIdPost: ${_editTransaction.value}")
-
     }
 }

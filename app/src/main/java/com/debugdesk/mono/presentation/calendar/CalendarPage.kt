@@ -72,9 +72,8 @@ import java.util.Calendar
 @Composable
 fun CalendarPage(
     calendarPageVM: CalendarPageVM = koinViewModel(),
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
-
     LaunchedEffect(key1 = Unit) {
         calendarPageVM.fetchTransactions()
     }
@@ -87,17 +86,16 @@ fun CalendarPage(
         onSelected = {
             calendarPageVM.onCalendarIntentHandle(
                 calendarIntent = it,
-                navHostController = navHostController
+                navHostController = navHostController,
             )
-        }
+        },
     )
 }
-
 
 @Composable
 private fun CalendarPageContainer(
     calendar: CalendarState,
-    onSelected: (CalendarIntent) -> Unit
+    onSelected: (CalendarIntent) -> Unit,
 ) {
     MonoColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,59 +108,69 @@ private fun CalendarPageContainer(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = stringResource(id = R.string.back),
+                Text(
+                    text = stringResource(id = R.string.back),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light),
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .clickable { onSelected(CalendarIntent.NavigateBack) }
-                        .padding(horizontal = dp2))
+                        .padding(horizontal = dp2),
+                )
                 YearDropdown(
                     modifier = Modifier.weight(1f),
                     calendarState = calendar,
-                    onYearSelected = { onSelected(CalendarIntent.OnCalendarUpdate(it)) }
+                    onYearSelected = { onSelected(CalendarIntent.OnCalendarUpdate(it)) },
                 )
 
                 MonthDropDown(
                     modifier = Modifier.padding(horizontal = dp4),
                     calendarState = calendar,
-                    onSelected = { onSelected(CalendarIntent.OnCalendarUpdate(it)) }
+                    onSelected = { onSelected(CalendarIntent.OnCalendarUpdate(it)) },
                 )
-
             }
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         CalendarGrid(
             calendarState = calendar,
             onSelected = { onSelected(CalendarIntent.OnDateSelected(it)) },
             onTransactionClick = {
                 onSelected(CalendarIntent.OnTransactionClick(it))
-            }
+            },
         )
     }
 }
 
 @Composable
 private fun WeekBox(
-    modifier: Modifier = Modifier, week: String, shape: RoundedCornerShape
+    modifier: Modifier = Modifier,
+    week: String,
+    shape: RoundedCornerShape,
 ) {
     val selectedWeekDay by rememberUpdatedState(newValue = week == getDayOfWeekName())
     val containerColor by animateColorAsState(
-        targetValue = if (selectedWeekDay) MaterialTheme.colorScheme.primary
-        else MaterialTheme.colorScheme.primaryContainer, label = "ContainerColor"
+        targetValue =
+        if (selectedWeekDay) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        },
+        label = "ContainerColor",
     )
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
+        modifier =
+        modifier
             .size(width = dp50, height = dp40)
-            .background(color = containerColor, shape = shape)
-
+            .background(color = containerColor, shape = shape),
     ) {
         Text(
-            text = week, color = contentColorFor(containerColor)
+            text = week,
+            color = contentColorFor(containerColor),
         )
     }
 }
@@ -175,56 +183,69 @@ private fun DateBox(
     height: Dp = dp55,
     padding: Dp = dp2,
     shape: Shape = RoundedCornerShape(dp4),
-    onSelected: (String) -> Unit = {}
+    onSelected: (String) -> Unit = {},
 ) {
     val (expense, income) = rememberUpdatedState(calendarState.dayTransaction(date)).value
     val outlineColor by animateColorAsState(
-        targetValue = if (calendarState.isSelected(date)) brandColor
-        else Color.Transparent, label = "ContainerColor"
+        targetValue =
+        if (calendarState.isSelected(date)) {
+            brandColor
+        } else {
+            Color.Transparent
+        },
+        label = "ContainerColor",
     )
     val containerColor by rememberUpdatedState(
-        newValue = calendarState.currentDateContainerColor(
-            date
-        )
+        newValue =
+        calendarState.currentDateContainerColor(
+            date,
+        ),
     )
 
-    Box(contentAlignment = Alignment.Center,
-        modifier = modifier
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+        modifier
             .padding(padding)
             .size(width = dp50, height = height)
             .border(width = dp1, color = outlineColor, shape = shape)
             .background(
                 color = containerColor.copy(alpha = 0.75f),
-                shape = shape
+                shape = shape,
             )
-            .clickable { onSelected(date) }) {
+            .clickable { onSelected(date) },
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(
+            verticalArrangement =
+            Arrangement.spacedBy(
                 space = dp6,
-                alignment = Alignment.CenterVertically
+                alignment = Alignment.CenterVertically,
             ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = date, color = contentColorFor(containerColor)
+                text = date,
+                color = contentColorFor(containerColor),
             )
             if (date.isNotEmpty()) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(
+                    horizontalArrangement =
+                    Arrangement.spacedBy(
                         dp6,
-                        alignment = Alignment.CenterHorizontally
-                    )
+                        alignment = Alignment.CenterHorizontally,
+                    ),
                 ) {
-
                     // Income
                     DotBox(
-                        color = brandColor, isAvailable = income
+                        color = brandColor,
+                        isAvailable = income,
                     )
 
                     // Expense
                     DotBox(
-                        color = inActiveButton, isAvailable = expense
+                        color = inActiveButton,
+                        isAvailable = expense,
                     )
                 }
             }
@@ -235,16 +256,18 @@ private fun DateBox(
 @Composable
 fun DotBox(
     modifier: Modifier = Modifier,
-    color: Color = inActiveButton, isAvailable: Boolean = false
+    color: Color = inActiveButton,
+    isAvailable: Boolean = false,
 ) {
     val animateColor by animateColorAsState(
         targetValue = if (isAvailable) color else Color.Transparent,
-        label = "Dot Box"
+        label = "Dot Box",
     )
     Box(
-        modifier = modifier
+        modifier =
+        modifier
             .size(dp12)
-            .background(animateColor, shape = CircleShape)
+            .background(animateColor, shape = CircleShape),
     )
 }
 
@@ -252,7 +275,7 @@ fun DotBox(
 fun MonthDropDown(
     modifier: Modifier = Modifier,
     calendarState: CalendarState,
-    onSelected: (CalendarState) -> Unit
+    onSelected: (CalendarState) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     DropDown(
@@ -267,9 +290,9 @@ fun MonthDropDown(
             Icon(
                 painter = painterResource(id = R.drawable.ic_caret_down),
                 contentDescription = "",
-                modifier = modifier.clickable { expanded = !expanded }
+                modifier = modifier.clickable { expanded = !expanded },
             )
-        }
+        },
     )
 }
 
@@ -285,63 +308,68 @@ fun YearDropdown(
         modifier = modifier.height(dp48),
         contentAlignment = Alignment.Center,
     ) {
-        DropDown(expanded = expanded,
+        DropDown(
+            expanded = expanded,
             selectedValue = calendarState.selectedYear.toString(),
             items = years,
             onSelected = { item, _ ->
                 onYearSelected(
                     calendarState.copy(
                         selectedYear = item.toIntIfEmpty(),
-                        showCategoryList = false
-                    )
+                        showCategoryList = false,
+                    ),
                 )
             },
             onExpend = { expanded = it },
             heading = {
                 Text(
                     text = "${calendarState.monthString}, ${calendarState.selectedYear}",
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .clickable { expanded = !expanded },
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
-
-            }
+            },
         )
     }
 }
-
 
 @Composable
 private fun CalendarGrid(
     calendarState: CalendarState,
     onSelected: (CalendarState) -> Unit,
-    onTransactionClick: (transactionId: Int) -> Unit = {}
+    onTransactionClick: (transactionId: Int) -> Unit = {},
 ) {
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.YEAR, calendarState.selectedYear)
-        set(Calendar.MONTH, calendarState.selectedMonth + 1)
-        set(Calendar.DAY_OF_MONTH, 1)
-    }
+    val calendar =
+        Calendar.getInstance().apply {
+            set(Calendar.YEAR, calendarState.selectedYear)
+            set(Calendar.MONTH, calendarState.selectedMonth)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
 
     val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
     val startDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(dp2)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(dp4)
-                )
+                    shape = RoundedCornerShape(dp4),
+                ),
         ) {
             stringArrayResource(id = R.array.weeks).forEach { day ->
                 WeekBox(
-                    week = day, modifier = Modifier.weight(1f), shape = RoundedCornerShape(dp4)
+                    week = day,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(dp4),
                 )
             }
         }
@@ -363,11 +391,11 @@ private fun CalendarGrid(
                                 onSelected(
                                     calendarState.copy(
                                         selectedDate = it.toIntIfEmpty(),
-                                        showCategoryList = true
-                                    )
+                                        showCategoryList = true,
+                                    ),
                                 )
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -380,12 +408,15 @@ private fun CalendarGrid(
             content = {
                 Column(modifier = Modifier.padding(top = dp16)) {
                     calendarState.sortedTransaction.forEach { (_, dailyTransaction) ->
-                        ExpenseCard(currency = stringResource(calendarState.currencyStringIcon),
+                        ExpenseCard(
+                            currency = stringResource(calendarState.currencyStringIcon),
                             dailyTransaction = dailyTransaction,
-                            onTap = { onTransactionClick(it.transactionId) })
+                            onTap = { onTransactionClick(it.transactionId) },
+                        )
                     }
                 }
-            })
+            },
+        )
     }
 }
 
@@ -395,9 +426,9 @@ private fun CalendarPagePrev() {
     PreviewTheme {
         CalendarPageContainer(
             CalendarState(
-                transaction = listOfPreviewTransaction
+                transaction = listOfPreviewTransaction,
             ),
-            onSelected = {}
+            onSelected = {},
         )
     }
 }

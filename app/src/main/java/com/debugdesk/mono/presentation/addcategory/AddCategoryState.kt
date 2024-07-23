@@ -7,4 +7,3 @@ data class AddCategoryState(
     val clearKeyboardFocus: Boolean = false,
     val error: String = "",
 )
-

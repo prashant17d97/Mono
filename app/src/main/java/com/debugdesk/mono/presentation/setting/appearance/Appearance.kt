@@ -48,6 +48,7 @@ import com.debugdesk.mono.R
 import com.debugdesk.mono.model.FontModel
 import com.debugdesk.mono.model.LanguageModel
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
+import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.presentation.uicomponents.Switch2
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
@@ -64,7 +65,7 @@ const val TAG = "Appearance"
 @Composable
 fun Appearance(
     navHostController: NavHostController,
-    appearanceVM: AppearanceVM = koinViewModel()
+    appearanceVM: AppearanceVM = koinViewModel(),
 ) {
     val context = LocalContext.current
     val appearanceState by appearanceVM.appearanceState.collectAsState()
@@ -84,10 +85,8 @@ fun Appearance(
         languageModel = context.getLanguages(appearanceState.appConfigProperties.language),
         onIntentChange = { appearanceIntent ->
             appearanceVM.handleAppearanceIntent(appearanceIntent, navHostController)
-        }
+        },
     )
-
-
 }
 
 @Composable
@@ -104,7 +103,7 @@ private fun AppearanceContainer(
         isScrollEnabled = false,
         trailing = stringResource(id = R.string.save),
         onBackClick = { onIntentChange(AppearanceIntent.Back) },
-        onTrailClick = { onIntentChange(AppearanceIntent.Save) }
+        onTrailClick = { onIntentChange(AppearanceIntent.Save) },
     ) {
         FontItems(
             title = stringResource(id = R.string.font),
@@ -114,19 +113,19 @@ private fun AppearanceContainer(
                 onIntentChange(
                     AppearanceIntent.ChangeFont(
                         appConfigProperties.fontFamily,
-                        !appearanceState.isFontExpended
-                    )
+                        !appearanceState.isFontExpended,
+                    ),
                 )
             },
             onItemClick = {
                 onIntentChange(
                     AppearanceIntent.ChangeFont(
                         it,
-                        !appearanceState.isFontExpended
-                    )
+                        !appearanceState.isFontExpended,
+                    ),
                 )
             },
-            items = fontItems
+            items = fontItems,
         )
 
         LanguageItems(
@@ -137,19 +136,19 @@ private fun AppearanceContainer(
                 onIntentChange(
                     AppearanceIntent.ChangeLanguage(
                         appConfigProperties.language,
-                        !appearanceState.isLanguageExpended
-                    )
+                        !appearanceState.isLanguageExpended,
+                    ),
                 )
             },
             onItemClick = {
                 onIntentChange(
                     AppearanceIntent.ChangeLanguage(
                         it,
-                        !appearanceState.isLanguageExpended
-                    )
+                        !appearanceState.isLanguageExpended,
+                    ),
                 )
             },
-            items = languageModel
+            items = languageModel,
         )
         DropDownThemeMenu(
             isDropDownExpanded = appearanceState.isThemeExpended,
@@ -157,8 +156,8 @@ private fun AppearanceContainer(
                 onIntentChange(
                     AppearanceIntent.ChangeTheme(
                         it,
-                        !appearanceState.isThemeExpended
-                    )
+                        !appearanceState.isThemeExpended,
+                    ),
                 )
             },
             themeMode = appConfigProperties.themeMode,
@@ -170,9 +169,9 @@ private fun AppearanceContainer(
                 onValueChange = {
                     Log.d(TAG, "AppearanceContainer: $it")
                     onIntentChange(
-                        AppearanceIntent.UpdateDynamicColor
+                        AppearanceIntent.UpdateDynamicColor,
                     )
-                }
+                },
             )
         }
     }
@@ -185,72 +184,84 @@ private fun FontItems(
     isExpanded: Boolean,
     onToggleExpand: (Boolean) -> Unit,
     onItemClick: (String) -> Unit,
-    items: List<FontModel>
+    items: List<FontModel>,
 ) {
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .padding(bottom = 5.dp)
-            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton)
+            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
     ) {
-        Row(modifier = Modifier
-            .clickable { onToggleExpand(!isExpanded) }
-            .fillMaxWidth(),
+        Row(
+            modifier =
+            Modifier
+                .clickable { onToggleExpand(!isExpanded) }
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp),
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp),
             )
         }
         AnimatedVisibility(visible = isExpanded) {
             LazyColumn(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 items(items) { item ->
                     Row(
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
                             .clickable { onItemClick(item.font) },
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = item.font, style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(
+                            text = item.font,
+                            style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontFamily =
+                                FontFamily(
                                     Font(
                                         googleFont = GoogleFont(name = item.font),
-                                        fontProvider = GoogleFont.Provider(
+                                        fontProvider =
+                                        GoogleFont.Provider(
                                             providerAuthority = "com.google.android.gms.fonts",
                                             providerPackage = "com.google.android.gms",
-                                            certificates = R.array.com_google_android_gms_fonts_certs
-                                        )
-                                    )
-                                )
-                            )
+                                            certificates = R.array.com_google_android_gms_fonts_certs,
+                                        ),
+                                    ),
+                                ),
+                            ),
                         )
 
-                        Icon(painter = painterResource(id = R.drawable.ic_right_tick),
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_right_tick),
                             contentDescription = "",
-                            tint = MaterialTheme.colorScheme.primary.takeIf { item.isSelected }
-                                ?: Color.Transparent)
+                            tint =
+                            MaterialTheme.colorScheme.primary.takeIf { item.isSelected }
+                                ?: Color.Transparent,
+                        )
                     }
                 }
             }
         }
     }
 }
-
 
 @Composable
 private fun LanguageItems(
@@ -259,65 +270,78 @@ private fun LanguageItems(
     isExpanded: Boolean,
     onToggleExpand: (Boolean) -> Unit,
     onItemClick: (String) -> Unit,
-    items: List<LanguageModel>
+    items: List<LanguageModel>,
 ) {
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .padding(bottom = 5.dp)
-            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton)
+            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
     ) {
-        Row(modifier = Modifier
-            .clickable { onToggleExpand(!isExpanded) }
-            .fillMaxWidth(),
+        Row(
+            modifier =
+            Modifier
+                .clickable { onToggleExpand(!isExpanded) }
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp),
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp),
             )
         }
         AnimatedVisibility(visible = isExpanded) {
             LazyColumn(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 items(items) { item ->
                     Row(
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .fillMaxWidth()
                             .padding(5.dp)
                             .clickable { onItemClick(item.language) },
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = item.language, style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(
+                            text = item.language,
+                            style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontFamily =
+                                FontFamily(
                                     Font(
                                         googleFont = GoogleFont(name = item.language),
-                                        fontProvider = GoogleFont.Provider(
+                                        fontProvider =
+                                        GoogleFont.Provider(
                                             providerAuthority = "com.google.android.gms.fonts",
                                             providerPackage = "com.google.android.gms",
-                                            certificates = R.array.com_google_android_gms_fonts_certs
-                                        )
-                                    )
-                                )
-                            )
+                                            certificates = R.array.com_google_android_gms_fonts_certs,
+                                        ),
+                                    ),
+                                ),
+                            ),
                         )
 
-                        Icon(painter = painterResource(id = R.drawable.ic_right_tick),
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_right_tick),
                             contentDescription = "",
-                            tint = MaterialTheme.colorScheme.primary.takeIf { item.isSelected }
-                                ?: Color.Transparent)
+                            tint =
+                            MaterialTheme.colorScheme.primary.takeIf { item.isSelected }
+                                ?: Color.Transparent,
+                        )
                     }
                 }
             }
@@ -328,29 +352,30 @@ private fun LanguageItems(
 @Composable
 private fun DynamicColorSetting(
     value: Boolean,
-    onValueChange: (Boolean) -> Unit
+    onValueChange: (Boolean) -> Unit,
 ) {
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .padding(vertical = 5.dp)
-            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton)
+            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(id = R.string.dynamicColor),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp),
             )
             Switch2(
                 value = value,
                 onValueChange = onValueChange,
                 width = 20.dp,
                 height = 10.dp,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
             )
         }
     }
@@ -362,60 +387,82 @@ private fun DropDownThemeMenu(
     themeMode: ThemeMode,
     onDropDownClick: (ThemeMode) -> Unit = {},
 ) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 5.dp)
-        .clickable { onDropDownClick(themeMode) }
-        .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
+    Row(
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp)
+            .clickable { onDropDownClick(themeMode) }
+            .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = disableButton),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(10.dp)
                 .width(200.dp),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(painter = painterResource(id = R.drawable.ic_dark_mode.takeIf { themeMode.isDarkTheme() }
-                ?: R.drawable.ic_mode_light),
+            Image(
+                painter =
+                painterResource(
+                    id =
+                    R.drawable.ic_dark_mode.takeIf { themeMode.isDarkTheme() }
+                        ?: R.drawable.ic_mode_light,
+                ),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary))
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+            )
             SpacerWidth(value = Dp.dp5)
             Text(
                 text = stringResource(id = R.string.dark_mode),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         }
-        Image(painter = painterResource(id = R.drawable.ic_caret_right),
+        Image(
+            painter = painterResource(id = R.drawable.ic_caret_right),
             contentDescription = "ic_caret_right",
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(width = 34.dp, height = 24.dp)
                 .padding(end = 10.dp)
                 .rotate(90f.takeIf { isDropDownExpanded } ?: 0f),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary))
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+        )
     }
-    DropdownMenu(expanded = isDropDownExpanded, offset = DpOffset(
-        x = 0.dp, y = (-60).dp
-    ), properties = PopupProperties(
-        dismissOnBackPress = true, dismissOnClickOutside = true
-    ), onDismissRequest = { onDropDownClick(themeMode) }) {
+    DropdownMenu(
+        expanded = isDropDownExpanded,
+        offset =
+        DpOffset(
+            x = 0.dp,
+            y = (-60).dp,
+        ),
+        properties =
+        PopupProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        ),
+        onDismissRequest = { onDropDownClick(themeMode) },
+    ) {
         ThemeMode.entries.forEach { menu ->
             DropdownMenuItem(onClick = {
                 onDropDownClick(menu)
             }, text = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(text = stringResource(id = menu.stringRes))
                     SpacerWidth(value = Dp.dp6)
                     AnimatedVisibility(
-                        visible = menu.stringRes == themeMode.stringRes
+                        visible = menu.stringRes == themeMode.stringRes,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Selected Theme"
+                            contentDescription = "Selected Theme",
                         )
                     }
                 }
@@ -424,16 +471,17 @@ private fun DropDownThemeMenu(
     }
 }
 
-
 @Preview
 @Composable
 fun AppearancePre() {
     val context = LocalContext.current
-    AppearanceContainer(
-        appConfigProperties = AppConfigProperties(),
-        appearanceState = AppearanceState(),
-        fontItems = context.getFontFamilies("Poppins"),
-        languageModel = context.getLanguages("English"),
-        onIntentChange = { },
-    )
+    PreviewTheme {
+        AppearanceContainer(
+            appConfigProperties = AppConfigProperties(),
+            appearanceState = AppearanceState(),
+            fontItems = context.getFontFamilies("Poppins"),
+            languageModel = context.getLanguages("English"),
+            onIntentChange = { },
+        )
+    }
 }

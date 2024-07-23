@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.intro
 
-
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -27,7 +26,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun Intro(
     navController: NavHostController,
-    viewModel: IntroViewModel = koinViewModel()
+    viewModel: IntroViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
     val activity = (context as? Activity)
@@ -36,9 +35,10 @@ fun Intro(
         activity?.finishAffinity()
     }
 
-    val pagerState = rememberPagerState {
-        viewModel.getIntroModel(context).size
-    }
+    val pagerState =
+        rememberPagerState {
+            viewModel.getIntroModel(context).size
+        }
 
     var currentIndex by rememberSaveable {
         mutableIntStateOf(0)
@@ -84,7 +84,7 @@ fun Intro(
                 total = introModel.size,
                 heading = introModel[index].heading,
                 description = introModel[index].description,
-                painterResource = introModel[index].img
+                painterResource = introModel[index].img,
             )
         }
     }

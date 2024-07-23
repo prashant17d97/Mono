@@ -34,26 +34,31 @@ fun EditCategoryCard(
 ) {
     Column {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(id = string.category),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp),
             )
-            Text(text = stringResource(id = string.editCategory),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
+            Text(
+                text = stringResource(id = string.editCategory),
+                style = MaterialTheme.typography.titleMedium,
+                modifier =
+                Modifier
                     .padding(top = 20.dp, bottom = 10.dp)
                     .clickable {
                         onCategoryEdit(TransactionIntent.UpdateCategoryIntent(EditCategoryIntent.OnEditCategoryClicked))
-                    })
+                    },
+            )
         }
 
-        LazyVerticalGrid(columns = GridCells.Adaptive(Dp.dp80),
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(Dp.dp80),
             contentPadding = PaddingValues(dp0),
             content = {
                 itemsIndexed(list) { index, item ->
@@ -63,13 +68,13 @@ fun EditCategoryCard(
                                 EditCategoryIntent.OnCategoryListChange(
                                     list.mapIndexed { j, item ->
                                         item.copy(isSelected = index == j)
-                                    })
-                            )
-
+                                    },
+                                ),
+                            ),
                         )
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -79,50 +84,51 @@ fun EditCategoryCard(
 fun EditCatPrev() {
     PreviewTheme {
         EditCategoryCard(
-            list = listOf(
+            list =
+            listOf(
                 CategoryModel(
                     categoryId = 1,
                     category = "Food",
                     categoryIcon = drawable.food,
                     categoryType = "Expense",
-                    isSelected = false
+                    isSelected = false,
                 ),
                 CategoryModel(
                     categoryId = 2,
                     category = "Salary",
                     categoryIcon = drawable.baby,
                     categoryType = "Income",
-                    isSelected = false
+                    isSelected = false,
                 ),
                 CategoryModel(
                     categoryId = 3,
                     category = "Transport",
                     categoryIcon = drawable.train,
                     categoryType = "Expense",
-                    isSelected = false
+                    isSelected = false,
                 ),
                 CategoryModel(
                     categoryId = 4,
                     category = "Shopping",
                     categoryIcon = drawable.coffee,
                     categoryType = "Expense",
-                    isSelected = false
+                    isSelected = false,
                 ),
                 CategoryModel(
                     categoryId = 5,
                     category = "Rent",
                     categoryIcon = drawable.baby,
                     categoryType = "Expense",
-                    isSelected = false
+                    isSelected = false,
                 ),
                 CategoryModel(
                     categoryId = 6,
                     category = "Others",
                     categoryIcon = drawable.books,
                     categoryType = "Expense",
-                    isSelected = false
+                    isSelected = false,
                 ),
-            )
+            ),
         ) {}
     }
 }

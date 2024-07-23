@@ -38,7 +38,7 @@ fun NoteTextField(
     onNoteChange: (String) -> Unit = {},
     onImageClick: () -> Unit = {},
     onDelete: () -> Unit = {},
-    onTrailClick: () -> Unit = {}
+    onTrailClick: () -> Unit = {},
 ) {
     val interaction = remember { MutableInteractionSource() }
     val inFocus by interaction.collectIsFocusedAsState()
@@ -47,22 +47,27 @@ fun NoteTextField(
     Column {
         Text(
             text = stringResource(id = R.string.note),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(dp10)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(dp10),
         )
-        Column(verticalArrangement = Arrangement.Top,
+        Column(
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
-                .border(width = dp1,
-                    color = MaterialTheme.colorScheme.primary.takeIf { inFocus }
+                .border(
+                    width = dp1,
+                    color =
+                    MaterialTheme.colorScheme.primary.takeIf { inFocus }
                         ?: CommonColor.disableButton,
-                    shape = RoundedCornerShape(dp10))) {
-
+                    shape = RoundedCornerShape(dp10),
+                ),
+        ) {
             MonoOutlineTextField(
                 trailingIcon = R.drawable.ic_gallary,
                 placeHolderText = stringResource(id = R.string.input),
-                textStyle = MaterialTheme.typography.bodyMedium,
+                textStyle = MaterialTheme.typography.titleMedium,
                 charLimit = 100,
                 inFocus = inFocus,
                 interactionSource = interaction,
@@ -79,17 +84,16 @@ fun NoteTextField(
                 },
             )
 
-            if (textOutlineEnabled){
+            if (textOutlineEnabled) {
                 ImageCard(
                     painter = image,
                     onDelete = onDelete,
-                    onImageClick = onImageClick
+                    onImageClick = onImageClick,
                 )
             }
         }
     }
 }
-
 
 @Preview
 @Composable

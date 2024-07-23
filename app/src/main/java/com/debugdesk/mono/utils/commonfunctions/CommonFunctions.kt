@@ -30,11 +30,10 @@ import java.util.Date
 import java.util.Locale
 
 object CommonFunctions {
-
     @Composable
     fun TimerDelay(
         timeInMilliSecond: Long = 100L,
-        onTimerEnd: suspend () -> Unit
+        onTimerEnd: suspend () -> Unit,
     ) {
         LaunchedEffect(
             key1 = Unit,
@@ -42,17 +41,19 @@ object CommonFunctions {
                 try {
                     startTimer(
                         time = timeInMilliSecond,
-                        onTimerEnd = onTimerEnd
+                        onTimerEnd = onTimerEnd,
                     )
                 } catch (ex: Exception) {
                     Log.e("TAG", "TimerDelayException: ${ex.message} timer cancelled")
                 }
-            }
+            },
         )
     }
 
-
-    private suspend fun startTimer(time: Long, onTimerEnd: suspend () -> Unit) {
+    private suspend fun startTimer(
+        time: Long,
+        onTimerEnd: suspend () -> Unit,
+    ) {
         delay(timeMillis = time)
         onTimerEnd()
     }
@@ -64,11 +65,12 @@ object CommonFunctions {
 
     fun Long.toDateWeek(pattern: String = "MMM dd, yyyy (EEE)"): String {
         val date = Date(this)
-        val formatter = SimpleDateFormat(
-            pattern, Locale.getDefault()
-        ) // Customize format as needed
+        val formatter =
+            SimpleDateFormat(
+                pattern,
+                Locale.getDefault(),
+            ) // Customize format as needed
         return formatter.format(date)
-
     }
 
     fun Context.getLanguages(language: String): List<LanguageModel> =
@@ -89,7 +91,6 @@ object CommonFunctions {
             ThemeMode.Dark -> true
         }
     }
-
 
     fun Long.longToDateString(datePattern: String = "yyyy-MM-dd"): String {
         val date = Date(this)
@@ -124,7 +125,6 @@ object CommonFunctions {
         return calendar
     }
 
-
     fun getMonthRange(monthsAgo: Int): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
         calendar.time = Date()
@@ -143,7 +143,7 @@ object CommonFunctions {
 
     fun getCurrentMonthYear(): Pair<Int, Int> {
         val calendar = Calendar.getInstance()
-        val currentMonth = calendar.get(Calendar.MONTH)  // 0-based (January = 0, December = 11)
+        val currentMonth = calendar.get(Calendar.MONTH) // 0-based (January = 0, December = 11)
         val currentYear = calendar.get(Calendar.YEAR)
         return Pair(currentMonth, currentYear)
     }
@@ -156,8 +156,10 @@ object CommonFunctions {
         return Pair(month, year)
     }
 
-
-    fun getPreviousMonth(currentMonth: Int, currentYear: Int): Long {
+    fun getPreviousMonth(
+        currentMonth: Int,
+        currentYear: Int,
+    ): Long {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.MONTH, currentMonth)
         calendar.set(Calendar.YEAR, currentYear)
@@ -165,15 +167,16 @@ object CommonFunctions {
         return calendar.timeInMillis
     }
 
-
-    fun getNextMonth(currentMonth: Int, currentYear: Int): Long {
+    fun getNextMonth(
+        currentMonth: Int,
+        currentYear: Int,
+    ): Long {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.MONTH, currentMonth)
         calendar.set(Calendar.YEAR, currentYear)
         calendar.add(Calendar.MONTH, 1)
         return calendar.timeInMillis
     }
-
 
     fun getMonthOnClick(isLeft: Boolean): Pair<Long, String> {
         val calendar = Calendar.getInstance()
@@ -188,8 +191,11 @@ object CommonFunctions {
         return Pair(calendar.timeInMillis, "$monthString, $year")
     }
 
-    fun getMonthName(month: Int, languageTag: String = "en"): String {
-        //val monthList = stringArrayResource(id = R.array.months)
+    fun getMonthName(
+        month: Int,
+        languageTag: String = "en",
+    ): String {
+        // val monthList = stringArrayResource(id = R.array.months)
         return DateFormatSymbols(Locale.forLanguageTag(languageTag)).months[month]
     }
 
@@ -203,7 +209,6 @@ object CommonFunctions {
             0.0
         }
     }
-
 
     fun String.takeWord(n: Int): String {
         if (isBlank()) {
@@ -223,36 +228,38 @@ object CommonFunctions {
         @StringRes message: Int = R.string.delete_all_transactions,
         @StringRes positiveButtonText: Int = R.string.okay,
         @StringRes negativeButtonText: Int = R.string.cancel,
-        drawable: Drawable = Drawable.Static(
-            icon = R.drawable.ic_warning,
-            tintColor = inActiveButton
-        ),
+        drawable: Drawable =
+            Drawable.Static(
+                icon = R.drawable.ic_warning,
+                tintColor = inActiveButton,
+            ),
         dismissOnBackPress: Boolean = true,
         dismissOnClickOutside: Boolean = true,
         onNegativeClick: () -> Unit = {},
-        onPositiveClick: () -> Unit = {}
+        onPositiveClick: () -> Unit = {},
     ) {
-        updateAlertState(AlertState(
-            title = title,
-            message = message,
-            positiveButtonText = positiveButtonText,
-            negativeButtonText = negativeButtonText,
-            drawable = drawable,
-            show = true,
-            properties = DialogProperties(
-                dismissOnBackPress = dismissOnBackPress,
-                dismissOnClickOutside = dismissOnClickOutside
+        updateAlertState(
+            AlertState(
+                title = title,
+                message = message,
+                positiveButtonText = positiveButtonText,
+                negativeButtonText = negativeButtonText,
+                drawable = drawable,
+                show = true,
+                properties =
+                DialogProperties(
+                    dismissOnBackPress = dismissOnBackPress,
+                    dismissOnClickOutside = dismissOnClickOutside,
+                ),
+                onNegativeClick = {
+                    hideAlertDialog()
+                    onNegativeClick()
+                },
+                onPositiveClick = {
+                    hideAlertDialog()
+                    onPositiveClick()
+                },
             ),
-            onNegativeClick = {
-                hideAlertDialog()
-                onNegativeClick()
-            },
-            onPositiveClick = {
-                hideAlertDialog()
-                onPositiveClick()
-            }
-
-        )
         )
     }
 
@@ -263,13 +270,14 @@ object CommonFunctions {
         val gb = mb * 1024
         val tb = gb * 1024
 
-        val (format, value) = when {
-            sizeInBytes < kb -> "%.0f Bytes" to sizeInBytes.toDouble()
-            sizeInBytes < mb -> "%.2f KB" to sizeInBytes / kb
-            sizeInBytes < gb -> "%.2f MB" to sizeInBytes / mb
-            sizeInBytes < tb -> "%.2f GB" to sizeInBytes / gb
-            else -> "%.2f TB" to sizeInBytes / tb
-        }
+        val (format, value) =
+            when {
+                sizeInBytes < kb -> "%.0f Bytes" to sizeInBytes.toDouble()
+                sizeInBytes < mb -> "%.2f KB" to sizeInBytes / kb
+                sizeInBytes < gb -> "%.2f MB" to sizeInBytes / mb
+                sizeInBytes < tb -> "%.2f GB" to sizeInBytes / gb
+                else -> "%.2f TB" to sizeInBytes / tb
+            }
 
         return String.format(Locale.getDefault(), format, value)
     }
@@ -280,9 +288,10 @@ object CommonFunctions {
             val zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
             zonedDateTime.dayOfMonth
         } else {
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = timestamp
-            }
+            val calendar =
+                Calendar.getInstance().apply {
+                    timeInMillis = timestamp
+                }
             calendar.get(Calendar.DAY_OF_MONTH)
         }
     }
@@ -297,17 +306,17 @@ object CommonFunctions {
             val zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
             Triple(zonedDateTime.dayOfMonth, zonedDateTime.monthValue - 1, zonedDateTime.year)
         } else {
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = timestamp
-            }
+            val calendar =
+                Calendar.getInstance().apply {
+                    timeInMillis = timestamp
+                }
             Triple(
                 first = calendar.get(Calendar.DAY_OF_MONTH),
                 second = calendar.get(Calendar.MONTH),
-                third = calendar.get(Calendar.YEAR)
+                third = calendar.get(Calendar.YEAR),
             )
         }
     }
-
 
     fun String.toIntIfEmpty(): Int {
         return if (this.isNotEmpty() && isNotBlank()) {

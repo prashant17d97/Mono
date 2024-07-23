@@ -39,19 +39,18 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun EditCategory(
     navHostController: NavHostController,
-    viewModel: EditCategoryVM = koinViewModel()
+    viewModel: EditCategoryVM = koinViewModel(),
 ) {
-
     val categoryModels by viewModel.categoryModelList.collectAsState()
     val context = LocalContext.current
     var expenseCategory: List<CategoryModel> by rememberSaveable {
         mutableStateOf(
-            emptyList()
+            emptyList(),
         )
     }
     var incomeCategory: List<CategoryModel> by rememberSaveable {
         mutableStateOf(
-            emptyList()
+            emptyList(),
         )
     }
     LaunchedEffect(categoryModels) {
@@ -70,63 +69,64 @@ fun EditCategory(
         trailingColor = disableButton,
         showBack = true,
         onBackClick = { navHostController.popBackStack() },
-        onTrailClick = { viewModel.removeCategory(incomeCategory, expenseCategory) }
+        onTrailClick = { viewModel.removeCategory(incomeCategory, expenseCategory) },
     ) {
         Text(
             text = stringResource(id = R.string.expense),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = dp2, vertical = dp5)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = dp2, vertical = dp5),
         )
 
         LazyVerticalGrid(columns = GridCells.Adaptive(dp70)) {
             items(
-                expenseCategory + CategoryModel(
-                    category = context.getString(R.string.addMore),
-                    isSelected = false,
-                    categoryType = ExpenseType.Neutral.name
-                )
+                expenseCategory +
+                    CategoryModel(
+                        category = context.getString(R.string.addMore),
+                        isSelected = false,
+                        categoryType = ExpenseType.Neutral.name,
+                    ),
             ) { model ->
                 CategoryCard(
                     model = model,
-                    selectedColor = inActiveButton
+                    selectedColor = inActiveButton,
                 ) {
                     if (model.categoryType == ExpenseType.Neutral.name) {
                         navHostController.navigate(
                             Screens.AddCategory.passAddCategoryArgs(
-                                ExpenseType.Expense.name
-                            )
+                                ExpenseType.Expense.name,
+                            ),
                         )
                     } else {
                         expenseCategory = viewModel.updateExpenseCategory(expenseCategory, model)
                     }
                 }
             }
-
         }
 
         SpacerHeight(value = dp10)
         Text(
             text = stringResource(id = R.string.income),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 5.dp),
         )
         LazyVerticalGrid(columns = GridCells.Adaptive(dp70)) {
             items(
-                incomeCategory + CategoryModel(
-                    category = context.getString(R.string.addMore),
-                    isSelected = false,
-                    categoryType = ExpenseType.Neutral.name
-                )
+                incomeCategory +
+                    CategoryModel(
+                        category = context.getString(R.string.addMore),
+                        isSelected = false,
+                        categoryType = ExpenseType.Neutral.name,
+                    ),
             ) { model ->
                 CategoryCard(
                     model = model,
-                    selectedColor = inActiveButton
+                    selectedColor = inActiveButton,
                 ) {
                     if (model.categoryType == ExpenseType.Neutral.name) {
                         navHostController.navigate(
                             Screens.AddCategory.passAddCategoryArgs(
-                                ExpenseType.Income.name
-                            )
+                                ExpenseType.Income.name,
+                            ),
                         )
                     } else {
                         incomeCategory = viewModel.updateIncomeCategory(incomeCategory, model)
@@ -134,6 +134,5 @@ fun EditCategory(
                 }
             }
         }
-
     }
 }

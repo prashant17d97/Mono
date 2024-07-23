@@ -35,26 +35,34 @@ fun CategoryCard(
     model: CategoryModel,
     selectedColor: Color = brandColor,
     unSelectedColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
-    onClick: (CategoryModel) -> Unit = { _ -> }
+    onClick: (CategoryModel) -> Unit = { _ -> },
 ) {
-
-    val color by animateColorAsState(targetValue = selectedColor.takeIf { model.isSelected }
-        ?: unSelectedColor, label = "")
+    val color by animateColorAsState(
+        targetValue =
+        selectedColor.takeIf { model.isSelected }
+            ?: unSelectedColor,
+        label = "",
+    )
 
     val alpha by animateFloatAsState(targetValue = if (model.enable) 1f else 0.5f, label = "Alpha")
-    Column(modifier = Modifier
-        .clickable {
-            if (model.enable) {
-                onClick(model.copy(isSelected = !model.isSelected))
+    Column(
+        modifier =
+        Modifier
+            .clickable {
+                if (model.enable) {
+                    onClick(model.copy(isSelected = !model.isSelected))
+                }
             }
-        }
-        .size(dp80)
-        .padding(dp4)
-        .border(
-            width = 1.dp, color = color.copy(alpha = alpha), shape = RoundedCornerShape(7.dp)
-        ),
+            .size(dp80)
+            .padding(dp4)
+            .border(
+                width = 1.dp,
+                color = color.copy(alpha = alpha),
+                shape = RoundedCornerShape(7.dp),
+            ),
         verticalArrangement = Arrangement.SpaceEvenly,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         if (model.categoryIcon != null) {
             Image(
                 painter = painterResource(id = model.categoryIcon),
@@ -66,7 +74,7 @@ fun CategoryCard(
         }
         Text(
             text = model.category,
-            style = MaterialTheme.typography.titleSmall.copy(color = color.copy(alpha = alpha))
+            style = MaterialTheme.typography.titleSmall.copy(color = color.copy(alpha = alpha)),
         )
     }
 }
@@ -76,11 +84,12 @@ fun CategoryCard(
 fun CategoryPrev() {
     PreviewTheme(isDarkTheme = true) {
         CategoryCard(
-            model = CategoryModel(
+            model =
+            CategoryModel(
                 category = stringResource(id = R.string.coffee),
                 categoryIcon = R.drawable.ic_trash,
-                isSelected = false
-            )
+                isSelected = false,
+            ),
         )
     }
 }
@@ -90,11 +99,12 @@ fun CategoryPrev() {
 fun CategoryPrev2() {
     PreviewTheme(isDarkTheme = true) {
         CategoryCard(
-            model = CategoryModel(
+            model =
+            CategoryModel(
                 category = stringResource(id = R.string.coffee),
                 categoryIcon = R.drawable.ic_trash,
-                isSelected = true
-            )
+                isSelected = true,
+            ),
         )
     }
 }

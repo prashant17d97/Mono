@@ -17,18 +17,38 @@ interface Repository {
     val categoryModelList: StateFlow<List<CategoryModel>>
 
     suspend fun getTransactionAll()
-    suspend fun getYearRange():IntRange
+
+    suspend fun getYearRange(): IntRange
+
     suspend fun fetchTransactionFromId(transactionId: Int)
+
     suspend fun insert(dailyTransaction: DailyTransaction)
+
     suspend fun deleteTransaction(dailyTransaction: DailyTransaction)
+
     suspend fun deleteAllTransaction()
+
     suspend fun updateTransaction(dailyTransaction: DailyTransaction)
+
     suspend fun clearDatabase()
-    suspend fun getAllTransactionByMonth(month: Int, year: Int)
+
+    suspend fun getAllTransactionByMonth(
+        month: Int,
+        year: Int,
+    )
+
     suspend fun getAllTransactionByYear(year: Int)
+
     suspend fun saveCategories(categoryModel: CategoryModel)
+
     suspend fun fetchCategories()
-    suspend fun fetchAllTransactionFromCategoryID(categoryID:Int)
+
+    suspend fun fetchAllTransactionFromCategoryID(categoryID: Int)
+
     suspend fun removeCategories(categories: List<CategoryModel>)
-    suspend fun getTransactionByDateRange(startDate: Long, endDate: Long)
+
+    suspend fun getTransactionByDateRange(
+        startDate: Long,
+        endDate: Long,
+    )
 }

@@ -10,19 +10,20 @@ import com.debugdesk.mono.ui.theme.MonoTheme
 @Composable
 fun PreviewTheme(
     isDarkTheme: Boolean = true,
-    appConfigProperties: AppConfigProperties = AppConfigProperties(
-        themeMode = isDarkTheme(
-            isDarkTheme
-        )
-    ),
-    content: @Composable () -> Unit
+    appConfigProperties: AppConfigProperties =
+        AppConfigProperties(
+            themeMode =
+            isDarkTheme(
+                isDarkTheme,
+            ),
+        ),
+    content: @Composable () -> Unit,
 ) {
     MonoTheme(appConfigProperties = appConfigProperties) {
         Surface(
             content = content,
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         )
-
     }
 }
 

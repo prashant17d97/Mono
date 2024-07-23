@@ -20,5 +20,5 @@ data class Transaction(
     val imagePath: String,
     val imageSource: String,
     val createdOn: Long,
-    val year: Int? = null
+    val year: Int? = null,
 )

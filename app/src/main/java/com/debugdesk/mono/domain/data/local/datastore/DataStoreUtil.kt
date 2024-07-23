@@ -13,7 +13,10 @@ import kotlinx.coroutines.launch
 class DataStoreUtil(
     private val dataStore: DataStore<Preferences>,
 ) {
-    fun <Generic> saveObject(key: Preferences.Key<String>, value: Generic) {
+    fun <Generic> saveObject(
+        key: Preferences.Key<String>,
+        value: Generic,
+    ) {
         CoroutineScope(Dispatchers.IO + exceptionHandler()).launch {
             dataStore.edit { preferences ->
                 preferences[key] = Gson().toJson(value)
@@ -21,7 +24,11 @@ class DataStoreUtil(
         }
     }
 
-    fun <T> retrieveObject(key: Preferences.Key<String>, `class`: Class<T>, valueIs: (T?) -> Unit) {
+    fun <T> retrieveObject(
+        key: Preferences.Key<String>,
+        `class`: Class<T>,
+        valueIs: (T?) -> Unit,
+    ) {
         CoroutineScope(Dispatchers.IO + exceptionHandler()).launch {
             dataStore.edit {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -31,8 +38,10 @@ class DataStoreUtil(
         }
     }
 
-
-    fun <Generic> saveKey(key: Preferences.Key<Generic>, value: Generic) {
+    fun <Generic> saveKey(
+        key: Preferences.Key<Generic>,
+        value: Generic,
+    ) {
         CoroutineScope(Dispatchers.IO + exceptionHandler()).launch {
             dataStore.edit { preferences ->
                 preferences[key] = value
@@ -40,7 +49,10 @@ class DataStoreUtil(
         }
     }
 
-    fun <Generic> retrieveKey(key: Preferences.Key<Generic>, valueIs: (Generic?) -> Unit) {
+    fun <Generic> retrieveKey(
+        key: Preferences.Key<Generic>,
+        valueIs: (Generic?) -> Unit,
+    ) {
         CoroutineScope(Dispatchers.IO + exceptionHandler()).launch {
             dataStore.edit {
                 CoroutineScope(Dispatchers.Main).launch {
@@ -62,13 +74,14 @@ class DataStoreUtil(
         }
     }
 
-    private fun exceptionHandler() = CoroutineExceptionHandler { _, t ->
-        Log.e("DataStoreUtil", "exceptionHandler: ${t.localizedMessage}")
+    private fun exceptionHandler() =
+        CoroutineExceptionHandler { _, t ->
+            Log.e("DataStoreUtil", "exceptionHandler: ${t.localizedMessage}")
 
-        CoroutineScope(Dispatchers.Main).launch {
-            Log.e("DataStoreUtil", "exceptionHandlerScope: ${t.localizedMessage}")
+            CoroutineScope(Dispatchers.Main).launch {
+                Log.e("DataStoreUtil", "exceptionHandlerScope: ${t.localizedMessage}")
 
-            t.printStackTrace()
+                t.printStackTrace()
+            }
         }
-    }
 }

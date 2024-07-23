@@ -2,16 +2,16 @@ package com.debugdesk.mono.navigation
 
 import com.debugdesk.mono.R
 
-
 sealed class Screens(
     val name: String,
     val selectedIcon: Int = 0,
     val notSelectedIcon: Int = 0,
-    val route: String = name
+    val route: String = name,
 ) {
     data object WelcomeScreen : Screens(name = WELCOME_SCREEN)
 
     data object Intro : Screens(name = INTRO)
+
     data object Input : Screens(
         name = INPUT,
         selectedIcon = R.drawable.input,
@@ -28,7 +28,7 @@ sealed class Screens(
         name = GRAPH,
         selectedIcon = R.drawable.ic_selected_graph,
         notSelectedIcon = R.drawable.ic_graph,
-        route = "$GRAPH/{$GRAPH_ARGS}"
+        route = "$GRAPH/{$GRAPH_ARGS}",
     ) {
         fun passCategoryId(categoryId: Int): String {
             return "$GRAPH/$categoryId"
@@ -45,7 +45,7 @@ sealed class Screens(
 
     data object EditTransaction : Screens(
         name = EDIT_TRANSACTION,
-        route = "$EDIT_TRANSACTION/{$EDIT_TRANSACTION_ARGS}"
+        route = "$EDIT_TRANSACTION/{$EDIT_TRANSACTION_ARGS}",
     ) {
         fun passTransactionId(transactionId: Int): String {
             return "$EDIT_TRANSACTION/$transactionId"
@@ -54,7 +54,7 @@ sealed class Screens(
 
     data object AddCategory : Screens(
         name = ADD_CATEGORY,
-        route = "$ADD_CATEGORY/{$ADD_CATEGORY_ARGS}"
+        route = "$ADD_CATEGORY/{$ADD_CATEGORY_ARGS}",
     ) {
         fun passAddCategoryArgs(stringArgs: String): String {
             return "$ADD_CATEGORY/$stringArgs"
@@ -68,7 +68,6 @@ sealed class Screens(
     data object CalendarPage : Screens(name = CALENDAR_PAGE)
 
     data object Reminder : Screens(name = REMINDER)
-
 
     companion object {
         /**
@@ -94,7 +93,5 @@ sealed class Screens(
         const val ADD_CATEGORY_ARGS = "AddCategoryArgs"
         const val EDIT_TRANSACTION_ARGS = "EDIT_TRANSACTION_Args"
         const val GRAPH_ARGS = "GRAPH_Args"
-
     }
-
 }

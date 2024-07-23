@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.uicomponents
 
-
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,12 +15,13 @@ fun DatePickerDialog(
     openDialog: Boolean,
     initial: Long,
     openDialogChange: (Boolean) -> Unit,
-    value: (Long) -> Unit
+    value: (Long) -> Unit,
 ) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initial,
-        yearRange = IntRange(2000, 2200),
-    )
+    val datePickerState =
+        rememberDatePickerState(
+            initialSelectedDateMillis = initial,
+            yearRange = IntRange(2000, 2200),
+        )
     if (openDialog) {
         DatePickerDialog(
             onDismissRequest = {
@@ -34,7 +34,7 @@ fun DatePickerDialog(
                         openDialogChange(false)
                         value(datePickerState.selectedDateMillis ?: 0L)
                     },
-                    enabled = true
+                    enabled = true,
                 ) {
                     Text("OK")
                 }
@@ -43,11 +43,11 @@ fun DatePickerDialog(
                 TextButton(
                     onClick = {
                         openDialogChange(false)
-                    }
+                    },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         ) {
             DatePicker(state = datePickerState, showModeToggle = false)
         }

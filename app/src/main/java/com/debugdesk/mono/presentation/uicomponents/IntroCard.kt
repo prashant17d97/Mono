@@ -33,67 +33,74 @@ fun IntroCard(
     skip: () -> Unit,
     onContinue: () -> Unit,
 ) {
-
     val height = (LocalConfiguration.current).screenHeightDp
     val width = (LocalConfiguration.current).screenWidthDp
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier =
+        modifier
             .width((width - 10).dp)
             .height(height = (height * 0.95).dp)
-            .padding(horizontal = 10.dp)
+            .padding(horizontal = 10.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = "$current/$total", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "$current/$total", style = MaterialTheme.typography.titleMedium)
             SkipButton(text = stringResource(id = R.string.skip), onClick = { skip() })
         }
 
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp)
+                .padding(bottom = 20.dp),
         ) {
             Image(
                 painter = painterResource(id = painterResource),
                 contentDescription = "IntroLogo",
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .animateContentSize()
                     .height((height * 0.4).dp)
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 10.dp),
             )
             Text(
                 text = heading,
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(bottom = 5.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             Text(
                 text = description,
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(bottom = 5.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
             )
         }
 
-        CustomButton(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
-            text = stringResource(id = R.string.conti).takeIf { current != total }
+        CustomButton(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            text =
+            stringResource(id = R.string.conti).takeIf { current != total }
                 ?: stringResource(id = R.string.getStarted),
             status = Buttons.Active,
-            onClick = { onContinue() })
-
+            onClick = { onContinue() },
+        )
     }
 }

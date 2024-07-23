@@ -38,7 +38,6 @@ import com.debugdesk.mono.utils.commonfunctions.CommonFunctions.toDateWeek
 import com.debugdesk.mono.utils.enums.Buttons
 import org.koin.androidx.compose.koinViewModel
 
-
 @Composable
 fun EditTransaction(
     navHostController: NavHostController,
@@ -54,9 +53,8 @@ fun EditTransaction(
         transactionState = editTransactionState,
         onEditTransactionIntent = {
             editTransactionViewModel.handleTransactionIntent(it, navHostController, context)
-        }
+        },
     )
-
 }
 
 @Composable
@@ -76,7 +74,7 @@ fun EditTransactionContainer(
         Modifier
             .fillMaxSize()
             .padding(vertical = dp10),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         MonoColumn(
             heading = transactionState.transaction.date.toDateWeek(),
@@ -92,18 +90,17 @@ fun EditTransactionContainer(
             trailingColor = CommonColor.inActiveButton,
             verticalArrangement = Arrangement.spacedBy(dp8, alignment = Alignment.Top),
         ) {
-
             CalendarCard(
                 date = transactionState.date,
                 showDialog = transactionState.showCalendarDialog,
                 onShowCalendarDialog = {
                     onEditTransactionIntent(
                         TransactionIntent.OpenCalendarDialog(
-                            it
-                        )
+                            it,
+                        ),
                     )
                 },
-                onDateChange = { onEditTransactionIntent(TransactionIntent.UpdateDate(it)) }
+                onDateChange = { onEditTransactionIntent(TransactionIntent.UpdateDate(it)) },
             )
 
             AmountTextFieldCalculator(
@@ -111,10 +108,10 @@ fun EditTransactionContainer(
                 onTextFieldCalculatorIntent = {
                     onEditTransactionIntent(
                         TransactionIntent.UpdateAmount(
-                            it
-                        )
+                            it,
+                        ),
                     )
-                }
+                },
             )
 
             TransactionDropDown(
@@ -124,7 +121,7 @@ fun EditTransactionContainer(
                     showTransactionType = !showTransactionType
                     onEditTransactionIntent(TransactionIntent.UpdateTransactionType(it))
                 },
-                dismiss = { showPreview = false }
+                dismiss = { showPreview = false },
             )
 
             NoteTextField(
@@ -142,56 +139,56 @@ fun EditTransactionContainer(
                 },
                 onTrailClick = {
                     onEditTransactionIntent(TransactionIntent.OnTrailIconClick)
-                }
-
+                },
             )
 
             EditCategoryCard(
                 list = transactionState.categoryList,
-                onCategoryEdit = onEditTransactionIntent
+                onCategoryEdit = onEditTransactionIntent,
             )
         }
 
-        CustomButton(modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-            status = Buttons.Active.takeIf { transactionState.changesFound }
+        CustomButton(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            status =
+            Buttons.Active.takeIf { transactionState.changesFound }
                 ?: Buttons.Disable,
             text = stringResource(id = R.string.update),
             onClick = {
                 onEditTransactionIntent(TransactionIntent.OnUpdateClick)
-            })
+            },
+        )
     }
 
     MediaBottomSheet(
         visible = transactionState.showCameraAndGallery,
         appStateManager = transactionState.appStateManager,
-        onProcess = onEditTransactionIntent
+        onProcess = onEditTransactionIntent,
     )
 
     ImagePreview(
         showPreview = showPreview,
         createdOn = transactionState.createdOn,
         painter = transactionState.transaction.painter,
-        size = transactionState.transaction.imageSize
+        size = transactionState.transaction.imageSize,
     ) { previewIntent ->
         when (previewIntent) {
             PreviewIntent.Delete -> {
                 showPreview = false
                 onEditTransactionIntent(
-                    TransactionIntent.DeleteImage
+                    TransactionIntent.DeleteImage,
                 )
             }
 
             PreviewIntent.Navigate -> {
                 showPreview = false
             }
-
-
         }
     }
 }
-
 
 @Preview
 @Composable
@@ -199,6 +196,7 @@ fun EditTransactionPrev() {
     PreviewTheme {
         EditTransactionContainer(
             transactionState = TransactionState(),
-            onEditTransactionIntent = {})
+            onEditTransactionIntent = {},
+        )
     }
 }

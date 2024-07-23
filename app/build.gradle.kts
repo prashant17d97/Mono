@@ -4,8 +4,21 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ktlint)
 }
-
+ktlint {
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures = false // Fail the build if KtLint finds any issues
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.HTML)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+    }
+    filter {
+        exclude("**/generated/**")
+    }
+//    tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+}
 android {
     namespace = libs.versions.applicationId.get()
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -28,7 +41,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -48,11 +61,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-}
-kotlin{
-    sourceSets.all {
-        languageSettings.enableLanguageFeature("ExplicitBackingFields")
     }
 }
 
@@ -81,11 +89,11 @@ dependencies {
     // Constraint Layout
     implementation(libs.androidx.constraintlayout.compose)
 
-    //DataStore
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
     // Koin
     implementation(libs.koin.androidx.compose)
-    //implementation(libs.koin.androidx.navigation)
+    // implementation(libs.koin.androidx.navigation)
 
     // Retrofit
     implementation(libs.retrofit)
@@ -103,10 +111,10 @@ dependencies {
     // Snapper
     implementation(libs.snapper)
 
-    //Google Font
+    // Google Font
     implementation(libs.androidx.ui.text.google.fonts)
 
-    //Room
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

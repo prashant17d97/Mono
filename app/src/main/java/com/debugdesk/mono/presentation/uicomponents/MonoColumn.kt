@@ -44,63 +44,77 @@ fun MonoColumn(
     bottom: Dp = top,
     start: Dp = top,
     end: Dp = top,
-    headerBotPadding :Dp= dp10,
+    headerBotPadding: Dp = dp10,
     trailingCompose: @Composable () -> Unit = {
         if (trailing != "") {
-            Text(text = trailing,
+            Text(
+                text = trailing,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge.copy(color = trailingColor),
-                modifier = Modifier
+                modifier =
+                Modifier
                     .clickable {
                         if (enableClick) {
                             onTrailClick()
                         }
                     }
-                    .padding(horizontal = 2.dp))
+                    .padding(horizontal = 2.dp),
+            )
         }
     },
     header: @Composable () -> Unit = {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
                 .padding(bottom = headerBotPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
         ) {
             if (showBack) {
-                Text(text = stringResource(id = R.string.back),
+                Text(
+                    text = stringResource(id = R.string.back),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
                     lineHeight = sp48,
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .clickable {
                             if (enableClick) {
                                 onBackClick()
                             }
                         }
-                        .padding(horizontal = 2.dp))
+                        .padding(horizontal = 2.dp),
+                )
             }
             if (heading != "") {
                 Text(
                     text = heading,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
-                    style = headingStyle
+                    style = headingStyle,
                 )
             }
             trailingCompose()
         }
     },
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(verticalArrangement = verticalArrangement,
+    Column(
+        verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
-        modifier = (modifier
-            .fillMaxWidth()
-            .padding(top = top, bottom = bottom, start = start, end = end)
-            .verticalScroll(scrollState)).takeIf { isScrollEnabled } ?: (modifier.padding(
-            top = top, bottom = bottom, start = start, end = end
-        ))) {
+        modifier =
+        (
+            modifier
+                .fillMaxWidth()
+                .padding(top = top, bottom = bottom, start = start, end = end)
+                .verticalScroll(scrollState)
+            ).takeIf { isScrollEnabled } ?: (
+            modifier.padding(
+                top = top, bottom = bottom, start = start, end = end,
+            )
+            ),
+    ) {
         header()
 
         content()

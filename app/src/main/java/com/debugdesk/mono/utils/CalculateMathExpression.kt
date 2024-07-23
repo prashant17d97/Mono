@@ -8,17 +8,23 @@ class CalculateMathExpression {
 
     companion object {
         private val calculateMathExpression = CalculateMathExpression()
-        fun String.calculate() = with(calculateMathExpression) {
-            df.format(evaluate(this@calculate))
-                .takeIf {
-                    evaluate(this@calculate) - evaluate(this@calculate).toInt() != 0.0
-                } ?: evaluate(
-                this@calculate
-            ).toInt()
-        }
+
+        fun String.calculate() =
+            with(calculateMathExpression) {
+                df.format(evaluate(this@calculate))
+                    .takeIf {
+                        evaluate(this@calculate) - evaluate(this@calculate).toInt() != 0.0
+                    } ?: evaluate(
+                    this@calculate,
+                ).toInt()
+            }
     }
 
-    private fun basic(rightNum: String?, leftNum: String?, op: String?): Double {
+    private fun basic(
+        rightNum: String?,
+        leftNum: String?,
+        op: String?,
+    ): Double {
         return when (op) {
             "+" -> {
                 ((rightNum?.toDouble() ?: 0.0) + (leftNum?.toDouble() ?: 0.0))
@@ -42,7 +48,10 @@ class CalculateMathExpression {
         }
     }
 
-    private fun elemInside(mainString: String?, listCheck: List<String>): Boolean {
+    private fun elemInside(
+        mainString: String?,
+        listCheck: List<String>,
+    ): Boolean {
         for (ops in listCheck) {
             if (mainString?.contains(ops)!!) {
                 return true
@@ -51,7 +60,10 @@ class CalculateMathExpression {
         return false
     }
 
-    private fun getOpIndex(query: String?, operations: List<String>): Array<Int> {
+    private fun getOpIndex(
+        query: String?,
+        operations: List<String>,
+    ): Array<Int> {
         var allIndex: Array<Int> = arrayOf()
         var dupQuery = query
         while (elemInside(dupQuery, operations)) {
@@ -60,7 +72,7 @@ class CalculateMathExpression {
                     allIndex = allIndex.plusElement(dupQuery.indexOf(op))
                     dupQuery = dupQuery.substring(
                         0,
-                        dupQuery.indexOf(op)
+                        dupQuery.indexOf(op),
                     ) + '1' + dupQuery.substring(dupQuery.indexOf(op) + 1)
                 }
             }
@@ -77,7 +89,7 @@ class CalculateMathExpression {
         var calcQuery = query
         while (elemInside(
                 calcQuery,
-                operations
+                operations,
             ) && (allIndex.size > 1 || if (allIndex.isEmpty()) true else allIndex[0] != 0)
         ) {
             for (op in operations) {
@@ -96,19 +108,35 @@ class CalculateMathExpression {
                     val leftNum =
                         calcQuery.slice(if (leftIndex == 0) leftIndex until indexOp else leftIndex + 1 until indexOp)
                     val result = basic(leftNum, rightNum, op)
-                    calcQuery = (if (leftIndex != 0) calcQuery.substring(
-                        0,
-                        leftIndex + 1
-                    ) else "") + result.toString() + (if (rightIndex != calcQuery.lastIndex) calcQuery.substring(
-                        rightIndex..calcQuery.lastIndex
-                    ) else "")
+                    calcQuery = (
+                        if (leftIndex != 0) {
+                            calcQuery.substring(
+                                0,
+                                leftIndex + 1,
+                            )
+                        } else {
+                            ""
+                        }
+                        ) + result.toString() + (
+                        if (rightIndex != calcQuery.lastIndex) {
+                            calcQuery.substring(
+                                rightIndex..calcQuery.lastIndex,
+                            )
+                        } else {
+                            ""
+                        }
+                        )
                 }
             }
         }
         return calcQuery?.toDouble() ?: 0.0
     }
 
-    private fun getAllIndex(query: String?, char: Char, replacement: String = "%"): List<Int> {
+    private fun getAllIndex(
+        query: String?,
+        char: Char,
+        replacement: String = "%",
+    ): List<Int> {
         var myQuery = query
         var indexes: List<Int> = listOf()
         while (char in myQuery!!) {
@@ -143,23 +171,36 @@ class CalculateMathExpression {
             val startBrackets = getBrackets(calcQuery)[0]
             val endBrackets = getBrackets(calcQuery)[1]
             val inBrackets = calcQuery.slice(startBrackets + 1 until endBrackets)
-            calcQuery = if ('(' in inBrackets && ')' in inBrackets) {
-                val inBracValue = evaluate(inBrackets)
-                calcQuery.substring(
-                    0,
-                    startBrackets
-                ) + inBracValue.toString() + (if (endBrackets == calcQuery.lastIndex) "" else calcQuery.substring(
-                    endBrackets + 1..calcQuery.lastIndex
-                ))
-            } else {
-                val inBracValue = parseSimple(inBrackets)
-                calcQuery.substring(
-                    0,
-                    startBrackets
-                ) + inBracValue.toString() + (if (endBrackets == calcQuery.lastIndex) "" else calcQuery.substring(
-                    endBrackets + 1..calcQuery.lastIndex
-                ))
-            }
+            calcQuery =
+                if ('(' in inBrackets && ')' in inBrackets) {
+                    val inBracValue = evaluate(inBrackets)
+                    calcQuery.substring(
+                        0,
+                        startBrackets,
+                    ) + inBracValue.toString() + (
+                        if (endBrackets == calcQuery.lastIndex) {
+                            ""
+                        } else {
+                            calcQuery.substring(
+                                endBrackets + 1..calcQuery.lastIndex,
+                            )
+                        }
+                        )
+                } else {
+                    val inBracValue = parseSimple(inBrackets)
+                    calcQuery.substring(
+                        0,
+                        startBrackets,
+                    ) + inBracValue.toString() + (
+                        if (endBrackets == calcQuery.lastIndex) {
+                            ""
+                        } else {
+                            calcQuery.substring(
+                                endBrackets + 1..calcQuery.lastIndex,
+                            )
+                        }
+                        )
+                }
             index++
         }
 
@@ -169,5 +210,5 @@ class CalculateMathExpression {
 
 enum class CalculatorEnum {
     Cancel,
-    Okay
+    Okay,
 }

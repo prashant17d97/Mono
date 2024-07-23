@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.splash
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,25 +28,24 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun WelcomeScreen(
     navController: NavHostController,
-    viewModel: MainViewModel = koinViewModel()
+    viewModel: MainViewModel = koinViewModel(),
 ) {
     val isIntroCompleted by viewModel.isIntroCompleted.collectAsState()
     MonoColumn(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxSize()
             .background(color = colorResource(R.color.logoBackground))
             .padding(dp10),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Image(
             modifier = Modifier.size(dp240),
             painter = painterResource(id = R.drawable.mono_splash),
-            contentDescription = "Logo"
+            contentDescription = "Logo",
         )
     }
-
 
     TimerDelay {
         if (isIntroCompleted) {
@@ -66,9 +64,7 @@ fun WelcomeScreen(
             }
         }
     }
-
 }
-
 
 @Preview
 @Composable

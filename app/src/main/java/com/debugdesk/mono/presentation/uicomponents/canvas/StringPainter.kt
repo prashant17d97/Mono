@@ -21,15 +21,16 @@ class StringPainter(private val text: String, private val textStyle: TextStyle) 
     override val intrinsicSize = androidx.compose.ui.geometry.Size.Unspecified
 
     override fun DrawScope.onDraw() {
-        val paint = TextPaint().apply {
-            color = textStyle.color.toArgb()
-            textSize = textStyle.fontSize.toPx()
-        }
+        val paint =
+            TextPaint().apply {
+                color = textStyle.color.toArgb()
+                textSize = textStyle.fontSize.toPx()
+            }
         drawContext.canvas.nativeCanvas.drawText(
             text,
             0f,
             paint.textSize,
-            paint
+            paint,
         )
     }
 }
@@ -37,10 +38,11 @@ class StringPainter(private val text: String, private val textStyle: TextStyle) 
 @Composable
 fun rememberStringPainter(
     text: String,
-    textStyle: TextStyle = TextStyle.Default.copy(
-        fontSize = 16.sp,
-        color = Color.Black
-    )
+    textStyle: TextStyle =
+        TextStyle.Default.copy(
+            fontSize = 16.sp,
+            color = Color.Black,
+        ),
 ): Painter {
     return remember(text, textStyle) {
         StringPainter(text, textStyle)

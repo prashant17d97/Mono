@@ -18,27 +18,27 @@ import com.debugdesk.mono.utils.Dp.dp60
 @Composable
 fun LottieAnimationPreloader(
     modifier: Modifier = Modifier,
-    lottieJson: Int = R.raw.login
+    lottieJson: Int = R.raw.login,
 ) {
     val preloaderLottieComposition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(
-            resId = lottieJson
-        )
+            resId = lottieJson,
+        ),
     )
 
     val preloaderProgress by animateLottieCompositionAsState(
         preloaderLottieComposition,
         iterations = LottieConstants.IterateForever,
-        isPlaying = true
+        isPlaying = true,
     )
-
 
     LottieAnimation(
         composition = preloaderLottieComposition,
         progress = { preloaderProgress },
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .height(dp240)
-            .padding(bottom = dp60)
+            .padding(bottom = dp60),
     )
 }

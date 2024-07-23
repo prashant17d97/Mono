@@ -15,24 +15,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CharacterCard(character: String, itemPerRow: Int, action: (String) -> Unit) {
+fun CharacterCard(
+    character: String,
+    itemPerRow: Int,
+    action: (String) -> Unit,
+) {
     val cardBackground = MaterialTheme.colorScheme.background
     val configuration = LocalConfiguration.current
     val size =
-        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) (configuration.screenWidthDp - 70) / itemPerRow
-        else (configuration.screenWidthDp - 70) / (itemPerRow) * 2
+        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            (configuration.screenWidthDp - 70) / itemPerRow
+        } else {
+            (configuration.screenWidthDp - 70) / (itemPerRow) * 2
+        }
 
     Box(
-        modifier = Modifier
+        modifier =
+        Modifier
             .size(size.dp)
             .clickable {
                 action(character)
             }
             .background(
-                color = when (character) {
-                    "+", "-", "x", "/", "=" -> cardBackground/*.copy(alpha = 0.9f)*/
+                color =
+                when (character) {
+                    "+", "-", "x", "/", "=" -> cardBackground // .copy(alpha = 0.9f)
                     else -> cardBackground
-                }
+                },
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -42,5 +51,4 @@ fun CharacterCard(character: String, itemPerRow: Int, action: (String) -> Unit) 
             style = MaterialTheme.typography.headlineSmall,
         )
     }
-
 }

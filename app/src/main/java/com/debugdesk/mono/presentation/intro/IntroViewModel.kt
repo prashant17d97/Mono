@@ -18,33 +18,32 @@ import kotlinx.coroutines.launch
 
 class IntroViewModel(
     private val appConfigManager: AppConfigManager,
-    private val repository: Repository
+    private val repository: Repository,
 ) : ViewModel() {
-
     init {
         viewModelScope.launch(Dispatchers.IO) {
             repository.fetchCategories()
         }
     }
 
-    fun getIntroModel(context: Context): List<IntroModel> = listOf(
-        IntroModel(
-            heading = context.getString(R.string.introHeading1),
-            description = context.getString(R.string.introDescription1),
-            img = R.drawable.intro_img_one
-        ),
-        IntroModel(
-            heading = context.getString(R.string.introHeading2),
-            description = context.getString(R.string.introDescription2),
-            img = R.drawable.intro_img_two
-        ),
-        IntroModel(
-            heading = context.getString(R.string.introHeading3),
-            description = context.getString(R.string.introDescription3),
-            img = R.drawable.intro_img_three
-        ),
-    )
-
+    fun getIntroModel(context: Context): List<IntroModel> =
+        listOf(
+            IntroModel(
+                heading = context.getString(R.string.introHeading1),
+                description = context.getString(R.string.introDescription1),
+                img = R.drawable.intro_img_one,
+            ),
+            IntroModel(
+                heading = context.getString(R.string.introHeading2),
+                description = context.getString(R.string.introDescription2),
+                img = R.drawable.intro_img_two,
+            ),
+            IntroModel(
+                heading = context.getString(R.string.introHeading3),
+                description = context.getString(R.string.introDescription3),
+                img = R.drawable.intro_img_three,
+            ),
+        )
 
     fun saveSomeCategory(context: Context) {
         // Added default categories for new User
@@ -65,7 +64,7 @@ class IntroViewModel(
                     category = context.getString(R.string.food),
                     categoryIcon = R.drawable.food,
                     categoryType = ExpenseType.Expense.name,
-                )
+                ),
             ).forEach {
                 if (it !in savedCategory) {
                     repository.saveCategories(it)
@@ -74,13 +73,14 @@ class IntroViewModel(
         }
     }
 
-    val seconds = (0..100)
-        .asSequence()
-        .asFlow()
-        .map {
-            if (it in 0..9) "0$it" else it
-        }
-        .onEach { delay(1000) }
+    val seconds =
+        (0..100)
+            .asSequence()
+            .asFlow()
+            .map {
+                if (it in 0..9) "0$it" else it
+            }
+            .onEach { delay(1000) }
 
     fun setIntroFinished() {
         appConfigManager.introCompleted(true)

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,8 +46,6 @@ import com.debugdesk.mono.presentation.uicomponents.SpacerHeight
 import com.debugdesk.mono.presentation.uicomponents.SpacerWidth
 import com.debugdesk.mono.utils.Dp.dp10
 import com.debugdesk.mono.utils.Dp.dp20
-import com.debugdesk.mono.utils.commonfunctions.TimeUtils.calculateTimeStamps
-import com.debugdesk.mono.utils.commonfunctions.TimeUtils.getTime
 import com.debugdesk.mono.utils.enums.Buttons
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
@@ -54,22 +53,66 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun Reminder(navHostController: NavHostController, viewModel: ReminderVM = koinViewModel()) {
+fun Reminder(
+    navHostController: NavHostController,
+    viewModel: ReminderVM = koinViewModel(),
+) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+
     viewModel.fetchAppInitialData()
+
+    val format = stringArrayResource(id = R.array.format)
+    val hourState = rememberLazyListState()
+    val minuteState = rememberLazyListState()
+    val formatState = rememberLazyListState()
+    val hr = remember { derivedStateOf { hourState.firstVisibleItemIndex } }.value
+    val selectedMinute = remember { derivedStateOf { minuteState.firstVisibleItemIndex } }.value
+    val formatA = remember { derivedStateOf { formatState.firstVisibleItemIndex } }.value
+
+    LaunchedEffect(
+        hourState.isScrollInProgress,
+        minuteState.isScrollInProgress,
+        formatState.isScrollInProgress,
+    ) {
+        Log.d(
+            "Reminder",
+            "Reminder: ${hourState.isScrollInProgress}, ${minuteState.isScrollInProgress}, ${formatState.isScrollInProgress}",
+        )
+        viewModel.handleEvent(
+            ReminderEvent.Scrolling(hourState.isScrollInProgress || minuteState.isScrollInProgress || formatState.isScrollInProgress),
+            context = context,
+        )
+        if (!hourState.isScrollInProgress || !minuteState.isScrollInProgress || !formatState.isScrollInProgress) {
+            Log.d("Reminder", "Reminder: inIf ")
+            viewModel.handleEvent(
+                ReminderEvent.UpdateTime(
+                    hour = hr,
+                    minute = selectedMinute,
+                    isPM = format[formatA] == context.getString(R.string.PM),
+                ),
+                context = context,
+            )
+        }
+    }
     ReminderView(
         state = state,
+        hourState = hourState,
+        minuteState = minuteState,
+        formatState = formatState,
         onEvent = { event -> viewModel.handleEvent(event, context = context) },
-        navHostController = navHostController
+        navHostController = navHostController,
     )
 }
 
 @Composable
 fun ReminderView(
     state: ReminderState,
+    hourState: LazyListState = rememberLazyListState(),
+    minuteState: LazyListState = rememberLazyListState(),
+    formatState: LazyListState = rememberLazyListState(),
     onEvent: (ReminderEvent) -> Unit,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     MonoColumn(
         modifier = Modifier.fillMaxSize(),
@@ -85,28 +128,26 @@ fun ReminderView(
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             ReminderCard(
                 hour = state.hour,
                 minute = state.minute,
-                currentTimeCallBack = { isScrolling, timeStamp ->
-                    Log.d("TAG", "ReminderView: ${timeStamp.getTime()}")
-                    onEvent(ReminderEvent.Scrolling(isScrolling))
-                    onEvent(ReminderEvent.UpdateTime(timeStamp))
-                }
+                hourState = hourState,
+                minuteState = minuteState,
+                formatState = formatState,
             )
             SpacerHeight(value = dp10)
             Text(
                 text = stringResource(id = R.string.reminderCaption),
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.labelLarge,
             )
         }
 
         CustomButton(
             text = stringResource(id = state.buttonString),
             modifier = Modifier.fillMaxWidth(),
-            status = state.buttonState
+            status = state.buttonState,
         ) {
             when (it) {
                 Buttons.Active -> onEvent(ReminderEvent.SetReminder)
@@ -119,20 +160,18 @@ fun ReminderView(
 
 @OptIn(ExperimentalSnapperApi::class)
 @Composable
-fun ReminderCard(hour: Int, minute: Int, currentTimeCallBack: (Boolean, Long) -> Unit) {
-    val context = LocalContext.current
+fun ReminderCard(
+    hour: Int,
+    minute: Int,
+    hourState: LazyListState = rememberLazyListState(),
+    minuteState: LazyListState = rememberLazyListState(),
+    formatState: LazyListState = rememberLazyListState(),
+) {
     val hours = stringArrayResource(id = R.array.hours_12)
     val minutes = stringArrayResource(id = R.array.minutes)
     val format = stringArrayResource(id = R.array.format)
     val density = LocalDensity.current
     val itemHeight = 80 // Adjust this value to change the height of each item
-    val hourState = rememberLazyListState()
-    val minuteState = rememberLazyListState()
-    val formatState = rememberLazyListState()
-    val hr = remember { derivedStateOf { hourState.firstVisibleItemIndex } }.value
-    val selectedMinute = remember { derivedStateOf { minuteState.firstVisibleItemIndex } }.value
-    val formatA = remember { derivedStateOf { formatState.firstVisibleItemIndex } }.value
-
 
     LaunchedEffect(Unit) {
         val centerIndex = hourState.layoutInfo.visibleItemsInfo.size / 2
@@ -154,18 +193,23 @@ fun ReminderCard(hour: Int, minute: Int, currentTimeCallBack: (Boolean, Long) ->
         }
         delay(600)
         hourState.animateScrollBy(
-            value = with(density) { (itemHeight.dp).toPx() } * (hour - (13.takeIf { hour > 12 }
-                ?: 1)),
-            animationSpec = tween(1000)
+            value =
+            with(density) { (itemHeight.dp).toPx() } * (
+                hour - (
+                    13.takeIf { hour > 12 }
+                        ?: 1
+                    )
+                ),
+            animationSpec = tween(1000),
         )
         minuteState.animateScrollBy(
             value = with(density) { (itemHeight.dp).toPx() } * (minute),
-            animationSpec = tween(2000.takeIf { minute > 5 } ?: 100)
+            animationSpec = tween(2000.takeIf { minute > 5 } ?: 100),
         )
         if (hour > 12 && minute >= 0) {
             formatState.animateScrollBy(
                 value = with(density) { (itemHeight.dp).toPx() } * 1,
-                animationSpec = tween(500)
+                animationSpec = tween(500),
             )
         }
     }
@@ -173,64 +217,69 @@ fun ReminderCard(hour: Int, minute: Int, currentTimeCallBack: (Boolean, Long) ->
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         LazyColumn(
             state = hourState,
             flingBehavior = rememberSnapperFlingBehavior(hourState),
-            modifier = Modifier
+            modifier =
+            Modifier
                 .height((itemHeight).dp)
                 .weight(1f)
                 .border(
                     width = 2.dp,
                     color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(20.dp)
-                )
+                    shape = RoundedCornerShape(20.dp),
+                ),
         ) {
             itemsIndexed(hours) { _, item ->
                 Box(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
                         .height(itemHeight.dp)
-                        .padding(horizontal = 30.dp), contentAlignment = Alignment.Center
+                        .padding(horizontal = 30.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = item,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineMedium,
                     )
                 }
             }
         }
         Text(
             text = ":",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(horizontal = 10.dp)
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(horizontal = 10.dp),
         )
         LazyColumn(
             state = minuteState,
             flingBehavior = rememberSnapperFlingBehavior(minuteState),
-            modifier = Modifier
+            modifier =
+            Modifier
                 .height((itemHeight).dp)
                 .weight(1f)
                 .border(
                     width = 2.dp,
                     color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(20.dp)
-                )
+                    shape = RoundedCornerShape(20.dp),
+                ),
         ) {
             itemsIndexed(minutes) { _, item ->
                 Box(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
                         .height(itemHeight.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = item,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier,
                     )
                 }
             }
@@ -240,40 +289,31 @@ fun ReminderCard(hour: Int, minute: Int, currentTimeCallBack: (Boolean, Long) ->
         LazyColumn(
             state = formatState,
             flingBehavior = rememberSnapperFlingBehavior(formatState),
-            modifier = Modifier
+            modifier =
+            Modifier
                 .weight(1f)
-                .height((itemHeight).dp)
+                .height((itemHeight).dp),
         ) {
             itemsIndexed(format) { _, item ->
                 Box(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
                         .height(itemHeight.dp)
-                        .padding(horizontal = 30.dp), contentAlignment = Alignment.Center
+                        .padding(horizontal = 30.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = item,
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-
+                        modifier = Modifier,
                     )
                 }
             }
         }
     }
-
-
-    currentTimeCallBack(
-        hourState.isScrollInProgress || minuteState.isScrollInProgress || formatState.isScrollInProgress,
-        calculateTimeStamps(
-            hourOfDay = hr,
-            minute = selectedMinute,
-            isPM = format[formatA] == context.getString(R.string.PM)
-        )
-    )
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
@@ -281,10 +321,8 @@ fun ReminderCard(hour: Int, minute: Int, currentTimeCallBack: (Boolean, Long) ->
 fun ReminderPreview() {
     PreviewTheme {
         ReminderCard(
-            hour = 22,
-            minute = 21,
-            ) { _, _ ->
-
-        }
+            hour = 2,
+            minute = 9,
+        )
     }
 }

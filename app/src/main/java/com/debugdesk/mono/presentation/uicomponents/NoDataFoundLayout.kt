@@ -36,33 +36,35 @@ fun NoDataFoundLayout(
     @StringRes
     text: Int = R.string.noTransactionFound,
     show: Boolean = false,
-    content: @Composable AnimatedVisibilityScope.() -> Unit = {}
+    content: @Composable AnimatedVisibilityScope.() -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AnimatedContent(
             targetState = show,
             transitionSpec = {
                 if (targetState > initialState) {
                     (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> -height } + fadeOut())
+                        slideOutVertically { height -> -height } + fadeOut(),
+                    )
                 } else {
                     (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> height } + fadeOut())
+                        slideOutVertically { height -> height } + fadeOut(),
+                    )
                 }.using(
-                    SizeTransform(clip = false)
+                    SizeTransform(clip = false),
                 )
             },
-            label = ""
+            label = "",
         ) {
             if (it) {
                 Column(
                     modifier = modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(dp20, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(
                         painter = painterResource(id = image),
@@ -76,12 +78,9 @@ fun NoDataFoundLayout(
             } else {
                 content()
             }
-
         }
     }
-
 }
-
 
 @Preview
 @Composable

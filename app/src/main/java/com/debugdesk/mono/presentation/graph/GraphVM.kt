@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import com.debugdesk.mono.domain.repo.Repository
 import com.debugdesk.mono.ui.appconfig.AppConfigManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,18 +13,23 @@ import org.koin.core.component.KoinComponent
 
 class GraphVM(
     private val repository: Repository,
-    private val appConfigManager: AppConfigManager
+    private val appConfigManager: AppConfigManager,
 ) : ViewModel(), KoinComponent {
-
     private val _graphState: MutableStateFlow<GraphState> =
         MutableStateFlow(GraphState())
-    val graphState: StateFlow<GraphState> = _graphState
+    val graphState: StateFlow<GraphState>
+        get() = _graphState
+    private var isRequestingForNewFetch: Int? = null
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             observedCategoryTransaction()
             observedAppConfigManager()
         }
+    }
+
+    companion object {
+        private val TAG = GraphVM::class.java.simpleName
     }
 
     private suspend fun observedAppConfigManager() {
@@ -33,7 +37,7 @@ class GraphVM(
             _graphState.tryEmit(
                 graphState.value.copy(
                     currencyIcon = appConfigProperties.selectedCurrencyIconString,
-                )
+                ),
             )
         }
     }
@@ -43,27 +47,24 @@ class GraphVM(
             _graphState.tryEmit(
                 graphState.value.copy(
                     transaction = transaction,
-                    isLoading = if (transaction.isEmpty()) {
-                        EffectState.NoDataFound
-                    } else {
-                        EffectState.Loaded
-                    }
-                )
+                ),
             )
         }
     }
 
     fun fetchTransaction(categoryId: Int) {
-        _graphState.tryEmit(
-            graphState.value.copy(isLoading = EffectState.Loading)
-        )
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(500)
-            repository.fetchAllTransactionFromCategoryID(categoryId)
+        if (isRequestingForNewFetch != categoryId) {
+            isRequestingForNewFetch = categoryId
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.fetchAllTransactionFromCategoryID(categoryId)
+            }
         }
     }
 
-    fun handleGraphIntent(graphIntent: GraphIntent, navHostController: NavHostController) {
+    fun handleGraphIntent(
+        graphIntent: GraphIntent,
+        navHostController: NavHostController,
+    ) {
         when (graphIntent) {
             GraphIntent.NavigateBack -> navHostController.popBackStack()
             GraphIntent.PromptFilter -> handleFilterBSM(true)

@@ -18,7 +18,6 @@ fun AmountTextFieldCalculator(
     amountTfState: AmountTfState,
     onTextFieldCalculatorIntent: (TextFieldCalculatorIntent) -> Unit,
 ) {
-
     MonoOutlineTextField(
         leadingIcon = amountTfState.currencyIcon,
         placeHolderText = stringResource(id = R.string.zero),
@@ -29,43 +28,45 @@ fun AmountTextFieldCalculator(
         onValueChange = {
             onTextFieldCalculatorIntent(
                 TextFieldCalculatorIntent.OnValueChange(
-                    amountTfState.amountValue
-                )
+                    amountTfState.amountValue,
+                ),
             )
         },
         enabled = false,
         trailingClick = {
             onTextFieldCalculatorIntent(
                 TextFieldCalculatorIntent.OpenDialog(
-                    openDialog = !amountTfState.openDialog
-                )
+                    openDialog = !amountTfState.openDialog,
+                ),
             )
         },
         fieldClickBack = {
             onTextFieldCalculatorIntent(
                 TextFieldCalculatorIntent.OpenDialog(
-                    openDialog = !amountTfState.openDialog
-                )
+                    openDialog = !amountTfState.openDialog,
+                ),
             )
-        }
+        },
     )
 
     if (amountTfState.openDialog) {
         PopUp(dismiss = {
             onTextFieldCalculatorIntent(TextFieldCalculatorIntent.OpenDialog(openDialog = false))
         }) {
-            Calculator(dotCount = 1.takeIf { amountTfState.amountValue.contains(".") } ?: 0,
+            Calculator(
+                dotCount = 1.takeIf { amountTfState.amountValue.contains(".") } ?: 0,
                 priorValue = amountTfState.amountValue,
                 onValueReturn = { operationType, value ->
                     onTextFieldCalculatorIntent(TextFieldCalculatorIntent.OnValueChange(value))
                     onTextFieldCalculatorIntent(
                         TextFieldCalculatorIntent.OpenDialog(
-                            openDialog = when (operationType) {
+                            openDialog =
+                            when (operationType) {
                                 CalculatorEnum.Cancel, CalculatorEnum.Okay -> false
-                            }
-                        )
+                            },
+                        ),
                     )
-                }
+                },
             )
         }
     }
@@ -76,10 +77,11 @@ fun AmountTextFieldCalculator(
 fun AmountPrev() {
     PreviewTheme {
         AmountTextFieldCalculator(
-            amountTfState = AmountTfState(
+            amountTfState =
+            AmountTfState(
                 currencyIcon = R.drawable.ic_currency,
-                amountValue = "0.0"
-            )
+                amountValue = "0.0",
+            ),
         ) {}
     }
 }

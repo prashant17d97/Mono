@@ -4,19 +4,18 @@ import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects.INTRO_FINISHED
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreObjects.REMINDER_TIME
 import com.debugdesk.mono.domain.data.local.datastore.DataStoreUtil
-import com.debugdesk.mono.model.RemainderTimeData
+import com.debugdesk.mono.model.ReminderTimeData
 import com.debugdesk.mono.ui.appconfig.defaultconfig.AppConfigProperties
 import com.debugdesk.mono.ui.appconfig.defaultconfig.DefaultConfigProperties
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class AppConfigurationManagerImpl(
-    private val dataStoreUtil: DataStoreUtil
+    private val dataStoreUtil: DataStoreUtil,
 ) : AppConfigManager {
-
     private val _appConfigProperties: MutableStateFlow<AppConfigProperties> =
         MutableStateFlow(
-            DefaultConfigProperties
+            DefaultConfigProperties,
         )
 
     private val _isIntroCompleted: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -24,10 +23,10 @@ class AppConfigurationManagerImpl(
 
     override val appConfigProperties: StateFlow<AppConfigProperties> = _appConfigProperties
 
-    private val _remainderTimeData: MutableStateFlow<RemainderTimeData> =
-        MutableStateFlow(RemainderTimeData())
-    override val remainderTimeData: StateFlow<RemainderTimeData>
-        get() = _remainderTimeData
+    private val _reminderTimeData: MutableStateFlow<ReminderTimeData> =
+        MutableStateFlow(ReminderTimeData())
+    override val reminderTimeData: StateFlow<ReminderTimeData>
+        get() = _reminderTimeData
 
     override fun subscribeNewAppConfig(appConfigProperties: AppConfigProperties) {
         _appConfigProperties.tryEmit(appConfigProperties)
@@ -45,7 +44,7 @@ class AppConfigurationManagerImpl(
     override fun restorePreviousAppConfig() {
         dataStoreUtil.retrieveObject(
             DataStoreObjects.APP_CONFIG_PROPERTIES,
-            AppConfigProperties::class.java
+            AppConfigProperties::class.java,
         ) {
             _appConfigProperties.tryEmit(it ?: DefaultConfigProperties)
         }
@@ -55,15 +54,15 @@ class AppConfigurationManagerImpl(
         dataStoreUtil.saveObject(DataStoreObjects.APP_CONFIG_PROPERTIES, _appConfigProperties.value)
     }
 
-    override fun saveReminderTimeData(remainderTimeData: RemainderTimeData) {
-        dataStoreUtil.saveObject(REMINDER_TIME, remainderTimeData)
+    override fun saveReminderTimeData(reminderTimeData: ReminderTimeData) {
+        dataStoreUtil.saveObject(REMINDER_TIME, reminderTimeData)
         fetchAppInitialData()
     }
 
     override fun fetchAppInitialData() {
         dataStoreUtil.retrieveObject(
             DataStoreObjects.APP_CONFIG_PROPERTIES,
-            AppConfigProperties::class.java
+            AppConfigProperties::class.java,
         ) {
             _appConfigProperties.tryEmit(it ?: DefaultConfigProperties)
         }
@@ -71,8 +70,8 @@ class AppConfigurationManagerImpl(
         dataStoreUtil.retrieveKey(INTRO_FINISHED) {
             _isIntroCompleted.tryEmit(it ?: false)
         }
-        dataStoreUtil.retrieveObject(REMINDER_TIME, RemainderTimeData::class.java) {
-            _remainderTimeData.tryEmit(it?:RemainderTimeData())
+        dataStoreUtil.retrieveObject(REMINDER_TIME, ReminderTimeData::class.java) {
+            _reminderTimeData.tryEmit(it ?: ReminderTimeData())
         }
     }
 }

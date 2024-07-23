@@ -26,29 +26,31 @@ data class AlertState(
     val negativeButtonText: Int = R.string.cancel,
     val drawable: Drawable = Drawable.Static(),
     val iconColor: Color = Color.Unspecified,
-    val properties: DialogProperties = DialogProperties(
-        dismissOnBackPress = true,
-        dismissOnClickOutside = true
-    ),
+    val properties: DialogProperties =
+        DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        ),
     val show: Boolean = false,
     val showIcon: Boolean = true,
     val onNegativeClick: () -> Unit = {},
-    val onPositiveClick: () -> Unit = {}
+    val onPositiveClick: () -> Unit = {},
 ) {
     companion object {
-        val NONE = AlertState(
-            title = R.string.alert,
-            message = R.string.delete_all_transactions,
-            positiveButtonText = R.string.okay,
-            negativeButtonText = R.string.cancel,
-            onNegativeClick = {}
-        )
+        val NONE =
+            AlertState(
+                show = false,
+                title = R.string.alert,
+                message = R.string.delete_all_transactions,
+                positiveButtonText = R.string.okay,
+                negativeButtonText = R.string.cancel,
+                onNegativeClick = {},
+            )
     }
 
     val negativeText: String
         @Composable
         get() = stringResource(id = negativeButtonText)
-
 
     val positiveText: String
         @Composable
@@ -56,15 +58,17 @@ data class AlertState(
 
     private val drawableRes: Pair<Painter?, Color>
         @Composable
-        get() = when (val drawable = drawable) {
-            is Drawable.Animated -> drawable.icon?.let {
-                animatedPainterResource(
-                    it
-                )
-            } to drawable.tintColor
+        get() =
+            when (val drawable = drawable) {
+                is Drawable.Animated ->
+                    drawable.icon?.let {
+                        animatedPainterResource(
+                            it,
+                        )
+                    } to drawable.tintColor
 
-            is Drawable.Static -> drawable.icon?.let { painterResource(id = it) } to drawable.tintColor
-        }
+                is Drawable.Static -> drawable.icon?.let { painterResource(id = it) } to drawable.tintColor
+            }
 
     val iconCompose: @Composable (() -> Unit)?
         get() {
@@ -75,19 +79,15 @@ data class AlertState(
                             painter = it,
                             contentDescription = "Icon",
                             modifier = Modifier.size(Dp.dp48),
-                            tint = drawableRes.second
+                            tint = drawableRes.second,
                         )
                     }
                 }
             } else {
                 null
             }
-
         }
-
-
 }
-
 
 sealed class Drawable {
     data class Animated(

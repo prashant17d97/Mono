@@ -21,17 +21,17 @@ import com.debugdesk.mono.utils.SP.sp48
 @Composable
 fun DropDown(
     expanded: Boolean = false,
-    selectedValue: String, items: List<String>,
+    selectedValue: String,
+    items: List<String>,
     onSelected: (String, index: Int) -> Unit,
     onExpend: (Boolean) -> Unit = {},
     heading: @Composable () -> Unit = {
         Text(
             text = selectedValue,
             modifier = Modifier.clickable { onExpend(!expanded) },
-            lineHeight = sp48
+            lineHeight = sp48,
         )
-
-    }
+    },
 ) {
     Box {
         heading()
@@ -39,7 +39,8 @@ fun DropDown(
             expanded = expanded,
             onDismissRequest = {
                 onExpend(false)
-            }) {
+            },
+        ) {
             items.forEachIndexed { index, item ->
                 DropdownMenuItem(onClick = {
                     onSelected(item, index)
@@ -47,16 +48,18 @@ fun DropDown(
                 }, text = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = dp2, alignment = Alignment.CenterHorizontally
-                        )
+                        horizontalArrangement =
+                        Arrangement.spacedBy(
+                            space = dp2,
+                            alignment = Alignment.CenterHorizontally,
+                        ),
                     ) {
                         Text(item)
                         AnimatedVisibility(visible = item == selectedValue) {
                             Icon(
                                 imageVector = Icons.Rounded.Check,
                                 contentDescription = "Selected",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }

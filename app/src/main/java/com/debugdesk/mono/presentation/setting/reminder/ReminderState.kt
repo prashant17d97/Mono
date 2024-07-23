@@ -7,18 +7,21 @@ import com.debugdesk.mono.utils.enums.Buttons
 data class ReminderState(
     val timeStamp: Long = 0L,
     val isScrolling: Boolean = false,
-    private val isReminderActive: Boolean = false
+    val isBefore: Boolean = false,
+    val canceled: Boolean = false,
+    private val isReminderActive: Boolean = false,
 ) {
     private val time =
         (System.currentTimeMillis().takeIf { timeStamp <= 0L } ?: timeStamp).getTime()
     val hour = time[0]
     val minute = time[1]
     val buttonState: Buttons
-        get() = when {
-            isScrolling -> Buttons.Disable
-            isReminderActive -> Buttons.Inactive
-            else -> Buttons.Active
-        }
+        get() =
+            when {
+                isScrolling -> Buttons.Disable
+                isReminderActive -> Buttons.Inactive
+                else -> Buttons.Active
+            }
 
     val buttonString: Int
         get() = if (!isReminderActive) R.string.setReminder else R.string.removeReminder
@@ -26,7 +29,11 @@ data class ReminderState(
 
 sealed class ReminderEvent {
     data object SetReminder : ReminderEvent()
+
     data object RemoveReminder : ReminderEvent()
-    data class UpdateTime(val timeStamp: Long) : ReminderEvent()
+
+    data class UpdateTime(val hour: Int, val minute: Int, val isPM: Boolean) :
+        ReminderEvent()
+
     data class Scrolling(val isScrolling: Boolean) : ReminderEvent()
 }

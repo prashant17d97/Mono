@@ -11,14 +11,18 @@ data class GraphState(
     @StringRes
     val currencyIcon: Int = R.string.inrIcon,
     val promptFilter: Boolean = false,
-    val isLoading: EffectState = EffectState.Loaded
-){
+) {
     val distributedTransaction = transaction.distributeTransactionsByDate()
-
+    val graphState: EffectState
+        get() =
+            when {
+                transaction.isEmpty() -> EffectState.NoDataFound
+                else -> EffectState.Loaded
+            }
 }
 
 enum class EffectState {
-    Loading,
     Loaded,
-    NoDataFound
+    NoDataFound,
+    NONE,
 }

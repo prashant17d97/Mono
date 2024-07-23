@@ -36,7 +36,7 @@ fun BottomSheetDialog(
     onDismiss: (Boolean) -> Unit,
     onCamera: () -> Unit,
     onGallery: () -> Unit,
-    bottomSheetScaffoldState: SheetState = rememberModalBottomSheetState()
+    bottomSheetScaffoldState: SheetState = rememberModalBottomSheetState(),
 ) {
     val scope = rememberCoroutineScope()
     AnimatedVisibility(visible = show) {
@@ -47,13 +47,16 @@ fun BottomSheetDialog(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = modifier
+                modifier =
+                modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(20.dp),
             ) {
-                Column(verticalArrangement = Arrangement.Top,
+                Column(
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .clickable {
                             scope
                                 .launch { bottomSheetScaffoldState.hide() }
@@ -64,25 +67,29 @@ fun BottomSheetDialog(
                                     onCamera()
                                 }
                         }
-                        .padding(10.dp)) {
+                        .padding(10.dp),
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_camera),
                         contentDescription = stringResource(id = R.string.camera),
-                        colorFilter = ColorFilter.tint(
-                            MaterialTheme.colorScheme.primary
+                        colorFilter =
+                        ColorFilter.tint(
+                            MaterialTheme.colorScheme.primary,
                         ),
-                        modifier = Modifier.size(60.dp)
+                        modifier = Modifier.size(60.dp),
                     )
 
                     SpacerHeight(value = dp10)
                     Text(
                         text = stringResource(id = R.string.camera),
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-                Column(verticalArrangement = Arrangement.Top,
+                Column(
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .clickable {
                             scope
                                 .launch { bottomSheetScaffoldState.hide() }
@@ -92,23 +99,22 @@ fun BottomSheetDialog(
                                     }
                                     onGallery()
                                 }
-
                         }
-                        .padding(10.dp)) {
+                        .padding(10.dp),
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_gallary),
                         contentDescription = stringResource(id = R.string.gallery),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier.size(60.dp)
+                        modifier = Modifier.size(60.dp),
                     )
                     SpacerHeight(value = dp10)
                     Text(
                         text = stringResource(id = R.string.gallery),
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
-
         }
     }
 }

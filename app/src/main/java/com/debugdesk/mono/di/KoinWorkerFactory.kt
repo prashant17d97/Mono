@@ -10,14 +10,15 @@ class KoinWorkerFactory : WorkerFactory(), KoinComponent {
     override fun createWorker(
         appContext: Context,
         workerClassName: String,
-        workerParameters: WorkerParameters
+        workerParameters: WorkerParameters,
     ): Worker? {
         return try {
             val workerClass = Class.forName(workerClassName).asSubclass(Worker::class.java)
-            val constructor = workerClass.getDeclaredConstructor(
-                Context::class.java,
-                WorkerParameters::class.java
-            )
+            val constructor =
+                workerClass.getDeclaredConstructor(
+                    Context::class.java,
+                    WorkerParameters::class.java,
+                )
             constructor.newInstance(appContext, workerParameters)
         } catch (e: Exception) {
             e.printStackTrace()

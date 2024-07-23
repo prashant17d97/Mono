@@ -55,7 +55,7 @@ fun CustomOutlineTextField(
     cornerShape: Dp = 10.dp,
     height: Dp = TextFieldDefaults.MinHeight,
     placeHolderText: String,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     singleLine: Boolean = true,
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Decimal,
@@ -78,62 +78,79 @@ fun CustomOutlineTextField(
 //        val width = LocalConfiguration.current.screenWidthDp
     val context = LocalContext.current
 
-    Row(horizontalArrangement = when {
-        leadingIcon != null && trailingIcon == null -> Arrangement.Start
-        leadingIcon == null && trailingIcon != null -> Arrangement.SpaceBetween
-        else -> Arrangement.Center
-    },
+    Row(
+        horizontalArrangement =
+        when {
+            leadingIcon != null && trailingIcon == null -> Arrangement.Start
+            leadingIcon == null && trailingIcon != null -> Arrangement.SpaceBetween
+            else -> Arrangement.Center
+        },
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .padding(
-                top = top, start = start, end = end, bottom = bottom
+                top = top,
+                start = start,
+                end = end,
+                bottom = bottom,
             )
             .onSizeChanged { size ->
                 onHeightChange(size.height)
             }
-            .border(width = 1.dp,
+            .border(
+                width = 1.dp,
                 color = MaterialTheme.colorScheme.primary.takeIf { inFocus } ?: disableButton,
-                shape = RoundedCornerShape(cornerShape))
+                shape = RoundedCornerShape(cornerShape),
+            )
             .defaultMinSize(
-                minWidth = TextFieldDefaults.MinWidth, minHeight = height
+                minWidth = TextFieldDefaults.MinWidth,
+                minHeight = height,
             )
             .background(
                 MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(cornerShape)
-            )) {
+                shape = RoundedCornerShape(cornerShape),
+            ),
+    ) {
         if (leadingIcon != null) {
             Image(
                 painter = painterResource(id = leadingIcon),
                 contentDescription = "LeadingIcon",
                 contentScale = ContentScale.Inside,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
-                modifier = Modifier
+                modifier =
+                Modifier
                     .background(
                         MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(
-                            topStart = cornerShape, bottomStart = cornerShape
-                        )
+                        shape =
+                        RoundedCornerShape(
+                            topStart = cornerShape,
+                            bottomStart = cornerShape,
+                        ),
                     )
-                    .size(width = TextFieldDefaults.MinHeight, height = height)
+                    .size(width = TextFieldDefaults.MinHeight, height = height),
             )
             VerticalDivider(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .size(width = 1.dp, height = height)
-                    .background(color = disableButton)
+                    .background(color = disableButton),
             )
         }
-        TextField(value = value,
+        TextField(
+            value = value,
             textStyle = textStyle,
             singleLine = singleLine,
             enabled = enabled,
             interactionSource = interaction,
-            keyboardOptions = KeyboardOptions(
+            keyboardOptions =
+            KeyboardOptions(
                 keyboardType = keyboardType,
                 imeAction = imeAction,
-                capitalization = capitalization
+                capitalization = capitalization,
             ),
-            keyboardActions = KeyboardActions(
+            keyboardActions =
+            KeyboardActions(
                 onDone = {
                     action()
                     keyBoardControl?.hide()
@@ -141,7 +158,7 @@ fun CustomOutlineTextField(
                 },
                 onNext = {
                     focusManager.moveFocus(
-                        focusDirection = FocusDirection.Next
+                        focusDirection = FocusDirection.Next,
                     )
                 },
                 onGo = {
@@ -166,7 +183,7 @@ fun CustomOutlineTextField(
                         when (imeAction) {
                             ImeAction.Next -> {
                                 focusManager.moveFocus(
-                                    focusDirection = FocusDirection.Next
+                                    focusDirection = FocusDirection.Next,
                                 )
                             }
 
@@ -187,18 +204,16 @@ fun CustomOutlineTextField(
                         errorMsg(context.getString(R.string.characterWarning))
                         when (imeAction) {
                             ImeAction.Done -> {
-
                                 keyBoardControl?.hide()
                                 focusManager.clearFocus()
                             }
 
                             ImeAction.Next -> {
                                 focusManager.moveFocus(
-                                    focusDirection = FocusDirection.Next
+                                    focusDirection = FocusDirection.Next,
                                 )
                             }
                         }
-
                     }
                 }
             },
@@ -206,29 +221,36 @@ fun CustomOutlineTextField(
                 Text(text = placeHolderText, style = textStyle.copy(color = disableButton))
             },
             shape = RoundedCornerShape(cornerShape),
-            colors = TextFieldDefaults.colors(
+            colors =
+            TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.background,
                 unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 disabledContainerColor = MaterialTheme.colorScheme.background,
                 focusedIndicatorColor = Color.Transparent,
                 cursorColor = MaterialTheme.colorScheme.primary,
                 disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
             ),
-            modifier = if (leadingIcon == null && trailingIcon == null) {
+            modifier =
+            if (leadingIcon == null && trailingIcon == null) {
                 modifier
                     .weight(1f)
                     .clickable { fieldClickBack() }
-
-            } else modifier.clickable { fieldClickBack() })
+            } else {
+                modifier.clickable { fieldClickBack() }
+            },
+        )
         if (trailingIcon != null) {
-            Image(painter = painterResource(id = trailingIcon),
+            Image(
+                painter = painterResource(id = trailingIcon),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 contentDescription = "trailingIcon",
                 contentScale = ContentScale.Inside,
-                modifier = Modifier
+                modifier =
+                Modifier
                     .size(height)
-                    .clickable { trailingClick() })
+                    .clickable { trailingClick() },
+            )
         }
     }
     hasFocus(inFocus)

@@ -24,5 +24,5 @@ data class InputState(
     val changesFound: Boolean = false,
     val clickedIndex: Int = 0,
     val appStateManager: AppStateManager = AppStateManagerImpl(),
-    val transactionType: ExpenseType = ExpenseType.Expense
+    val transactionType: ExpenseType = ExpenseType.Expense,
 )

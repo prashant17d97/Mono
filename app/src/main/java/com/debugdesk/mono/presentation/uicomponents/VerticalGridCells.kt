@@ -23,7 +23,7 @@ fun <Generic> VerticalGridCells(
     bottom: Dp = 5.dp,
     start: Dp = 5.dp,
     end: Dp = 5.dp,
-    itemScope: @Composable (Generic, Int, Int) -> Unit = { _, _, _ -> }
+    itemScope: @Composable (Generic, Int, Int) -> Unit = { _, _, _ -> },
 ) {
     val listSize = list.size
     var index = 0
@@ -37,11 +37,11 @@ fun <Generic> VerticalGridCells(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(start = start, top = top, end = end, bottom = bottom)
+        modifier = modifier.padding(start = start, top = top, end = end, bottom = bottom),
     ) {
-
         for (row in 1..totalRow) {
-            LazyRow(modifier = Modifier.fillMaxWidth(),
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
                 userScrollEnabled = false,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -52,7 +52,8 @@ fun <Generic> VerticalGridCells(
                         }
                         index++
                     })
-                })
+                },
+            )
         }
     }
 }

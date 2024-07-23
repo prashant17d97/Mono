@@ -68,20 +68,21 @@ fun MediaBottomSheet(
         }
     }
 
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        scope.launch(Dispatchers.Main) {
-            if (file.exists()) {
-                val imageString = file.toCompressedBase64(context)
-                onProcess(
-                    TransactionIntent.SaveImage(
-                        imagePath = imageString,
-                        imageSource = ImageSource.CAMERA,
-                        createdOn = System.currentTimeMillis()
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+            scope.launch(Dispatchers.Main) {
+                if (file.exists()) {
+                    val imageString = file.toCompressedBase64(context)
+                    onProcess(
+                        TransactionIntent.SaveImage(
+                            imagePath = imageString,
+                            imageSource = ImageSource.CAMERA,
+                            createdOn = System.currentTimeMillis(),
+                        ),
                     )
-                )
+                }
             }
         }
-    }
 
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uriFile ->
@@ -92,8 +93,8 @@ fun MediaBottomSheet(
                         TransactionIntent.SaveImage(
                             imagePath = imageString,
                             imageSource = ImageSource.GALLERY,
-                            createdOn = System.currentTimeMillis()
-                        )
+                            createdOn = System.currentTimeMillis(),
+                        ),
                     )
                 }
             }
@@ -102,12 +103,13 @@ fun MediaBottomSheet(
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            Log.e("CameraAndGallery: ", event.name)
-            if (event == Lifecycle.Event.ON_RESUME) {
-                permissionHandler = null
+        val observer =
+            LifecycleEventObserver { _, event ->
+                Log.e("CameraAndGallery: ", event.name)
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    permissionHandler = null
+                }
             }
-        }
 
         lifecycleOwner.lifecycle.addObserver(observer)
 
@@ -115,7 +117,6 @@ fun MediaBottomSheet(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
 
     permissionHandler?.let {
         PermissionLauncherHandler(
@@ -131,16 +132,16 @@ fun MediaBottomSheet(
         onProcess(TransactionIntent.DismissCameraAndGalleryWindow)
     }
 
-
-    MediaBottomSheetContainer(visible = visible,
+    MediaBottomSheetContainer(
+        visible = visible,
         appStateManager = appStateManager,
         permissionHandler = {
             permissionHandler = it
         },
         dismiss = {
             onProcess(TransactionIntent.DismissCameraAndGalleryWindow)
-        })
-
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,39 +152,39 @@ private fun MediaBottomSheetContainer(
     permissionHandler: (PermissionHandler) -> Unit,
     dismiss: () -> Unit = {},
 ) {
-
     BottomSheet(
-        show = visible, onDismiss = dismiss
+        show = visible,
+        onDismiss = dismiss,
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Top,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(120.dp),
         ) {
             Fab(
                 text = stringResource(id = R.string.gallery),
-                icon = painterResource(id = R.drawable.ic_gallary)
+                icon = painterResource(id = R.drawable.ic_gallary),
             ) {
                 permissionHandler(
                     CameraFunction.getGalleryPermissionHandler(
-                        appStateManager = appStateManager
-                    )
+                        appStateManager = appStateManager,
+                    ),
                 )
             }
 
             Fab(
                 text = stringResource(id = R.string.camera),
-                icon = painterResource(id = R.drawable.camera)
+                icon = painterResource(id = R.drawable.camera),
             ) {
                 permissionHandler(
                     CameraFunction.getCameraPermissionHandler(
-                        appStateManager = appStateManager
-                    )
+                        appStateManager = appStateManager,
+                    ),
                 )
             }
-
         }
     }
 }
@@ -194,9 +195,8 @@ private fun MediaBottomSheetPrev() {
     PreviewTheme {
         Fab(
             text = stringResource(id = R.string.gallery),
-            icon = painterResource(id = R.drawable.camera)
+            icon = painterResource(id = R.drawable.camera),
         ) {
-
         }
     }
 }
@@ -206,26 +206,26 @@ fun Fab(
     modifier: Modifier = Modifier,
     icon: Painter,
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(
+        verticalArrangement =
+        Arrangement.spacedBy(
             space = 10.dp,
-            alignment = Alignment.Top
+            alignment = Alignment.Top,
         ),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FloatingActionButton(onClick = onClick) {
             Icon(
                 painter = icon,
-                contentDescription = stringResource(
-                    id = R.string.camera
-                )
+                contentDescription =
+                stringResource(
+                    id = R.string.camera,
+                ),
             )
         }
 
         Text(text = text)
     }
 }
-
-

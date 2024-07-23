@@ -1,5 +1,6 @@
 package com.debugdesk.mono.presentation.uicomponents
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -16,6 +17,7 @@ import com.debugdesk.mono.utils.states.Drawable
 @Composable
 fun AlertStateDialog(alertState: AlertState) {
     if (alertState.show) {
+        Log.d("Dialog", "AlertStateDialog: ")
         AlertDialog(
             properties = alertState.properties,
             icon = alertState.iconCompose,
@@ -28,7 +30,7 @@ fun AlertStateDialog(alertState: AlertState) {
                 Text(
                     text = stringResource(id = alertState.message),
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = if (alertState.showIcon) TextAlign.Center else TextAlign.Start
+                    textAlign = if (alertState.showIcon) TextAlign.Center else TextAlign.Start,
                 )
             },
             onDismissRequest = alertState.onNegativeClick,
@@ -45,7 +47,7 @@ fun AlertStateDialog(alertState: AlertState) {
                         Text(text = alertState.negativeText)
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -55,12 +57,13 @@ fun AlertStateDialog(alertState: AlertState) {
 fun AlertStatePre() {
     PreviewTheme {
         AlertStateDialog(
-            alertState = AlertState(
+            alertState =
+            AlertState(
                 show = true,
                 drawable = Drawable.Animated(R.drawable.ringer_bell),
                 showIcon = false,
-                negativeButtonText = R.string.empty
-            )
+                negativeButtonText = R.string.empty,
+            ),
         )
     }
 }

@@ -63,7 +63,8 @@ fun CalendarBar(
     var showCustomRangeDialog by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .then(
                 if (reportState.isCalendarExpanded) {
@@ -71,41 +72,44 @@ fun CalendarBar(
                 } else {
                     Modifier
                         .height(40.dp)
-                }
+                },
             )
             .background(
                 color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(
+                shape =
+                RoundedCornerShape(
                     bottomEnd = Dp.dp20,
                     bottomStart = Dp.dp20,
                     topEnd = Dp.dp20,
-                    topStart = Dp.dp20
-                )
+                    topStart = Dp.dp20,
+                ),
             )
-
             .padding(vertical = dp6, horizontal = dp2),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AnimatedVisibility(visible = reportState.isCalendarExpanded) {
             FlowRow(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(dp6, Alignment.CenterVertically),
-                horizontalArrangement = Arrangement.spacedBy(dp6, Alignment.CenterHorizontally)
+                horizontalArrangement = Arrangement.spacedBy(dp6, Alignment.CenterHorizontally),
             ) {
                 reportState.filters.forEach { filter ->
                     Text(
                         text = stringResource(id = filter.title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier =
+                        Modifier
                             .background(
-                                color = if (filter.isSelected) {
+                                color =
+                                if (filter.isSelected) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
                                     MaterialTheme.colorScheme.secondaryContainer
                                 },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
                             )
                             .padding(dp8)
                             .clickable {
@@ -121,14 +125,14 @@ fun CalendarBar(
                                             ReportIntent.UpdateFilter(
                                                 filter = filter,
                                                 filterRange = filter.filterRange,
-                                                dateRange = null
-                                            )
+                                                dateRange = null,
+                                            ),
                                         )
                                     }
                                 }
 
                                 onIntentChange(ReportIntent.ExpandCalendar(isCalendarExpanded = false))
-                            }
+                            },
                     )
                 }
             }
@@ -136,54 +140,61 @@ fun CalendarBar(
 
         AnimatedVisibility(visible = !reportState.isCalendarExpanded) {
             Row(
-                modifier = modifier
+                modifier =
+                modifier
                     .fillMaxWidth()
                     .height(dp48),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_left_arrow),
                     contentDescription = "Left",
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .size(dp40)
-                        .clickable { onIntentChange(ReportIntent.LeftClick) }
+                        .clickable { onIntentChange(ReportIntent.LeftClick) },
                 )
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                    Modifier
                         .fillMaxHeight()
-                        .clickable { onIntentChange(ReportIntent.ExpandCalendar(isCalendarExpanded = true)) }) {
+                        .clickable { onIntentChange(ReportIntent.ExpandCalendar(isCalendarExpanded = true)) },
+                ) {
                     Text(
                         text = reportState.calendarTitleString,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     Icon(
                         imageVector = Icons.Rounded.ArrowDropDown,
                         contentDescription = "",
-                        modifier = Modifier.size(dp40)
+                        modifier = Modifier.size(dp40),
                     )
                 }
                 Row {
-                    AnimatedVisibility(visible = reportState.showRest,
+                    AnimatedVisibility(
+                        visible = reportState.showRest,
                         enter = fadeIn() + slideInHorizontally { it },
-                        exit = fadeOut() + slideOutHorizontally { it }) {
+                        exit = fadeOut() + slideOutHorizontally { it },
+                    ) {
                         IconButton(
-                            onClick = { onIntentChange(ReportIntent.ResetClick) }
-
+                            onClick = { onIntentChange(ReportIntent.ResetClick) },
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Refresh,
                                 contentDescription = "Reset",
-                                modifier = Modifier.size(dp40)
+                                modifier = Modifier.size(dp40),
                             )
                         }
                     }
                     Icon(
                         painter = painterResource(id = R.drawable.ic_right_arrow),
                         contentDescription = "Right",
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .size(dp40)
-                            .clickable { onIntentChange(ReportIntent.RightClick) }
+                            .clickable { onIntentChange(ReportIntent.RightClick) },
                     )
                 }
             }
@@ -195,79 +206,82 @@ fun CalendarBar(
                 onSubmit = {
                     onIntentChange(
                         ReportIntent.UpdateFilter(
-                            filter = Filter(
+                            filter =
+                            Filter(
                                 title = R.string.custom_range,
                                 isSelected = true,
-                                filterRange = FilterRange.CUSTOM_RANGE
+                                filterRange = FilterRange.CUSTOM_RANGE,
                             ),
                             filterRange = FilterRange.CUSTOM_RANGE,
-                            dateRange = it
-                        )
+                            dateRange = it,
+                        ),
                     )
                     showCustomRangeDialog = !showCustomRangeDialog
                     Log.e("Calendar", "CalendarBar: $it")
                 },
-                onCancel = { showCustomRangeDialog = !showCustomRangeDialog }
+                onCancel = { showCustomRangeDialog = !showCustomRangeDialog },
             )
         }
     }
 }
 
-
 @Composable
 fun CustomDateRange(
     onSubmit: (Pair<Long, Long>) -> Unit = {},
-    onCancel: (Boolean) -> Unit = {}
+    onCancel: (Boolean) -> Unit = {},
 ) {
     var startDate: Long? by remember { mutableStateOf(null) }
     var endDate: Long? by remember { mutableStateOf(null) }
     Column(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(
+                shape =
+                RoundedCornerShape(
                     bottomEnd = Dp.dp20,
                     bottomStart = Dp.dp20,
                     topEnd = Dp.dp20,
-                    topStart = Dp.dp20
-                )
+                    topStart = Dp.dp20,
+                ),
             )
             .padding(dp10),
-        verticalArrangement = Arrangement.spacedBy(
+        verticalArrangement =
+        Arrangement.spacedBy(
             space = dp10,
-            alignment = Alignment.CenterVertically
+            alignment = Alignment.CenterVertically,
         ),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = stringResource(id = R.string.select_date_range))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(
+            horizontalArrangement =
+            Arrangement.spacedBy(
                 dp10,
-                alignment = Alignment.CenterHorizontally
-            )
+                alignment = Alignment.CenterHorizontally,
+            ),
         ) {
             DateText(
                 modifier = Modifier.weight(1f),
                 text = startDate?.toDate() ?: stringResource(id = R.string.start),
-
-                ) { startDate = it }
+            ) { startDate = it }
             DateText(
                 modifier = Modifier.weight(1f),
                 text = endDate?.toDate() ?: stringResource(id = R.string.end),
             ) { endDate = it }
-
         }
 
         SpacerHeight(value = dp10)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(
+            horizontalArrangement =
+            Arrangement.spacedBy(
                 dp10,
-                alignment = Alignment.End
-            )
+                alignment = Alignment.End,
+            ),
         ) {
             Button(onClick = { onCancel(false) }) {
                 Text(text = stringResource(id = R.string.cancel))
@@ -275,34 +289,37 @@ fun CustomDateRange(
             Button(onClick = { onSubmit(Pair(startDate ?: 0, endDate ?: 0)) }) {
                 Text(text = stringResource(id = R.string.okay))
             }
-
         }
     }
 }
 
 @Composable
 fun DateText(
-    modifier: Modifier = Modifier, text: String,
+    modifier: Modifier = Modifier,
+    text: String,
     initialDateInMillis: Long? = System.currentTimeMillis(),
-    selectedDate: (Long) -> Unit = {}
+    selectedDate: (Long) -> Unit = {},
 ) {
     var showDateDialog by remember { mutableStateOf(false) }
     Box(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(
+                color = MaterialTheme.colorScheme.primary,
+                shape =
+                RoundedCornerShape(
                     bottomEnd = Dp.dp20,
                     bottomStart = Dp.dp20,
                     topEnd = Dp.dp20,
-                    topStart = Dp.dp20
-                )
+                    topStart = Dp.dp20,
+                ),
             )
             .padding(dp10)
             .clickable {
                 showDateDialog = !showDateDialog
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(text = text)
     }
@@ -311,7 +328,7 @@ fun DateText(
         openDialog = showDateDialog,
         initial = initialDateInMillis ?: 0,
         openDialogChange = { showDateDialog = it },
-        value = selectedDate
+        value = selectedDate,
     )
 }
 
@@ -322,7 +339,6 @@ fun CalendarPrev() {
         CalendarBar(
             reportState = ReportState(),
         )
-
     }
 }
 
@@ -333,7 +349,6 @@ fun CalendarPrev2() {
         CalendarBar(
             reportState = ReportState(isCalendarExpanded = true),
         )
-
     }
 }
 
@@ -342,6 +357,5 @@ fun CalendarPrev2() {
 fun CustomDateRangePrev() {
     PreviewTheme {
         CustomDateRange()
-
     }
 }

@@ -35,29 +35,29 @@ import com.debugdesk.mono.utils.enums.ExpenseType
 
 @Composable
 fun ExpenseCard(
-    modifier: Modifier=Modifier,
+    modifier: Modifier = Modifier,
     currency: String,
     dailyTransaction: List<DailyTransaction>,
-    onTap: (transitionId: DailyTransaction) -> Unit = {}
+    onTap: (transitionId: DailyTransaction) -> Unit = {},
 ) {
-
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(5.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
         ) {
             Text(
                 text = dailyTransaction[0].date.toDate(),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
             )
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -66,14 +66,14 @@ fun ExpenseCard(
                 if (dailyTransaction.getIncomeAmount() > 0.0) {
                     Text(
                         text = "+$currency ${dailyTransaction.getIncomeAmount()}",
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
                 if (dailyTransaction.getExpenseAmount() > 0.0) {
                     SpacerHeight(value = dp5)
                     Text(
                         text = "-$currency ${dailyTransaction.getExpenseAmount()}",
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
             }
@@ -81,35 +81,35 @@ fun ExpenseCard(
 
         dailyTransaction.forEachIndexed { _, incomeExpenseModel ->
             Row(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth().height(dp40)
                     .padding(horizontal = dp10, vertical = dp6)
                     .clickable { onTap(incomeExpenseModel) },
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Image(
                         painter = painterResource(id = incomeExpenseModel.categoryIcon),
                         contentDescription = "Category",
                         modifier = Modifier.size(dp24),
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary),
                     )
 
                     Text(
                         text = incomeExpenseModel.notes,
-                        modifier = Modifier.padding(horizontal = dp5)
+                        modifier = Modifier.padding(horizontal = dp5),
                     )
-
-
                 }
                 Text(
-                    text = "${"+".takeIf { incomeExpenseModel.type == ExpenseType.Income.name } ?: "-"}${currency} ${incomeExpenseModel.amount}",
-                    color = MaterialTheme.colorScheme.primary.takeIf { incomeExpenseModel.type == ExpenseType.Income.name }
+                    text = "${"+".takeIf { incomeExpenseModel.type == ExpenseType.Income.name } ?: "-"}$currency ${incomeExpenseModel.amount}",
+                    color =
+                    MaterialTheme.colorScheme.primary.takeIf { incomeExpenseModel.type == ExpenseType.Income.name }
                         ?: inActiveButton,
                 )
             }
@@ -122,7 +122,9 @@ fun ExpenseCard(
 private fun ExpenseCardPrev() {
     PreviewTheme {
         ExpenseCard(
-            currency = stringResource(id = R.string.inrIcon), dailyTransaction = listOf(
+            currency = stringResource(id = R.string.inrIcon),
+            dailyTransaction =
+            listOf(
                 DailyTransaction(
                     date = System.currentTimeMillis(),
                     type = ExpenseType.Expense.name,
@@ -131,10 +133,9 @@ private fun ExpenseCardPrev() {
                     categoryIcon = R.drawable.ic_category,
                     categoryId = 6,
                     amount = 2000.0,
-                    currentMonthId = 0
-                )
-            )
+                    currentMonthId = 0,
+                ),
+            ),
         )
     }
 }
-

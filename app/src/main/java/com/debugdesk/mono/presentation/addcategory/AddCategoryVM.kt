@@ -18,7 +18,9 @@ class AddCategoryVM(
     val categoryModel: StateFlow<AddCategoryState> = _categoryModel
 
     fun onIntentChange(
-        intent: AddCategoryIntent, navHostController: NavHostController, argument: String
+        intent: AddCategoryIntent,
+        navHostController: NavHostController,
+        argument: String,
     ) {
         when (intent) {
             is AddCategoryIntent.AddCategory -> {
@@ -32,14 +34,14 @@ class AddCategoryVM(
                             category = categoryModel.value.category,
                             categoryIcon = categoryModel.value.categoryIcon,
                             categoryType = argument,
-                        )
+                        ),
                     )
                 }.invokeOnCompletion { throwable ->
                     throwable?.let {
                         _categoryModel.tryEmit(
                             AddCategoryState(
-                                error = it.localizedMessage ?: "Error occurred"
-                            )
+                                error = it.localizedMessage ?: "Error occurred",
+                            ),
                         )
                         return@invokeOnCompletion
                     }

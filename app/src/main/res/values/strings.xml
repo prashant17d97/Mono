@@ -48,7 +48,9 @@
     <string name="characterWarning">You can not add more character!</string>
 
 
-    <string name="reminderCaption">Mono will reminder to note daily transaction on this time everyday.</string>
+    <string name="reminderCaption">Mono will remind you to note daily transaction on this time everyday.</string>
+    <string name="reminderCaptionBefore">Mono will remind you to note daily transactions at %s every day, starting from tomorrow.</string>
+    <string name="reminderCaptionAfter">Mono will remind you to note daily transactions at %s every day, starting from today.</string>
     <string name="setReminder">Set Reminder</string>
     <string name="removeReminder">Remove Reminder</string>
     <string name="reminderRemoved">Reminder Removed</string>
@@ -522,5 +524,6 @@
     <string name="empty" />
     <string name="notfication_message">Allow notifications to receive all transaction updates and alerts.</string>
     <string name="notfication_title">Notification Alert</string>
+    <string name="add_transaction">Add Transaction</string>
 
 </resources>

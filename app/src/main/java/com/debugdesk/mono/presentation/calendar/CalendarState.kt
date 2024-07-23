@@ -25,27 +25,24 @@ data class CalendarState(
     val showCategoryList: Boolean = true,
     val transaction: List<DailyTransaction> = emptyList(),
     @StringRes
-    val currencyStringIcon: Int = R.string.inrIcon
+    val currencyStringIcon: Int = R.string.inrIcon,
 ) {
-
-
     val dayTransaction = { day: String ->
         Pair(
             day.getTransaction(ExpenseType.Expense)?.type == ExpenseType.Expense.name,
-            day.getTransaction(ExpenseType.Income)?.type == ExpenseType.Income.name
+            day.getTransaction(ExpenseType.Income)?.type == ExpenseType.Income.name,
         )
     }
 
     val isSelected =
         { day: String ->
-            day.toIntIfEmpty() != getCurrentDate
-                    && day.toIntIfEmpty() == selectedDate
-                    && selectedDate != 0
+            day.toIntIfEmpty() != getCurrentDate &&
+                day.toIntIfEmpty() == selectedDate &&
+                selectedDate != 0
         }
 
-
     val sortedTransaction: Map<Int, List<DailyTransaction>> get() = transaction.distributeTransactionsByDate()
-    val isTransactionEmpty:Boolean get() = transaction.isEmpty()
+    val isTransactionEmpty: Boolean get() = transaction.isEmpty()
     val monthString: String
         @Composable
         get() {
@@ -56,8 +53,13 @@ data class CalendarState(
     @Composable
     fun currentDateContainerColor(date: String): Color {
         return animateColorAsState(
-            targetValue = if (date.toIntIfEmpty() == getCurrentDate) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.primaryContainer, label = "ContainerColor"
+            targetValue =
+            if (date.toIntIfEmpty() == getCurrentDate) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.primaryContainer
+            },
+            label = "ContainerColor",
         ).value
     }
 
@@ -68,15 +70,16 @@ data class CalendarState(
         }
 
     private fun String.getTransaction(type: ExpenseType): DailyTransaction? {
-        val transaction = transaction.find {
-            it.currentMonthId == selectedMonth
-                    && it.year == selectedYear
-                    && it.type == type.name
-                    && getDateOfMonthFromTimestamp(it.date) == toIntIfEmpty()
-        }
+        val transaction =
+            transaction.find {
+                it.currentMonthId == selectedMonth &&
+                    it.year == selectedYear &&
+                    it.type == type.name &&
+                    getDateOfMonthFromTimestamp(it.date) == toIntIfEmpty()
+            }
         Log.e(
             "CalendarState",
-            ": ${transaction?.type},  $this, ${transaction?.currentMonthId}, $selectedMonth"
+            ": ${transaction?.type},  $this, ${transaction?.currentMonthId}, $selectedMonth",
         )
         return transaction
     }

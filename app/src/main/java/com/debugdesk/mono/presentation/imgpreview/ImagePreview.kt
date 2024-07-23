@@ -1,6 +1,5 @@
 package com.debugdesk.mono.presentation.imgpreview
 
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -66,18 +65,20 @@ fun ImagePreview(
     createdOn: Long = System.currentTimeMillis(),
     size: String = "",
     painter: Painter,
-    onClick: (PreviewIntent) -> Unit
+    onClick: (PreviewIntent) -> Unit,
 ) {
     AnimatedContent(
-        targetState = showPreview, transitionSpec = {
+        targetState = showPreview,
+        transitionSpec = {
             if (targetState > initialState) {
                 (slideInVertically { height -> height } + fadeIn()).togetherWith(slideOutVertically { height -> -height } + fadeOut())
             } else {
                 (slideInVertically { height -> -height } + fadeIn()).togetherWith(slideOutVertically { height -> height } + fadeOut())
             }.using(
-                SizeTransform(clip = false)
+                SizeTransform(clip = false),
             )
-        }, label = ""
+        },
+        label = "",
     ) {
         if (it) {
             BackHandler {
@@ -89,13 +90,16 @@ fun ImagePreview(
                 },
                 content = { padding ->
                     ViewContainer(
-                        modifier = Modifier.padding(padding), painter = painter
+                        modifier = Modifier.padding(padding),
+                        painter = painter,
                     )
                 },
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     AppBar(
-                        onClick = onClick, createdOn = createdOn, imageSize = size
+                        onClick = onClick,
+                        createdOn = createdOn,
+                        imageSize = size,
                     )
                 },
             )
@@ -103,33 +107,35 @@ fun ImagePreview(
     }
 }
 
-
 @Composable
 private fun AppBar(
     modifier: Modifier = Modifier,
     createdOn: Long = System.currentTimeMillis(),
     imageSize: String,
-    onClick: (PreviewIntent) -> Unit
+    onClick: (PreviewIntent) -> Unit,
 ) {
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .height(56.dp)
             .background(color = MaterialTheme.colorScheme.surface),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(
-            space = 10.dp, alignment = Alignment.Start
-        )
+        horizontalArrangement =
+        Arrangement.spacedBy(
+            space = 10.dp,
+            alignment = Alignment.Start,
+        ),
     ) {
-
         IconButton(onClick = { onClick(PreviewIntent.Navigate) }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_caret_down),
-                contentDescription = stringResource(
-                    id = R.string.back
+                contentDescription =
+                stringResource(
+                    id = R.string.back,
                 ),
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.rotate(90f)
+                modifier = Modifier.rotate(90f),
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.Top)) {
@@ -137,11 +143,12 @@ private fun AppBar(
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp, alignment = Alignment.Start)) {
                 Text(
                     text = createdOn.toDate("MMM dd, yyyy hh:mm a"),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
                 if (imageSize.isNotEmpty()) {
                     Text(
-                        text = imageSize, style = MaterialTheme.typography.bodySmall
+                        text = imageSize,
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
@@ -150,7 +157,10 @@ private fun AppBar(
 }
 
 @Composable
-private fun ViewContainer(modifier: Modifier = Modifier, painter: Painter) {
+private fun ViewContainer(
+    modifier: Modifier = Modifier,
+    painter: Painter,
+) {
     var scale by remember { mutableFloatStateOf(1f) }
     val animatedScale by animateFloatAsState(targetValue = scale, label = "")
 
@@ -158,7 +168,8 @@ private fun ViewContainer(modifier: Modifier = Modifier, painter: Painter) {
     var zoomOffset by remember { mutableStateOf(Offset(0f, 0f)) }
     val animatedZoomOffset by animateOffsetAsState(targetValue = zoomOffset, label = "zoom")
     Box(
-        modifier = Modifier
+        modifier =
+        Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
@@ -166,20 +177,21 @@ private fun ViewContainer(modifier: Modifier = Modifier, painter: Painter) {
                     val maxOffsetX = (size.width * (scale - 1)) / 2
                     val maxOffsetY = (size.height * (scale - 1)) / 2
                     if (zoomed) {
-                        zoomOffset = Offset(
-                            (zoomOffset.x + pan.x).coerceIn(-maxOffsetX, maxOffsetX),
-                            (zoomOffset.y + pan.y).coerceIn(-maxOffsetY, maxOffsetY)
-                        )
+                        zoomOffset =
+                            Offset(
+                                (zoomOffset.x + pan.x).coerceIn(-maxOffsetX, maxOffsetX),
+                                (zoomOffset.y + pan.y).coerceIn(-maxOffsetY, maxOffsetY),
+                            )
                     }
                 }
-
-            }, contentAlignment = Alignment.BottomCenter
-
+            },
+        contentAlignment = Alignment.BottomCenter,
     ) {
-
-        Image(painter = painter,
+        Image(
+            painter = painter,
             contentDescription = null,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxSize()
                 .align(Alignment.Center)
                 .pointerInput(Unit) {
@@ -200,37 +212,43 @@ private fun ViewContainer(modifier: Modifier = Modifier, painter: Painter) {
                     scaleY = maxOf(.5f, minOf(5f, animatedScale))
                     translationX = animatedZoomOffset.x
                     translationY = animatedZoomOffset.y
-                })
-
+                },
+        )
     }
 }
 
 @Composable
 private fun BottomBar(onClick: (PreviewIntent) -> Unit) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background, modifier = Modifier.height(70.dp)
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.height(70.dp),
     ) {
         NavigationBarItem(selected = false, onClick = { onClick(PreviewIntent.Delete) }, icon = {
             BottomBarItem(
-                icon = Icons.Rounded.Delete, label = stringResource(id = R.string.delete)
+                icon = Icons.Rounded.Delete,
+                label = stringResource(id = R.string.delete),
             )
         })
     }
 }
 
 @Composable
-private fun BottomBarItem(icon: ImageVector, label: String) {
+private fun BottomBarItem(
+    icon: ImageVector,
+    label: String,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(8.dp),
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(24.dp)
-                .clip(CircleShape)
+                .clip(CircleShape),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = label, fontSize = 12.sp)
@@ -243,12 +261,15 @@ fun DefaultPreview() {
     PreviewTheme {
         AppBar(imageSize = "2MB") {}
         ViewContainer(
-            painter = painterResource(id = R.drawable.intro_img_two)
+            painter = painterResource(id = R.drawable.intro_img_two),
         )
     }
 }
 
-private fun calculateOffset(tapOffset: Offset, size: IntSize): Offset {
+private fun calculateOffset(
+    tapOffset: Offset,
+    size: IntSize,
+): Offset {
     val offsetX =
         (-(tapOffset.x - (size.width / 2f)) * 2f).coerceIn(-size.width / 2f, size.width / 2f)
     return Offset(offsetX, 0f)

@@ -53,14 +53,16 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Input(
-    navHostController: NavHostController, viewModel: InputVM = koinViewModel()
+    navHostController: NavHostController,
+    viewModel: InputVM = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val incomeState by viewModel.incomeState.collectAsState()
     val expenseState by viewModel.expenseState.collectAsState()
-    val pagerState = rememberPagerState {
-        tabs.size
-    }
+    val pagerState =
+        rememberPagerState {
+            tabs.size
+        }
     val context = LocalContext.current
     var showPreview by remember {
         mutableStateOf(false)
@@ -91,24 +93,25 @@ fun Input(
                 inputIntent = inputIntent,
                 transactionType = expenseType(pagerState.currentPage),
                 navHostController = navHostController,
-                context = context
+                context = context,
             )
-        }
+        },
     )
 
     val state by rememberUpdatedState(
-        newValue = if (pagerState.currentPage == 0) {
+        newValue =
+        if (pagerState.currentPage == 0) {
             expenseState
         } else {
             incomeState
-        }
+        },
     )
 
     ImagePreview(
         showPreview = showPreview,
         createdOn = state.createdOn,
         painter = state.transaction.painter,
-        size = state.transaction.imageSize
+        size = state.transaction.imageSize,
     ) { previewIntent ->
         when (previewIntent) {
             PreviewIntent.Delete -> {
@@ -116,7 +119,7 @@ fun Input(
                     inputIntent = TransactionIntent.DeleteImage,
                     transactionType = expenseType(pagerState.currentPage),
                     navHostController = navHostController,
-                    context = context
+                    context = context,
                 )
                 showPreview = false
             }
@@ -124,7 +127,6 @@ fun Input(
             PreviewIntent.Navigate -> {
                 showPreview = false
             }
-
         }
     }
 }
@@ -139,13 +141,13 @@ fun InputContainer(
     tabs: List<Int>,
     onTabClick: (Int) -> Unit,
     onImageClick: () -> Unit = {},
-    onInputIntent: (TransactionIntent) -> Unit
+    onInputIntent: (TransactionIntent) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             CustomTabs(selectedIndex = state.currentPage, list = tabs, onClick = onTabClick)
 
@@ -153,36 +155,37 @@ fun InputContainer(
                 state = state,
             ) { pageIndex ->
                 when (pageIndex) {
-                    0 -> InputPage(
-                        categories = expenseState.categoryList,
-                        inputState = expenseState,
-                        text = R.string.expense,
-                        onSave = {
-                            onInputIntent(
-                                TransactionIntent.OnNewTransactionSaveClick(
-                                    ExpenseType.Expense
+                    0 ->
+                        InputPage(
+                            categories = expenseState.categoryList,
+                            inputState = expenseState,
+                            text = R.string.expense,
+                            onSave = {
+                                onInputIntent(
+                                    TransactionIntent.OnNewTransactionSaveClick(
+                                        ExpenseType.Expense,
+                                    ),
                                 )
-                            )
-                        },
-                        onImageClick = onImageClick,
-                        onInputIntent = onInputIntent
-                    )
+                            },
+                            onImageClick = onImageClick,
+                            onInputIntent = onInputIntent,
+                        )
 
-                    1 -> InputPage(
-                        categories = incomeState.categoryList,
-                        inputState = incomeState,
-                        text = R.string.income,
-                        onSave = {
-                            onInputIntent(
-                                TransactionIntent.OnNewTransactionSaveClick(
-                                    ExpenseType.Income
+                    1 ->
+                        InputPage(
+                            categories = incomeState.categoryList,
+                            inputState = incomeState,
+                            text = R.string.income,
+                            onSave = {
+                                onInputIntent(
+                                    TransactionIntent.OnNewTransactionSaveClick(
+                                        ExpenseType.Income,
+                                    ),
                                 )
-                            )
-                        },
-                        onImageClick = onImageClick,
-                        onInputIntent = onInputIntent
-                    )
-
+                            },
+                            onImageClick = onImageClick,
+                            onInputIntent = onInputIntent,
+                        )
                 }
             }
         }
@@ -197,12 +200,11 @@ private fun InputPage(
     text: Int = R.string.expense,
     onSave: () -> Unit = {},
     onImageClick: () -> Unit = {},
-    onInputIntent: (TransactionIntent) -> Unit
+    onInputIntent: (TransactionIntent) -> Unit,
 ) {
-
     Column(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         MonoColumn(
             isScrollEnabled = false,
@@ -215,29 +217,31 @@ private fun InputPage(
             trailingColor = CommonColor.inActiveButton,
             verticalArrangement = Arrangement.spacedBy(dp10, alignment = Alignment.Top),
         ) {
-
             CalendarCard(
                 date = inputState.date,
                 showDialog = inputState.showCalendarDialog,
                 onShowCalendarDialog = {
                     onInputIntent(
                         TransactionIntent.OpenCalendarDialog(
-                            it
-                        )
+                            it,
+                        ),
                     )
                 },
-                onDateChange = { onInputIntent(TransactionIntent.UpdateDate(it)) })
+                onDateChange = { onInputIntent(TransactionIntent.UpdateDate(it)) },
+            )
             Text(
                 text = stringResource(id = text),
             )
-            AmountTextFieldCalculator(amountTfState = inputState.amountTfState,
+            AmountTextFieldCalculator(
+                amountTfState = inputState.amountTfState,
                 onTextFieldCalculatorIntent = {
                     onInputIntent(
                         TransactionIntent.UpdateAmount(
-                            it
-                        )
+                            it,
+                        ),
                     )
-                })
+                },
+            )
 
             NoteTextField(
                 note = inputState.note,
@@ -252,47 +256,49 @@ private fun InputPage(
                 },
                 onTrailClick = {
                     onInputIntent(TransactionIntent.OnTrailIconClick)
-                }
-
+                },
             )
 
             EditCategoryCard(
                 list = categories,
-                onCategoryEdit = onInputIntent
+                onCategoryEdit = onInputIntent,
             )
         }
 
-        CustomButton(modifier = Modifier
-            .fillMaxWidth()
-            .padding(dp10),
+        CustomButton(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(dp10),
             status = Buttons.Active.takeIf { inputState.changesFound } ?: Buttons.Disable,
             text = stringResource(id = R.string.save),
-            onClick = { onSave() })
+            onClick = { onSave() },
+        )
     }
 
     MediaBottomSheet(
         visible = inputState.showCameraAndGallery,
         appStateManager = inputState.appStateManager,
-        onProcess = onInputIntent
+        onProcess = onInputIntent,
     )
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 private fun InputPagePrev() {
     PreviewTheme {
-        InputContainer(modifier = Modifier,
+        InputContainer(
+            modifier = Modifier,
             expenseState = InputState(),
             incomeState = InputState(),
-            state = rememberPagerState {
+            state =
+            rememberPagerState {
                 2
             },
             tabs = tabs,
             onTabClick = { },
-            onInputIntent = {}
-
+            onInputIntent = {},
         )
     }
 }

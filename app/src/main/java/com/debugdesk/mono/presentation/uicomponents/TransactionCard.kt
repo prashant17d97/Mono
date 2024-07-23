@@ -34,104 +34,110 @@ fun TransactionCard(
     modifier: Modifier = Modifier,
     currency: String,
     dailyTransaction: DailyTransaction,
-    onIntentChange: (ReportIntent) -> Unit = {}
+    onIntentChange: (ReportIntent) -> Unit = {},
 ) {
     PopUp(dismiss = { onIntentChange(ReportIntent.CloseTransactionCard) }) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
+            modifier =
+            modifier
                 .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(Dp.dp16)
+                    shape = RoundedCornerShape(Dp.dp16),
                 )
-                .padding(Dp.dp10)
+                .padding(Dp.dp10),
         ) {
             Text(
                 text = stringResource(id = R.string.transaction_card_title),
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
-
             Row(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(vertical = Dp.dp10),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = "$currency ${dailyTransaction.amount}",
                     style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Icon(
-                    imageVector = Icons.Rounded.Delete, contentDescription = "Close",
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = "Close",
                     tint = CommonColor.inActiveButton,
-                    modifier = Modifier.clickable { onIntentChange(ReportIntent.DeleteTransaction) }
+                    modifier = Modifier.clickable { onIntentChange(ReportIntent.DeleteTransaction) },
                 )
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
+                horizontalArrangement =
+                Arrangement.spacedBy(
                     Dp.dp6,
-                    alignment = Alignment.Start
+                    alignment = Alignment.Start,
                 ),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(id = dailyTransaction.categoryIcon),
                     contentDescription = "Close",
-                    modifier = Modifier.clickable { })
+                    modifier = Modifier.clickable { },
+                )
                 Text(
                     text = dailyTransaction.category,
                     style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
             Text(
                 text = dailyTransaction.date.toDate(),
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(top = Dp.dp16),
                 style = MaterialTheme.typography.bodyLarge,
             )
             Text(
                 text = dailyTransaction.note,
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(vertical = Dp.dp16),
                 style = MaterialTheme.typography.bodyLarge,
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
+                modifier =
+                Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement =
+                Arrangement.spacedBy(
                     Dp.dp24,
-                    alignment = Alignment.End
+                    alignment = Alignment.End,
                 ),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(id = R.string.close),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.clickable { onIntentChange(ReportIntent.CloseTransactionCard) }
+                    modifier = Modifier.clickable { onIntentChange(ReportIntent.CloseTransactionCard) },
                 )
 
                 Button(onClick = { onIntentChange(ReportIntent.EditTransaction(dailyTransaction.transactionId)) }) {
                     Text(
                         text = stringResource(id = R.string.edit),
-
-                        )
+                    )
                 }
-
             }
-
         }
     }
 }
@@ -142,7 +148,7 @@ fun TransactionCardPrev() {
     PreviewTheme {
         TransactionCard(
             dailyTransaction = emptyTransaction,
-            currency = stringResource(id = R.string.inrIcon)
+            currency = stringResource(id = R.string.inrIcon),
         )
     }
 }

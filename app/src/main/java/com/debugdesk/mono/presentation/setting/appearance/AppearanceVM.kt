@@ -15,7 +15,6 @@ class AppearanceVM(
     private val appConfigManager: AppConfigManager,
     private val appStateManager: AppStateManager,
 ) : ViewModel() {
-
     val appConfigProperties = appConfigManager.appConfigProperties
     private val _appearanceState: MutableStateFlow<AppearanceState> =
         MutableStateFlow(AppearanceState())
@@ -35,10 +34,9 @@ class AppearanceVM(
         }
     }
 
-
     fun handleAppearanceIntent(
         appearanceIntent: AppearanceIntent,
-        navHostController: NavHostController
+        navHostController: NavHostController,
     ) {
         when (appearanceIntent) {
             AppearanceIntent.Back -> revertTheAppConfigPropertiesChange(navHostController)
@@ -48,7 +46,6 @@ class AppearanceVM(
             is AppearanceIntent.UpdateDynamicColor -> updateDynamicColor()
             AppearanceIntent.Save -> saveNewAppConfigPropertiesChanges()
         }
-
     }
 
     private fun updateDynamicColor() {
@@ -57,8 +54,8 @@ class AppearanceVM(
             appearanceState.value.appConfigProperties.copy(dynamicColor = !state)
         _appearanceState.tryEmit(
             appearanceState.value.copy(
-                appConfigProperties = appearance
-            )
+                appConfigProperties = appearance,
+            ),
         )
         requestAppConfigChanges(appearance)
     }
@@ -66,14 +63,14 @@ class AppearanceVM(
     private fun changeTheme(appearanceIntent: AppearanceIntent.ChangeTheme) {
         val appearance =
             appearanceState.value.appConfigProperties.copy(
-                themeMode = appearanceIntent.theme
+                themeMode = appearanceIntent.theme,
             )
 
         _appearanceState.tryEmit(
             appearanceState.value.copy(
                 isThemeExpended = appearanceIntent.isExpended,
-                appConfigProperties = appearance
-            )
+                appConfigProperties = appearance,
+            ),
         )
         requestAppConfigChanges(appearance)
     }
@@ -81,14 +78,14 @@ class AppearanceVM(
     private fun changeLanguage(appearanceIntent: AppearanceIntent.ChangeLanguage) {
         val appearance =
             appearanceState.value.appConfigProperties.copy(
-                language = appearanceIntent.language
+                language = appearanceIntent.language,
             )
 
         _appearanceState.tryEmit(
             appearanceState.value.copy(
                 isLanguageExpended = appearanceIntent.isExpended,
-                appConfigProperties = appearance
-            )
+                appConfigProperties = appearance,
+            ),
         )
         requestAppConfigChanges(appearance)
     }
@@ -96,14 +93,14 @@ class AppearanceVM(
     private fun changeFont(appearanceIntent: AppearanceIntent.ChangeFont) {
         val appearance =
             appearanceState.value.appConfigProperties.copy(
-                fontFamily = appearanceIntent.font
+                fontFamily = appearanceIntent.font,
             )
 
         _appearanceState.tryEmit(
             appearanceState.value.copy(
                 isFontExpended = appearanceIntent.isExpended,
-                appConfigProperties = appearance
-            )
+                appConfigProperties = appearance,
+            ),
         )
         requestAppConfigChanges(appearance)
     }
@@ -122,8 +119,8 @@ class AppearanceVM(
             appearanceState.value.copy(
                 isFontExpended = false,
                 isThemeExpended = false,
-                isLanguageExpended = false
-            )
+                isLanguageExpended = false,
+            ),
         )
         appConfigManager.saveNewAppConfig()
         appStateManager.showToastState(R.string.app_config_saved)

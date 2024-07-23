@@ -21,22 +21,26 @@ fun CalendarCard(
     onShowCalendarDialog: (Boolean) -> Unit = {},
     onDateChange: (Long) -> Unit = {},
 ) {
-
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+        Modifier
             .fillMaxWidth()
             .clickable { onShowCalendarDialog(true) }
             .background(
-                color = MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape
-            )) {
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = CircleShape,
+            ),
+    ) {
         Text(
-            text = date.toDate(), modifier = Modifier.padding(10.dp)
+            text = date.toDate(),
+            modifier = Modifier.padding(10.dp),
         )
     }
     DatePickerDialog(
         openDialog = showDialog,
         initial = date,
         openDialogChange = { onShowCalendarDialog(it) },
-        value = { onDateChange(it) }
+        value = { onDateChange(it) },
     )
 }

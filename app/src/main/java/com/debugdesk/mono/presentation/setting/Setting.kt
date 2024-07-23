@@ -45,7 +45,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun Setting(
     navHostController: NavHostController,
-    settingVM: SettingVM = koinViewModel()
+    settingVM: SettingVM = koinViewModel(),
 ) {
     val appConfigProperties by settingVM.appConfigProperties.collectAsState()
 
@@ -54,7 +54,8 @@ fun Setting(
 
     MonoColumn(
         heading = stringResource(id = R.string.setting),
-        onBackClick = { navHostController.popBackStack() }) {
+        onBackClick = { navHostController.popBackStack() },
+    ) {
         settingVM.settings(appConfigProperties.selectedCurrencyIconDrawable)
             .forEach { settingModel ->
                 SettingItem(settingModel = settingModel, navHostController = navHostController)
@@ -68,10 +69,11 @@ fun Setting(
 @Composable
 private fun SettingItem(
     settingModel: SettingModel,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     Row(
-        modifier = Modifier
+        modifier =
+        Modifier
             .clickable {
                 navHostController.navigate(
                     when (settingModel.name) {
@@ -79,7 +81,7 @@ private fun SettingItem(
                         SettingNameEnum.Currency -> Screens.Currency.route
                         SettingNameEnum.Reminder -> Screens.Reminder.route
                         SettingNameEnum.Appearance -> Screens.Appearance.route
-                    }
+                    },
                 )
             }
             .fillMaxWidth()
@@ -87,37 +89,39 @@ private fun SettingItem(
             .border(
                 width = dp1,
                 shape = RoundedCornerShape(dp8),
-                color = disableButton
+                color = disableButton,
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(dp10)
                 .weight(1f),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 painter = painterResource(id = settingModel.icon),
                 contentDescription = null,
                 modifier = Modifier.size(dp24),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             )
             SpacerWidth(value = dp5)
             Text(
                 text = stringResource(id = settingModel.name.stringRes),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         }
         Image(
             painter = painterResource(id = R.drawable.ic_caret_right),
             contentDescription = "ic_caret_right",
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary), // Adjust tint as needed
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(width = dp34, height = dp24)
-                .padding(end = dp10)
+                .padding(end = dp10),
         )
     }
 }
@@ -128,72 +132,87 @@ private fun DeleteAllRow(
     onDeleted: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier =
+        Modifier
             .clickable(enabled = isDataAvailable) { onDeleted() } // Click only if enabled
             .fillMaxWidth()
             .padding(bottom = dp5)
             .border(
                 width = dp1,
                 shape = RoundedCornerShape(dp8),
-                color = disableButton
-            ), // Update border color based on boolean
+                color = disableButton,
+            ),
+        // Update border color based on boolean
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_trash),
             contentDescription = null,
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(dp40)
                 .padding(start = dp10, end = dp5, top = dp10, bottom = dp10),
-            colorFilter = ColorFilter.tint(
-                if (isDataAvailable) inActiveButton else inActiveButton.copy(
-                    alpha = 0.5f
-                )
-            )
+            colorFilter =
+            ColorFilter.tint(
+                if (isDataAvailable) {
+                    inActiveButton
+                } else {
+                    inActiveButton.copy(
+                        alpha = 0.8f,
+                    )
+                },
+            ),
         )
         Text(
             text = stringResource(id = R.string.delete_all),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = if (isDataAvailable) inActiveButton else inActiveButton.copy(
-                    alpha = 0.5f
-                )
-            ) // Update text color based on boolean
+            style =
+            MaterialTheme.typography.titleMedium.copy(
+                color =
+                if (isDataAvailable) {
+                    inActiveButton
+                } else {
+                    inActiveButton.copy(
+                        alpha = 0.8f,
+                    )
+                },
+            ), // Update text color based on boolean
         )
-    }
-
-}
-
-@Preview
-@Composable
-fun SettingPreview() = PreviewTheme {
-    Column {
-        SettingItem(
-            settingModel = SettingModel(
-                icon = R.drawable.ic_dark_mode,
-                name = SettingNameEnum.Category
-            ), navHostController = rememberNavController()
-
-        )
-        DeleteAllRow(isDataAvailable = true, onDeleted = {})
-        DeleteAllRow(isDataAvailable = false, onDeleted = {})
-
     }
 }
 
 @Preview
 @Composable
-fun SettingPreviewsLight() = PreviewTheme(isDarkTheme = false) {
-    Column {
-        SettingItem(
-            settingModel = SettingModel(
-                icon = R.drawable.ic_dark_mode,
-                name = SettingNameEnum.Category
-            ), navHostController = rememberNavController()
-
-        )
-        DeleteAllRow(isDataAvailable = true, onDeleted = {})
-        DeleteAllRow(isDataAvailable = false, onDeleted = {})
-
+fun SettingPreview() =
+    PreviewTheme {
+        Column {
+            SettingItem(
+                settingModel =
+                SettingModel(
+                    icon = R.drawable.ic_dark_mode,
+                    name = SettingNameEnum.Category,
+                ),
+                navHostController = rememberNavController(),
+            )
+            DeleteAllRow(isDataAvailable = true, onDeleted = {})
+            DeleteAllRow(isDataAvailable = false, onDeleted = {})
+        }
     }
-}
+
+@Preview
+@Composable
+fun SettingPreviewsLight() =
+    PreviewTheme(isDarkTheme = false) {
+        Column {
+            SettingItem(
+                settingModel =
+                SettingModel(
+                    icon = R.drawable.ic_dark_mode,
+                    name = SettingNameEnum.Category,
+                ),
+                navHostController = rememberNavController(),
+            )
+            DeleteAllRow(isDataAvailable = true, onDeleted = {})
+            DeleteAllRow(isDataAvailable = false, onDeleted = {})
+        }
+    }

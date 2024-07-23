@@ -46,9 +46,11 @@
                 android:resource="@xml/path_provider" />
         </provider>
 
-        <meta-data
+       <!-- <meta-data
             android:name="androidx.work.WorkManagerInitializer"
-            android:value="false" />
+            android:value="false" />-->
+
+        <receiver android:name=".notification.NotificationReceiver"/>
     </application>
 
 </manifest>

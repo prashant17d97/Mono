@@ -8,11 +8,11 @@ import androidx.compose.ui.window.DialogProperties
 fun PopUp(
     dismiss: () -> Unit,
     properties: DialogProperties = DialogProperties(dismissOnClickOutside = false),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = { dismiss() },
-        properties = properties
+        properties = properties,
     ) {
         content()
     }

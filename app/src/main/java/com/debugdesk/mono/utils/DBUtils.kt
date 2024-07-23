@@ -6,39 +6,40 @@ import com.debugdesk.mono.utils.enums.ImageSource
 import java.util.Locale
 
 object DBUtils {
+    fun DailyTransaction.toTransaction() =
+        Transaction(
+            transactionId = this.transactionId,
+            date = this.date,
+            type = this.type,
+            note = this.note,
+            category = this.category,
+            categoryIcon = this.categoryIcon,
+            categoryId = this.categoryId,
+            amount = this.amount,
+            currentMonthId = this.currentMonthId,
+            imagePath = this.imagePath,
+            imageSource = this.imageSource.name,
+            createdOn = this.createdOn,
+            year = this.year,
+        )
 
-    fun DailyTransaction.toTransaction() = Transaction(
-        transactionId = this.transactionId,
-        date = this.date,
-        type = this.type,
-        note = this.note,
-        category = this.category,
-        categoryIcon = this.categoryIcon,
-        categoryId = this.categoryId,
-        amount = this.amount,
-        currentMonthId = this.currentMonthId,
-        imagePath = this.imagePath,
-        imageSource = this.imageSource.name,
-        createdOn = this.createdOn,
-        year = this.year
-    )
-
-    fun Transaction.toDailyTransaction() = DailyTransaction(
-        transactionId = this.transactionId,
-        date = this.date,
-        type = this.type,
-        note = this.note,
-        category = this.category,
-        categoryIcon = this.categoryIcon,
-        categoryId = this.categoryId,
-        amount = this.amount,
-        imageSize = getBase64ImageSize(this.imagePath),
-        currentMonthId = this.currentMonthId,
-        imagePath = this.imagePath,
-        imageSource = this.imageSource.toImageSource(),
-        createdOn = this.createdOn,
-        year = this.year,
-    )
+    fun Transaction.toDailyTransaction() =
+        DailyTransaction(
+            transactionId = this.transactionId,
+            date = this.date,
+            type = this.type,
+            note = this.note,
+            category = this.category,
+            categoryIcon = this.categoryIcon,
+            categoryId = this.categoryId,
+            amount = this.amount,
+            imageSize = getBase64ImageSize(this.imagePath),
+            currentMonthId = this.currentMonthId,
+            imagePath = this.imagePath,
+            imageSource = this.imageSource.toImageSource(),
+            createdOn = this.createdOn,
+            year = this.year,
+        )
 
     fun <T> List<T>.orIfEmpty(): List<T> = this.ifEmpty { emptyList() }
 
@@ -63,6 +64,4 @@ object DBUtils {
             else -> String.format(Locale.getDefault(), "%.2f bytes", dataSize)
         }
     }
-
-
 }

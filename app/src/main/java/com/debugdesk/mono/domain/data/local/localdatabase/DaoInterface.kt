@@ -11,7 +11,6 @@ import com.debugdesk.mono.domain.data.local.localdatabase.model.Transaction
 
 @Dao
 interface DaoInterface {
-
     @Query("SELECT * FROM transactionEntry ORDER BY date DESC")
     suspend fun getAllTransaction(): List<Transaction>
 
@@ -25,7 +24,10 @@ interface DaoInterface {
     suspend fun updateTransaction(transaction: Transaction)
 
     @Query("SELECT * FROM transactionEntry WHERE year = :year AND currentMonthId = :month ORDER BY date DESC")
-    suspend fun getAllTransactionByMonth(year: Int, month: Int): List<Transaction>
+    suspend fun getAllTransactionByMonth(
+        year: Int,
+        month: Int,
+    ): List<Transaction>
 
     @Query("SELECT * FROM transactionEntry WHERE transactionId = :transactionId ORDER BY date DESC")
     suspend fun fetchTransactionFromId(transactionId: Int): Transaction
@@ -34,7 +36,10 @@ interface DaoInterface {
     suspend fun getAllTransactionByYear(year: Int): List<Transaction>
 
     @Query("SELECT * FROM transactionEntry WHERE date BETWEEN :startDate AND :endDate")
-    suspend fun findItemsInDateRange(startDate: Long, endDate: Long): List<Transaction>
+    suspend fun findItemsInDateRange(
+        startDate: Long,
+        endDate: Long,
+    ): List<Transaction>
 
     @Query("SELECT * FROM categoryModel")
     suspend fun getAllCategory(): List<CategoryModel>

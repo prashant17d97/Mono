@@ -15,7 +15,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
 class CalendarPageVM(
-    private val repository: Repository, private val appConfigManager: AppConfigManager
+    private val repository: Repository,
+    private val appConfigManager: AppConfigManager,
 ) : ViewModel(), KoinComponent {
     private val _calendarState: MutableStateFlow<CalendarState> = MutableStateFlow(CalendarState())
     val calendarState: StateFlow<CalendarState> = _calendarState
@@ -32,7 +33,7 @@ class CalendarPageVM(
         viewModelScope.launch {
             combine(
                 repository.allDailyMonthTransaction,
-                appConfigManager.appConfigProperties
+                appConfigManager.appConfigProperties,
             ) { transaction, appConfig ->
                 val currentState = calendarState.value
                 CalendarState(
@@ -42,7 +43,7 @@ class CalendarPageVM(
                     yearRange = currentState.yearRange,
                     showCategoryList = currentState.showCategoryList,
                     transaction = transaction,
-                    currencyStringIcon = appConfig.selectedCurrencyIconString
+                    currencyStringIcon = appConfig.selectedCurrencyIconString,
                 )
             }.collect { transactions ->
                 _calendarState.tryEmit(transactions)
@@ -50,30 +51,31 @@ class CalendarPageVM(
         }
     }
 
-
     fun fetchTransactions() {
         viewModelScope.launch(Dispatchers.IO) {
             _calendarState.tryEmit(calendarState.value.copy(yearRange = repository.getYearRange()))
             repository.getAllTransactionByMonth(
-                calendarState.value.selectedMonth, calendarState.value.selectedYear
+                calendarState.value.selectedMonth,
+                calendarState.value.selectedYear,
             )
         }
     }
 
     fun onCalendarIntentHandle(
-        calendarIntent: CalendarIntent, navHostController: NavHostController
+        calendarIntent: CalendarIntent,
+        navHostController: NavHostController,
     ) {
         when (calendarIntent) {
             is CalendarIntent.OnCalendarUpdate -> fetchTransaction(calendarIntent.calendarState)
             is CalendarIntent.OnDateSelected -> updateCalendarState(calendarIntent.calendarState)
             CalendarIntent.NavigateBack -> navHostController.popBackStack()
-            is CalendarIntent.OnTransactionClick -> navHostController.navigateTo(
-                Screens.EditTransaction.passTransactionId(
-                    calendarIntent.transactionId
+            is CalendarIntent.OnTransactionClick ->
+                navHostController.navigateTo(
+                    Screens.EditTransaction.passTransactionId(
+                        calendarIntent.transactionId,
+                    ),
                 )
-            )
         }
-
     }
 
     private fun fetchTransaction(calendarState: CalendarState) {
@@ -83,8 +85,7 @@ class CalendarPageVM(
 
     private fun updateCalendarState(calendarState: CalendarState) {
         _calendarState.tryEmit(
-            calendarState
+            calendarState,
         )
     }
-
 }

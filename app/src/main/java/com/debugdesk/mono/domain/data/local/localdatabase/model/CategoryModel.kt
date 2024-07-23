@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.debugdesk.mono.R
 
-
 @Entity(
     tableName = "categoryModel",
 )
@@ -24,10 +23,13 @@ data class CategoryModel(
         parcel.readString() ?: "",
         parcel.readInt(),
         parcel.readString() ?: "",
-        parcel.readByte() != 0.toByte()
+        parcel.readByte() != 0.toByte(),
     )
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
+    override fun writeToParcel(
+        parcel: Parcel,
+        flags: Int,
+    ) {
         parcel.writeInt(categoryId)
         parcel.writeString(category)
         parcel.writeInt(categoryIcon ?: R.drawable.mono)

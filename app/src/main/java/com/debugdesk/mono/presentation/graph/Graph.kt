@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,13 +17,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,20 +38,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.debugdesk.mono.R
+import com.debugdesk.mono.datagraph.FloatingGraph
+import com.debugdesk.mono.datagraph.graphDataSet
 import com.debugdesk.mono.presentation.uicomponents.BottomSheet
 import com.debugdesk.mono.presentation.uicomponents.ExpenseCard
 import com.debugdesk.mono.presentation.uicomponents.MonoColumn
-import com.debugdesk.mono.presentation.uicomponents.NoDataFoundLayout
 import com.debugdesk.mono.presentation.uicomponents.PreviewTheme
+import com.debugdesk.mono.utils.CommonColor.brandColor
 import com.debugdesk.mono.utils.CommonColor.disableButton
 import com.debugdesk.mono.utils.Dp.dp0
 import com.debugdesk.mono.utils.Dp.dp1
@@ -55,7 +64,6 @@ import com.debugdesk.mono.utils.Dp.dp100
 import com.debugdesk.mono.utils.Dp.dp25
 import com.debugdesk.mono.utils.Dp.dp3
 import com.debugdesk.mono.utils.Dp.dp40
-import com.debugdesk.mono.utils.Dp.dp8
 import com.debugdesk.mono.utils.Dp.dp95
 import org.koin.androidx.compose.koinViewModel
 
@@ -63,10 +71,12 @@ import org.koin.androidx.compose.koinViewModel
 fun Graph(
     navHostController: NavHostController,
     categoryId: Int,
-    graphVM: GraphVM = koinViewModel()
+    graphVM: GraphVM = koinViewModel(),
 ) {
     val graphState by graphVM.graphState.collectAsState()
-    LaunchedEffect(key1 = Unit) {
+
+    // Fetch transactions when categoryId changes
+    LaunchedEffect(categoryId) {
         graphVM.fetchTransaction(categoryId)
     }
 
@@ -74,7 +84,7 @@ fun Graph(
         graphState = graphState,
         onIntentChanges = {
             graphVM.handleGraphIntent(it, navHostController)
-        }
+        },
     )
 }
 
@@ -83,12 +93,8 @@ fun Graph(
 fun GraphAnimateContainer(
     modifier: Modifier = Modifier,
     graphState: GraphState,
-    onIntentChanges: (GraphIntent) -> Unit = {}
+    onIntentChanges: (GraphIntent) -> Unit = {},
 ) {
-    val buttonDisable by rememberUpdatedState(
-        newValue =
-        graphState.isLoading != EffectState.Loading
-    )
     MonoColumn(
         modifier = modifier.fillMaxSize(),
         showBack = true,
@@ -100,11 +106,9 @@ fun GraphAnimateContainer(
         bottom = dp10,
         heading = stringResource(id = R.string.category_report),
         headingStyle = MaterialTheme.typography.titleMedium,
-        enableClick = buttonDisable,
         trailingCompose = {
             IconButton(
                 onClick = { onIntentChanges(GraphIntent.PromptFilter) },
-                enabled = buttonDisable
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_filter),
@@ -112,42 +116,46 @@ fun GraphAnimateContainer(
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
-
         },
         horizontalAlignment = Alignment.CenterHorizontally,
-        onBackClick = { onIntentChanges(GraphIntent.NavigateBack) }) {
+        onBackClick = { onIntentChanges(GraphIntent.NavigateBack) },
+    ) {
         AnimatedContent(
-            targetState = graphState.isLoading,
+            targetState = graphState.graphState,
             transitionSpec = {
                 if (targetState > initialState) {
                     (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> -height } + fadeOut())
+                        slideOutVertically { height -> -height } + fadeOut(),
+                    )
                 } else {
                     (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> height } + fadeOut())
-                }.using(
-                    SizeTransform(clip = false)
-                )
+                        slideOutVertically { height -> height } + fadeOut(),
+                    )
+                }.using(SizeTransform(clip = false))
             },
-            label = "AnimatedContent"
+            label = "AnimatedContent",
         ) {
             when (it) {
-                EffectState.NoDataFound -> NoDataFoundLayout(show = true)
-                EffectState.Loaded -> GraphData(
-                    graphState = graphState,
-                    onIntentChanges = onIntentChanges
-                )
+                EffectState.Loaded ->
+                    GraphData(
+                        graphState = graphState,
+                        onIntentChanges = onIntentChanges,
+                    )
 
-                EffectState.Loading -> Loading()
-
+                EffectState.NoDataFound ->
+                    GraphData(
+                        graphState = graphState,
+                        onIntentChanges = onIntentChanges,
+                    ) // NoDataFoundLayout(show = true)
+                EffectState.NONE -> {}
             }
-
         }
     }
 
     BottomSheet(
         show = graphState.promptFilter,
-        onDismiss = { onIntentChanges(GraphIntent.HideFilter) }) {
+        onDismiss = { onIntentChanges(GraphIntent.HideFilter) },
+    ) {
     }
 }
 
@@ -155,23 +163,60 @@ fun GraphAnimateContainer(
 private fun GraphData(
     modifier: Modifier = Modifier,
     graphState: GraphState,
-    onIntentChanges: (GraphIntent) -> Unit = {}
+    onIntentChanges: (GraphIntent) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier =
+        modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(space = dp8)
+        verticalArrangement = Arrangement.spacedBy(space = 10.dp),
     ) {
         GraphTab(
             selectedTab = graphState.selectedTabs,
-            onTabSelected = { onIntentChanges(GraphIntent.UpdateTab(it)) })
+            onTabSelected = { onIntentChanges(GraphIntent.UpdateTab(it)) },
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Box(
+            modifier =
+            Modifier
+                .size(280.dp)
+                .clip(RoundedCornerShape(60.dp))
+                .background(color = brandColor.copy(alpha = 0.2f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                verticalArrangement =
+                Arrangement.spacedBy(
+                    space = 20.dp,
+                    alignment = Alignment.CenterVertically,
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.food),
+                    contentDescription = "",
+                    modifier = Modifier.size(160.dp),
+                    colorFilter = ColorFilter.tint(color = brandColor),
+                )
+                Text(text = "Food", style = MaterialTheme.typography.titleLarge)
+            }
+        }
 
+        Text(text = "This Month")
+        Text(
+            text = "+${stringResource(id = graphState.currencyIcon)} 300.00",
+            style = MaterialTheme.typography.headlineLarge.copy(color = brandColor),
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        FloatingGraph(graphDataSet = graphDataSet)
+        Spacer(modifier = Modifier.height(10.dp))
         graphState.distributedTransaction.forEach { (_, transaction) ->
             ExpenseCard(
                 currency = stringResource(graphState.currencyIcon),
-                dailyTransaction = transaction
+                dailyTransaction = transaction,
             )
-
         }
     }
 }
@@ -181,7 +226,7 @@ private fun Loading(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CircularProgressIndicator(strokeCap = StrokeCap.Round)
     }
@@ -191,58 +236,63 @@ private fun Loading(modifier: Modifier = Modifier) {
 private fun GraphTab(
     tabs: List<Tabs> = Tabs.entries,
     selectedTab: Tabs,
-    onTabSelected: (Tabs) -> Unit
+    onTabSelected: (Tabs) -> Unit,
 ) {
     val selectedIndex = tabs.indexOf(selectedTab)
     val offsetX by animateDpAsState(
         targetValue = dp100 * selectedIndex,
         label = "",
-        animationSpec = spring()
+        animationSpec = spring(),
     )
 
     Box(
-        modifier = Modifier
+        modifier =
+        Modifier
             .background(
                 color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(dp25)
+                shape = RoundedCornerShape(dp25),
             )
             .border(dp1, disableButton, RoundedCornerShape(dp25))
             .height(dp40)
             .width(dp100 * tabs.size)
             .padding(dp3),
-        contentAlignment = Alignment.CenterStart
+        contentAlignment = Alignment.CenterStart,
     ) {
         Box(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .offset(x = offsetX)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(dp25)
+                    shape = RoundedCornerShape(dp25),
                 )
                 .fillMaxHeight()
                 .width(dp95)
-                .padding(dp3)
+                .padding(dp3),
         )
 
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             tabs.forEach { tab ->
                 Box(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxHeight()
                         .width(dp100)
                         .clickable { onTabSelected(tab) },
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = stringResource(id = tab.string),
-                        color = if (selectedTab == tab)
+                        color =
+                        if (selectedTab == tab) {
                             MaterialTheme.colorScheme.onPrimaryContainer
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onBackground
+                        },
                     )
                 }
             }
@@ -250,11 +300,12 @@ private fun GraphTab(
     }
 }
 
-
 @Preview
 @Composable
 private fun GraphPrev() {
     PreviewTheme {
-        GraphAnimateContainer(graphState = GraphState(isLoading = EffectState.Loaded))
+        GraphAnimateContainer(
+            graphState = GraphState(),
+        )
     }
 }

@@ -22,12 +22,13 @@ fun BottomSheet(
     AnimatedVisibility(
         visible = show,
         enter = slideInVertically { it },
-        exit = slideOutVertically { it }) {
+        exit = slideOutVertically { it },
+    ) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = modelBottomSheet,
             dragHandle = { BottomSheetDefaults.DragHandle() },
-            content = content
+            content = content,
         )
     }
 }

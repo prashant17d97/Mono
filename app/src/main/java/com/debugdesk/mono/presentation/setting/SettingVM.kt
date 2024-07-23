@@ -33,7 +33,7 @@ class SettingVM(
             SettingModel(icon = R.drawable.ic_wrench, name = SettingNameEnum.Appearance),
             SettingModel(
                 icon = currencyIconDrawable,
-                name = SettingNameEnum.Currency
+                name = SettingNameEnum.Currency,
             ),
             SettingModel(icon = R.drawable.ic_reminder, name = SettingNameEnum.Reminder),
         )
@@ -57,8 +57,7 @@ class SettingVM(
                     }
                     clearPicturesFolder(context = context)
                 }
-            }
+            },
         )
     }
-
 }

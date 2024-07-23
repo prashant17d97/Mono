@@ -34,7 +34,6 @@ import java.util.Date
 import java.util.Locale
 
 object CameraFunction {
-
     private const val TAG = "CameraFunction"
 
     fun Context.createImageFile(): File {
@@ -42,15 +41,18 @@ object CameraFunction {
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File(
             storageDir,
-            "${getString(R.string.app_name)}_${timestamp}.jpg"
+            "${getString(R.string.app_name)}_$timestamp.jpg",
         )
     }
 
-    fun getUriFromFile(context: Context, file: File): Uri {
+    fun getUriFromFile(
+        context: Context,
+        file: File,
+    ): Uri {
         return FileProvider.getUriForFile(
             context,
             "${BuildConfig.APPLICATION_ID}.provider",
-            file
+            file,
         )
     }
 
@@ -123,11 +125,12 @@ object CameraFunction {
 
             // Compress loop to achieve desired size
             do {
-                compressedImageFile = Compressor.compress(context, originalFile) {
-                    quality(quality = quality)
-                    resolution(width = 720, height = 1024)
-                    size(maxFileSize = 500 * 1020)
-                }
+                compressedImageFile =
+                    Compressor.compress(context, originalFile) {
+                        quality(quality = quality)
+                        resolution(width = 720, height = 1024)
+                        size(maxFileSize = 500 * 1020)
+                    }
                 quality -= 5 // Decrease quality gradually
             } while (compressedImageFile.length() > 500 * 1024 && quality >= 30) // Adjust conditions based on desired size
 
@@ -141,17 +144,19 @@ object CameraFunction {
 
     private fun rotateImageIfRequired(imagePath: String): Bitmap {
         val exif = ExifInterface(imagePath)
-        val orientation = exif.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )
+        val orientation =
+            exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL,
+            )
 
-        val rotationAngle = when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270
-            else -> 0
-        }
+        val rotationAngle =
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
 
         val bitmap = BitmapFactory.decodeFile(imagePath)
         val matrix = Matrix()
@@ -167,13 +172,13 @@ object CameraFunction {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    fun getGalleryPermissionHandler(
-        appStateManager: AppStateManager
-    ): PermissionHandler {
+    fun getGalleryPermissionHandler(appStateManager: AppStateManager): PermissionHandler {
         return PermissionHandler(
-            permissionStrings = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissionStrings =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 arrayOf(
-                    Manifest.permission.READ_MEDIA_IMAGES, READ_MEDIA_VISUAL_USER_SELECTED
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    READ_MEDIA_VISUAL_USER_SELECTED,
                 )
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -183,32 +188,28 @@ object CameraFunction {
             appStateManager = appStateManager,
             errorMsg = R.string.gallery_permission,
             openSettingMsg = R.string.gallery_permission_denied,
-            requestCode = RequestCode.GALLERY
+            requestCode = RequestCode.GALLERY,
         )
     }
 
-    fun getCameraPermissionHandler(
-        appStateManager: AppStateManager
-    ): PermissionHandler {
+    fun getCameraPermissionHandler(appStateManager: AppStateManager): PermissionHandler {
         return PermissionHandler(
             permissionStrings = arrayOf(Manifest.permission.CAMERA),
             appStateManager = appStateManager,
             errorMsg = R.string.camera_permission,
             openSettingMsg = R.string.gallery_camera_denied,
-            requestCode = RequestCode.CAMERA
+            requestCode = RequestCode.CAMERA,
         )
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun getNotificationPermissionHandler(
-        appStateManager: AppStateManager
-    ): PermissionHandler {
+    fun getNotificationPermissionHandler(appStateManager: AppStateManager): PermissionHandler {
         return PermissionHandler(
             permissionStrings = arrayOf(Manifest.permission.POST_NOTIFICATIONS),
             appStateManager = appStateManager,
             errorMsg = R.string.notification_permission,
             openSettingMsg = R.string.notification_denied,
-            requestCode = RequestCode.NOTIFICATION
+            requestCode = RequestCode.NOTIFICATION,
         )
     }
 

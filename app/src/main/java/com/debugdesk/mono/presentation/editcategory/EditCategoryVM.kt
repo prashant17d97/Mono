@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class EditCategoryVM(
-    private val repository: Repository
+    private val repository: Repository,
 ) : ViewModel() {
     companion object {
         private const val TAG = "EditCategoryVM"
@@ -26,7 +26,7 @@ class EditCategoryVM(
 
     fun updateExpenseCategory(
         categories: List<CategoryModel>,
-        model: CategoryModel
+        model: CategoryModel,
     ): List<CategoryModel> {
         return categories.map {
             if (it.category == model.category) {
@@ -39,7 +39,7 @@ class EditCategoryVM(
 
     fun updateIncomeCategory(
         categories: List<CategoryModel>,
-        model: CategoryModel
+        model: CategoryModel,
     ): List<CategoryModel> {
         return categories.map {
             if (it.category == model.category) {
@@ -50,11 +50,13 @@ class EditCategoryVM(
         }
     }
 
-    fun removeCategory(incomeCategory: List<CategoryModel>, expenseCategory: List<CategoryModel>) {
+    fun removeCategory(
+        incomeCategory: List<CategoryModel>,
+        expenseCategory: List<CategoryModel>,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.removeCategories(incomeCategory.filter { it.isSelected })
             repository.removeCategories(expenseCategory.filter { it.isSelected })
-
         }
     }
 }

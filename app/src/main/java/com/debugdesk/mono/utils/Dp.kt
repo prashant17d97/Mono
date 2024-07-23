@@ -13,7 +13,6 @@ object CommonColor {
 
 object Tabs {
     val tabs: List<Int> = listOf(R.string.expense, R.string.income)
-
 }
 
 object Dp {
@@ -521,7 +520,6 @@ object Dp {
 }
 
 object SP {
-
     val sp0 = 0.sp
 
     val sp1 = 1.sp

@@ -69,15 +69,16 @@ class InputVM(
         viewModelScope.launch {
             combine(
                 appConfigManager.appConfigProperties,
-                repository.categoryModelList
+                repository.categoryModelList,
             ) { appConfigProperties, categoryModels ->
 
                 InputState(
-                    amountTfState = AmountTfState(
-                        currencyIcon = appConfigProperties.selectedCurrencyIconDrawable
+                    amountTfState =
+                    AmountTfState(
+                        currencyIcon = appConfigProperties.selectedCurrencyIconDrawable,
                     ),
                     categoryList = categoryModels,
-                    appStateManager = appStateManager
+                    appStateManager = appStateManager,
                 )
             }.collect {
                 updateState(it)
@@ -90,15 +91,15 @@ class InputVM(
             InputState(
                 amountTfState = state.amountTfState,
                 categoryList = state.categoryList.filter { it.categoryType == ExpenseType.Income.name },
-                appStateManager = state.appStateManager
-            )
+                appStateManager = state.appStateManager,
+            ),
         )
         _expenseState.tryEmit(
             InputState(
                 amountTfState = state.amountTfState,
                 categoryList = state.categoryList.filter { it.categoryType == ExpenseType.Expense.name },
-                appStateManager = state.appStateManager
-            )
+                appStateManager = state.appStateManager,
+            ),
         )
     }
 
@@ -110,10 +111,12 @@ class InputVM(
     }
 
     private fun emitChanges(state: InputState) {
-        val updatedState = state.copy(
-            changesFound = state.transaction.amount != 0.0
-                    && state.transaction.categoryIcon != emptyTransaction.categoryIcon
-        )
+        val updatedState =
+            state.copy(
+                changesFound =
+                state.transaction.amount != 0.0 &&
+                    state.transaction.categoryIcon != emptyTransaction.categoryIcon,
+            )
         if (state == _incomeState.value) {
             _incomeState.tryEmit(updatedState)
         } else {
@@ -125,54 +128,58 @@ class InputVM(
         inputIntent: TransactionIntent,
         transactionType: ExpenseType,
         navHostController: NavHostController,
-        context: Context
+        context: Context,
     ) {
         this.transactionType = transactionType
         when (inputIntent) {
             TransactionIntent.OnBackClick -> handleBackClick(navHostController)
-            is TransactionIntent.OnNewTransactionSaveClick -> saveNewTransaction(
-                inputIntent.type,
-                navHostController, context
-            )
+            is TransactionIntent.OnNewTransactionSaveClick ->
+                saveNewTransaction(
+                    inputIntent.type,
+                    navHostController,
+                    context,
+                )
 
             is TransactionIntent.OpenCalendarDialog -> updateCalendarDialog(inputIntent.showDialog)
             is TransactionIntent.UpdateAmount -> updateAmount(inputIntent.amountTFIntent)
             is TransactionIntent.UpdateDate -> updateDate(inputIntent.date)
             TransactionIntent.DismissCameraAndGalleryWindow, is TransactionIntent.DismissCameraGallery -> closeCameraAndGalleryWindow()
-            is TransactionIntent.SaveImage -> saveImages(
-                inputIntent
-            )
+            is TransactionIntent.SaveImage ->
+                saveImages(
+                    inputIntent,
+                )
 
-            is TransactionIntent.UpdateCategoryIntent -> updateCategoryIntent(
-                inputIntent.editCategoryIntent,
-                navHostController
-            )
-
+            is TransactionIntent.UpdateCategoryIntent ->
+                updateCategoryIntent(
+                    inputIntent.editCategoryIntent,
+                    navHostController,
+                )
 
             TransactionIntent.DeleteImage -> deleteImage()
             TransactionIntent.OnTrailIconClick -> openCameraAndGalleryWindow()
-            is TransactionIntent.OnValueChange -> stateFlow.tryEmit(
-                state.copy(
-                    transaction = state.transaction.copy(note = inputIntent.value),
-                    note = inputIntent.value
+            is TransactionIntent.OnValueChange ->
+                stateFlow.tryEmit(
+                    state.copy(
+                        transaction = state.transaction.copy(note = inputIntent.value),
+                        note = inputIntent.value,
+                    ),
                 )
-            )
 
             else -> {}
         }
     }
 
     private fun handleBackClick(navHostController: NavHostController) {
-        if (initialTransaction == null
-            || initialTransaction == expenseState.value.transaction
-            || initialTransaction == incomeState.value.transaction
+        if (initialTransaction == null ||
+            initialTransaction == expenseState.value.transaction ||
+            initialTransaction == incomeState.value.transaction
         ) {
             navHostController.popBackStack()
         } else {
             appStateManager.showAlertDialog(
                 message = R.string.discard_changes,
                 positiveButtonText = R.string.discard,
-                onPositiveClick = { navHostController.popBackStack() }
+                onPositiveClick = { navHostController.popBackStack() },
             )
         }
     }
@@ -180,23 +187,27 @@ class InputVM(
     private fun saveNewTransaction(
         type: ExpenseType,
         navHostController: NavHostController,
-        context: Context
+        context: Context,
     ) {
         val (month, year) = CommonFunctions.getMonthAndYearFromLong(state.transaction.date)
 
         viewModelScope.launch {
-            val transaction = state.transaction.copy(
-                type = type.name,
-                currentMonthId = month,
-                year = year
-            )
+            val transaction =
+                state.transaction.copy(
+                    type = type.name,
+                    currentMonthId = month,
+                    year = year,
+                )
             repository.insert(transaction)
         }.invokeOnCompletion {
             resetState(navHostController, context)
         }
     }
 
-    private fun resetState(navHostController: NavHostController, context: Context) {
+    private fun resetState(
+        navHostController: NavHostController,
+        context: Context,
+    ) {
         viewModelScope.launch {
             updateState(InputState())
             repository.getTransactionAll()
@@ -211,16 +222,16 @@ class InputVM(
     private fun saveImages(intent: TransactionIntent.SaveImage) {
         stateFlow.tryEmit(
             state.copy(
-                transaction = state.transaction.copy(
+                transaction =
+                state.transaction.copy(
                     imagePath = intent.imagePath,
                     imageSource = intent.imageSource,
-                    createdOn = intent.createdOn
+                    createdOn = intent.createdOn,
                 ),
                 image = intent.imagePath,
                 createdOn = intent.createdOn,
-                imageSource = intent.imageSource
-
-            )
+                imageSource = intent.imageSource,
+            ),
         )
         closeCameraAndGalleryWindow()
     }
@@ -230,39 +241,45 @@ class InputVM(
     }
 
     private fun updateAmount(amountIntent: TextFieldCalculatorIntent) {
-        val amount = when (amountIntent) {
-            is TextFieldCalculatorIntent.OnHeightChange -> {
-                state.copy(
-                    amountTfState = state.amountTfState.copy(
-                        height = amountIntent.height,
+        val amount =
+            when (amountIntent) {
+                is TextFieldCalculatorIntent.OnHeightChange -> {
+                    state.copy(
+                        amountTfState =
+                        state.amountTfState.copy(
+                            height = amountIntent.height,
+                        ),
                     )
-                )
-            }
+                }
 
-            is TextFieldCalculatorIntent.OnValueChange -> {
-                state.copy(
-                    transaction = state.transaction.copy(
-                        amount = amountIntent.value.double()
-                    ), amountTfState = state.amountTfState.copy(
-                        amountValue = amountIntent.value
+                is TextFieldCalculatorIntent.OnValueChange -> {
+                    state.copy(
+                        transaction =
+                        state.transaction.copy(
+                            amount = amountIntent.value.double(),
+                        ),
+                        amountTfState =
+                        state.amountTfState.copy(
+                            amountValue = amountIntent.value,
+                        ),
                     )
-                )
-            }
+                }
 
-            is TextFieldCalculatorIntent.OpenDialog -> {
-                state.copy(
-                    amountTfState = state.amountTfState.copy(
-                        openDialog = amountIntent.openDialog
+                is TextFieldCalculatorIntent.OpenDialog -> {
+                    state.copy(
+                        amountTfState =
+                        state.amountTfState.copy(
+                            openDialog = amountIntent.openDialog,
+                        ),
                     )
-                )
+                }
             }
-        }
         stateFlow.tryEmit(amount)
     }
 
     private fun updateCategoryIntent(
         categoryIntent: EditCategoryIntent,
-        navHostController: NavHostController
+        navHostController: NavHostController,
     ) {
         when (categoryIntent) {
             is EditCategoryIntent.OnCategoryListChange -> {
@@ -270,12 +287,13 @@ class InputVM(
                 stateFlow.tryEmit(
                     state.copy(
                         categoryList = categoryIntent.list,
-                        transaction = state.transaction.copy(
+                        transaction =
+                        state.transaction.copy(
                             category = selectedCategory.category,
                             categoryId = selectedCategory.categoryId,
-                            categoryIcon = selectedCategory.categoryIcon ?: R.drawable.mono
-                        )
-                    )
+                            categoryIcon = selectedCategory.categoryIcon ?: R.drawable.mono,
+                        ),
+                    ),
                 )
             }
 
@@ -288,28 +306,29 @@ class InputVM(
         Log.d(TAG, "updateDate: $month, $year, ${Date(date)}")
         stateFlow.tryEmit(
             state.copy(
-                transaction = state.transaction.copy(
+                transaction =
+                state.transaction.copy(
                     date = date,
                     currentMonthId = month,
-                    year = year
+                    year = year,
                 ),
                 date = date,
-            )
+            ),
         )
     }
-
 
     private fun deleteImage() {
         stateFlow.tryEmit(
             state.copy(
-                transaction = state.transaction.copy(
+                transaction =
+                state.transaction.copy(
                     imagePath = "",
-                    imageSource = ImageSource.NONE
+                    imageSource = ImageSource.NONE,
                 ),
                 image = "",
                 imageSource = ImageSource.NONE,
-                createdOn = 0L
-            )
+                createdOn = 0L,
+            ),
         )
         appStateManager.showToastState(toastMsg = R.string.image_deleted)
     }
@@ -329,17 +348,16 @@ class InputVM(
                 showCalendarDialog = false,
                 showCameraAndGallery = false,
                 changesFound = false,
-                transactionType = transactionType
-            )
+                transactionType = transactionType,
+            ),
         )
         _expenseState.tryEmit(
             expenseState.value.copy(
                 showCalendarDialog = false,
                 showCameraAndGallery = false,
                 changesFound = false,
-                transactionType = transactionType
-            )
+                transactionType = transactionType,
+            ),
         )
     }
 }
-

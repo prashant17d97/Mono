@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.debugdesk.mono.presentation.setting.currency.RadioModel
 import com.debugdesk.mono.utils.CommonColor.disableButton
@@ -27,60 +28,80 @@ import com.debugdesk.mono.utils.CommonColor.disableButton
 @Composable
 fun CurrencyCard(
     radioModel: RadioModel,
-    onClick: (RadioModel) -> Unit
+    onClick: (RadioModel) -> Unit,
 ) {
-    Row(modifier = Modifier
-        .clickable { onClick(radioModel) }
-        .fillMaxWidth()
-        .height(40.dp),
+    Row(
+        modifier =
+        Modifier
+            .clickable { onClick(radioModel) }
+            .fillMaxWidth()
+            .height(40.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
         RadioButton(
             selected = radioModel.isSelected,
             onClick = { onClick(radioModel) },
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(0.dp)
                 .weight(0.25f),
-            colors = RadioButtonDefaults.colors(
+            colors =
+            RadioButtonDefaults.colors(
                 selectedColor = MaterialTheme.colorScheme.primary,
-                unselectedColor = disableButton
-            )
+                unselectedColor = disableButton,
+            ),
         )
         Row(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .weight(3f)
                 .padding(start = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
         ) {
             Box(
-                contentAlignment = Alignment.Center, modifier = Modifier
+                contentAlignment = Alignment.Center,
+                modifier =
+                Modifier
                     .border(
-                        width = 1.dp, color = disableButton, shape = RoundedCornerShape(5.dp)
+                        width = 1.dp,
+                        color = disableButton,
+                        shape = RoundedCornerShape(5.dp),
                     )
-                    .size(35.dp)
+                    .size(35.dp),
             ) {
                 Text(
                     text = stringResource(id = radioModel.currencyStringIcon),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center,
                 )
             }
             Text(
                 text = "${stringResource(id = radioModel.currencyStringIcon)} ${radioModel.defaultCurrencyValue}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
+                style = MaterialTheme.typography.titleMedium,
+                modifier =
+                Modifier
                     .padding(start = 10.dp)
                     .weight(1f),
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Start,
             )
         }
 
         Text(
             text = stringResource(id = radioModel.currencyCode),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f),
-            textAlign = TextAlign.End
+            textAlign = TextAlign.End,
         )
+    }
+}
+
+@Preview
+@Composable
+private fun CurrencyPrev() {
+    PreviewTheme {
+        CurrencyCard(radioModel = RadioModel(isSelected = true)) {
+        }
     }
 }

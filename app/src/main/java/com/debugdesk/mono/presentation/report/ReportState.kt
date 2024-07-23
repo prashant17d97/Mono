@@ -36,7 +36,7 @@ data class ReportState(
     val showClickedTransaction: DailyTransaction = emptyTransaction,
     val categories: List<CategoryModel> = emptyList(),
     val reportView: List<ReportView> = ReportView.entries,
-    val selectedReportView: Int = ReportView.MonthlyReport.stringValue
+    val selectedReportView: Int = ReportView.MonthlyReport.stringValue,
 ) {
     val distributedTransaction = transaction.distributeTransactionsByDate()
     val isTransactionEmpty = distributedTransaction.isEmpty()
@@ -47,8 +47,12 @@ data class ReportState(
     val incomeCategory = categories.filter { it.categoryType?.filterIncomeType ?: false }
 }
 
-enum class ReportView(@StringRes val stringValue: Int) {
+enum class ReportView(
+    @StringRes val stringValue: Int,
+) {
     MonthlyReport(stringValue = R.string.month_report),
-    CategoryReport(stringValue = R.string.category_report),
-    CalendarReport(stringValue = R.string.calender_report)
+
+//    Will push on next release
+//    CategoryReport(stringValue = R.string.category_report),
+    CalendarReport(stringValue = R.string.calender_report),
 }

@@ -5,11 +5,11 @@ class ObjectIdGenerator(private val length: Int = 16) {
 
     companion object {
         private val instance = ObjectIdGenerator()
+
         fun generate(): String {
             return (1..instance.length)
                 .map { instance.allowedChars.random() }
                 .joinToString("")
         }
     }
-
 }

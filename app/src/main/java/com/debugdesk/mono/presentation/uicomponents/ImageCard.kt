@@ -22,32 +22,36 @@ import com.debugdesk.mono.utils.Dp
 fun ImageCard(
     painter: Painter,
     onDelete: () -> Unit = {},
-    onImageClick: () -> Unit = {}
+    onImageClick: () -> Unit = {},
 ) {
     Box(
-        modifier = Modifier
+        modifier =
+        Modifier
             .size(Dp.dp140)
             .padding(Dp.dp6)
             .background(
                 color = Color.Transparent,
-                shape = RoundedCornerShape(Dp.dp6)
-            ), contentAlignment = Alignment.TopEnd
+                shape = RoundedCornerShape(Dp.dp6),
+            ),
+        contentAlignment = Alignment.TopEnd,
     ) {
         Image(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(Dp.dp140)
                 .clip(RoundedCornerShape(Dp.dp6))
                 .clickable { onImageClick() },
             painter = painter,
             contentScale = ContentScale.FillBounds,
-            contentDescription = null
+            contentDescription = null,
         )
         Image(
             painter = painterResource(id = R.drawable.remove),
             contentDescription = "Delete",
-            modifier = Modifier
+            modifier =
+            Modifier
                 .size(Dp.dp24)
-                .clickable(onClick = onDelete)
+                .clickable(onClick = onDelete),
         )
     }
 }
